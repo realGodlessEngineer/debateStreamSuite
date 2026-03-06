@@ -1,6 +1,6 @@
 {
   "name": "debate-stream-suite",
-  "version": "2.2.0",
+  "version": "2.5.0",
   "description": "A comprehensive real-time streaming toolkit for debate and discussion livestreams",
   "main": "electron/main.js",
   "scripts": {
@@ -25,13 +25,17 @@
   },
   "devDependencies": {
     "cross-env": "^7.0.3",
-    "electron": "^40.1.0",
+    "electron": "^40.8.0",
     "electron-builder": "^26.7.0",
     "nodemon": "^3.0.1"
+  },
+  "author": {
+    "name": "Godless Engineer"
   },
   "build": {
     "appId": "com.debatestreamsuite.app",
     "productName": "DebateStreamSuite",
+    "publish": null,
     "directories": {
       "output": "dist"
     },
@@ -39,19 +43,21 @@
       "electron/**/*",
       "src/**/*",
       "public/**/*",
+      "icons/**/*",
       "package.json"
     ],
     "win": {
       "target": "nsis",
-      "icon": "electron/icons/icon.ico"
+      "icon": "electron/icons/icon.ico",
+      "legalTrademarks": "Godless Engineer"
     },
     "mac": {
       "target": "dmg",
-      "icon": "electron/icons/icon.icns"
+      "icon": "electron/icons/icon.png"
     },
     "linux": {
       "target": "AppImage",
-      "icon": "electron/icons"
+      "icon": "electron/icons/icon.png"
     }
   }
 }

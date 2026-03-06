@@ -3,7 +3,7 @@
  * DebateStreamSuite - Electron Main Process
  */
 
-const { app, BrowserWindow, Tray, Menu, clipboard, nativeImage, shell, ipcMain } = require('electron');
+const { app, BrowserWindow, Tray, Menu, clipboard, nativeImage, shell } = require('electron');
 const path = require('path');
 
 // Start the Express server
@@ -33,13 +33,11 @@ function createMainWindow() {
       contextIsolation: true,
       nodeIntegration: false
     },
-    show: false // Don't show until ready
+    show: false
   });
 
-  // Load the main page
   mainWindow.loadFile(path.join(__dirname, 'index.html'));
 
-  // Show window when ready
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();
   });
@@ -63,31 +61,26 @@ function createMainWindow() {
  * Create the system tray icon and menu
  */
 function createTray() {
-  // Create tray icon (use a simple icon or create one)
   const iconPath = path.join(__dirname, 'icons', 'tray-icon.png');
 
-  // Create a simple icon if it doesn't exist
   let trayIcon;
   try {
     trayIcon = nativeImage.createFromPath(iconPath);
     if (trayIcon.isEmpty()) {
-      // Create a simple colored icon as fallback
       trayIcon = createFallbackIcon();
     }
   } catch (e) {
     trayIcon = createFallbackIcon();
   }
 
-  // Resize for tray (16x16 on most systems)
   trayIcon = trayIcon.resize({ width: 16, height: 16 });
 
   tray = new Tray(trayIcon);
   tray.setToolTip('DebateStreamSuite');
 
-  // Create context menu
   const contextMenu = Menu.buildFromTemplate([
     {
-      label: 'Show OBS Instructions',
+      label: 'Show Window',
       click: () => {
         if (mainWindow) {
           mainWindow.show();
@@ -97,35 +90,35 @@ function createTray() {
     },
     { type: 'separator' },
     {
-      label: 'Open Caller Control',
+      label: 'Copy Caller Control URL',
       click: () => {
-        shell.openExternal(`${BASE_URL}/dock.html`);
+        clipboard.writeText(`${BASE_URL}/dock.html`);
       }
     },
     {
-      label: 'Copy Caller Display Link',
+      label: 'Copy Caller Display URL',
       click: () => {
         clipboard.writeText(`${BASE_URL}/display.html`);
       }
     },
     { type: 'separator' },
     {
-      label: 'Open Bible Control',
+      label: 'Copy Bible Control URL',
       click: () => {
-        shell.openExternal(`${BASE_URL}/bible-control.html`);
+        clipboard.writeText(`${BASE_URL}/bible-control.html`);
       }
     },
     {
-      label: 'Copy Bible Display Link',
+      label: 'Copy Bible Display URL',
       click: () => {
         clipboard.writeText(`${BASE_URL}/bible-display.html`);
       }
     },
     { type: 'separator' },
     {
-      label: 'Open Soundboard',
+      label: 'Copy Soundboard URL',
       click: () => {
-        shell.openExternal(`${BASE_URL}/soundboard.html`);
+        clipboard.writeText(`${BASE_URL}/soundboard.html`);
       }
     },
     { type: 'separator' },
@@ -140,7 +133,6 @@ function createTray() {
 
   tray.setContextMenu(contextMenu);
 
-  // Show window on double-click
   tray.on('double-click', () => {
     if (mainWindow) {
       mainWindow.show();
@@ -153,11 +145,9 @@ function createTray() {
  * Create a fallback icon if no icon file exists
  */
 function createFallbackIcon() {
-  // Create a simple 16x16 icon
   const size = 16;
   const canvas = Buffer.alloc(size * size * 4);
 
-  // Fill with a color (red for DebateStreamSuite)
   for (let i = 0; i < size * size; i++) {
     const offset = i * 4;
     canvas[offset] = 230;     // R
@@ -172,27 +162,12 @@ function createFallbackIcon() {
   });
 }
 
-// IPC Handlers for renderer process
-ipcMain.on('copy-to-clipboard', (event, text) => {
-  if (typeof text !== 'string' || text.length > 2000) return;
-  clipboard.writeText(text);
-});
-
-ipcMain.on('open-external', (event, url) => {
-  if (typeof url !== 'string') return;
-  // Only allow http/https URLs to prevent file:// or other protocol abuse
-  if (url.startsWith('http://') || url.startsWith('https://')) {
-    shell.openExternal(url);
-  }
-});
-
 // App lifecycle events
 app.whenReady().then(() => {
   createMainWindow();
   createTray();
 
   app.on('activate', () => {
-    // macOS: Re-create window when dock icon is clicked
     if (BrowserWindow.getAllWindows().length === 0) {
       createMainWindow();
     } else {
@@ -201,14 +176,12 @@ app.whenReady().then(() => {
   });
 });
 
-// Quit when all windows are closed (except on macOS)
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
   }
 });
 
-// Handle before-quit to properly close
 app.on('before-quit', () => {
   app.isQuitting = true;
 });
