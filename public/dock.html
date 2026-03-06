@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Caller Control</title>
+  <link rel="stylesheet" href="css/themes/godless-engineer.css">
+  <link rel="stylesheet" href="dock.css">
+</head>
+<body>
+  <!-- Title Bar -->
+  <div class="title-bar">
+    <h1><span class="status-dot" id="statusDot"></span> Caller Control</h1>
+    <div class="title-bar-actions">
+      <button class="btn-info" id="showConfigBtn">
+        <span>&#127909;</span> Show
+      </button>
+      <button class="btn-info" id="showInstructions">
+        <span>?</span> OBS Setup
+      </button>
+      <button class="btn-settings" id="showSettingsBtn" title="Settings">⚙️</button>
+    </div>
+  </div>
+
+  <!-- Show Config Summary Bar -->
+  <div class="show-config-bar" id="showConfigBar">
+    <span class="show-config-bar-text" id="showConfigBarText">No show configured</span>
+    <button class="show-config-bar-edit" id="showConfigBarEdit" title="Edit show config">&#9998;</button>
+  </div>
+
+  <!-- Show Config Modal -->
+  <div class="modal-overlay" id="showConfigModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Show Configuration</h2>
+        <button class="btn-close" id="closeShowConfigBtn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <h3>Show Title</h3>
+        <div class="form-compact">
+          <input type="text" id="showTitleInput" placeholder="e.g., The Godless Engineer Show">
+        </div>
+
+        <h3>Host 1</h3>
+        <div class="form-compact">
+          <input type="text" id="host1Name" placeholder="Host name">
+        </div>
+        <div class="form-compact">
+          <input type="text" id="host1Pronouns" placeholder="Pronouns (e.g., he/him)">
+        </div>
+
+        <h3>Host 2 <span class="optional-label">(optional)</span></h3>
+        <div class="form-compact">
+          <input type="text" id="host2Name" placeholder="Host name">
+        </div>
+        <div class="form-compact">
+          <input type="text" id="host2Pronouns" placeholder="Pronouns (e.g., she/her)">
+        </div>
+
+        <div class="button-row" style="margin-top: 12px;">
+          <button class="dock-btn btn-update" id="saveShowConfigBtn">Save</button>
+          <button class="dock-btn btn-clear" id="clearShowConfigBtn">Clear</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Dialog -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>OBS Setup Instructions</h2>
+        <button class="btn-close" id="closeModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <h3>Browser Source Setup</h3>
+        <ol>
+          <li>Add a <strong>Browser Source</strong> in OBS</li>
+          <li>Set URL to: <code id="obsUrl">http://localhost:3000/display.html</code></li>
+          <li>Set Width: <strong>1080</strong> and Height: <strong>1920</strong></li>
+          <li>Check "Shutdown source when not visible" for better performance</li>
+        </ol>
+
+        <h3>Custom Dock Setup</h3>
+        <p>For easy access within OBS, add this as a Custom Dock:</p>
+        <ol>
+          <li>In OBS, go to <strong>Docks &rarr; Custom Browser Docks...</strong></li>
+          <li>Dock Name: <strong>Caller Control</strong></li>
+          <li>URL: <code id="dockUrl">http://localhost:3000/dock.html</code></li>
+          <li>Click <strong>Apply</strong></li>
+          <li>The dock will appear in your OBS interface</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+  <div class="dock-container">
+    <!-- Timer Section -->
+    <div class="dock-section">
+      <div class="timer-section">
+        <div class="timer-compact">
+          <div class="timer-display-compact" id="timerDisplay">00:00</div>
+          <div class="timer-status-compact" id="timerStatus">STOPPED</div>
+        </div>
+        <div class="timer-controls">
+          <button class="dock-btn btn-start" id="startTimerBtn" title="Start Timer">&#9658;</button>
+          <button class="dock-btn btn-stop" id="stopTimerBtn" title="Stop Timer">&#9632;</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Current Caller Section -->
+    <div class="dock-section current-section">
+      <div class="section-label">Current Caller</div>
+      <div class="current-display">
+        <div class="current-name" id="currentName">-</div>
+        <div class="current-pronouns" id="currentPronouns">-</div>
+      </div>
+    </div>
+
+    <!-- Input Form Section -->
+    <div class="dock-section">
+      <div class="section-label">Update Caller</div>
+      <form id="callerForm">
+        <div class="form-compact">
+          <input type="text" id="name" name="name" placeholder="Caller name" required>
+        </div>
+        <div class="form-compact">
+          <input type="text" id="pronouns" name="pronouns" placeholder="Pronouns (e.g., they/them)">
+        </div>
+        <div class="button-row">
+          <button type="submit" class="dock-btn btn-update">Update</button>
+          <button type="button" id="clearBtn" class="dock-btn btn-clear">Clear</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Call Log Section -->
+    <div class="dock-section">
+      <div class="section-header">
+        <div class="section-label">Call Log</div>
+        <div>
+          <button class="dock-btn-mini" id="exportLogBtn" title="Export Log">&#8681;</button>
+          <button class="dock-btn-mini" id="clearLogBtn" title="Clear Log">&#128465;</button>
+        </div>
+      </div>
+      <div class="log-compact" id="callLog">
+        <div class="log-empty-compact">No calls logged yet</div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="js/sanitize.js"></script>
+  <script src="js/socket-connection.js"></script>
+  <script src="js/theme-loader.js"></script>
+  <script src="js/settings-modal.js"></script>
+  <script src="js/caller-control.js"></script>
+  <script src="js/show-config-modal.js"></script>
+  <script>
+    // OBS Setup modal
+    const modalOverlay = document.getElementById('modalOverlay');
+    const showConfigModal = document.getElementById('showConfigModal');
+
+    document.getElementById('showInstructions').addEventListener('click', () => {
+      modalOverlay.classList.add('active');
+    });
+
+    document.getElementById('closeModal').addEventListener('click', () => {
+      modalOverlay.classList.remove('active');
+    });
+
+    modalOverlay.addEventListener('click', (e) => {
+      if (e.target === modalOverlay) modalOverlay.classList.remove('active');
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        if (showConfigModal.classList.contains('active')) {
+          ShowConfigModal.close();
+        } else if (modalOverlay.classList.contains('active')) {
+          modalOverlay.classList.remove('active');
+        }
+      }
+    });
+
+    // Update URLs based on current location
+    const baseUrl = window.location.origin;
+    document.getElementById('obsUrl').textContent = baseUrl + '/display.html';
+    document.getElementById('dockUrl').textContent = baseUrl + '/dock.html';
+
+    // Settings modal
+    document.getElementById('showSettingsBtn').addEventListener('click', () => {
+      SettingsModal.open();
+    });
+
+    // Initialize show config modal with shared socket
+    ShowConfigModal.init(CallerControl.socket);
+  </script>
+</body>
+</html>

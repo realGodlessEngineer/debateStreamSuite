@@ -1,0 +1,79 @@
+/**
+ * The Bible Guy Theme
+ * Warm orange/gold theme with sky blue accents
+ * Inspired by The Bible Guy logo
+ */
+
+:root {
+  /* Theme Metadata */
+  --theme-name: 'The Bible Guy';
+  --theme-description: 'Warm orange/gold theme with sky blue accents';
+
+  /* Brand Colors - Orange/Gold */
+  --color-primary: #F5A623;
+  --color-primary-dark: #D4891A;
+  --color-primary-light: #FFBF47;
+  --color-primary-glow: rgba(245, 166, 35, 0.4);
+  --color-primary-subtle: rgba(245, 166, 35, 0.2);
+  --color-primary-border: rgba(245, 166, 35, 0.4);
+
+  /* Accent - Sky Blue */
+  --color-accent: #5BA8D4;
+  --color-accent-dark: #4A90B8;
+  --color-accent-glow: rgba(91, 168, 212, 0.3);
+
+  /* Background Colors - Dark warm tones */
+  --color-bg-primary: #1a1510;
+  --color-bg-secondary: #211b14;
+  --color-bg-tertiary: #2a221a;
+  --color-bg-tinted: #251a0f;
+  --color-bg-card: rgba(245, 166, 35, 0.05);
+  --color-bg-card-solid: #2a221a;
+  --color-bg-input: rgba(0, 0, 0, 0.4);
+  --color-bg-input-solid: #1a1510;
+  --color-bg-hover: rgba(245, 166, 35, 0.1);
+  --color-bg-dark: #1a1510;
+
+  /* Surface Colors */
+  --color-surface-border: #3d3228;
+  --color-surface-elevated: #2a221a;
+
+  /* Text Colors */
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #f0e6d8;
+  --color-text-muted: #c4b8a8;
+  --color-text-dim: #9a8e7e;
+  --color-text-dimmer: #706458;
+
+  /* Status Colors */
+  --color-success: #6BCB77;
+  --color-success-bg: rgba(107, 203, 119, 0.2);
+  --color-success-border: rgba(107, 203, 119, 0.5);
+  --color-error: #FF6B6B;
+  --color-error-bg: rgba(255, 107, 107, 0.2);
+  --color-error-border: rgba(255, 107, 107, 0.5);
+  --color-warning: #FFD93D;
+  --color-warning-bg: rgba(255, 217, 61, 0.2);
+  --color-warning-border: rgba(255, 217, 61, 0.5);
+
+  /* Connected Status - Sky Blue */
+  --color-connected: #5BA8D4;
+  --color-connected-glow: rgba(91, 168, 212, 0.5);
+  --color-disconnected: #8B5A2B;
+
+  /* Shadows */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 20px rgba(245, 166, 35, 0.3);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.6);
+  --shadow-glow: 0 0 20px rgba(245, 166, 35, 0.2);
+
+  /* Scrollbar */
+  --scrollbar-track: transparent;
+  --scrollbar-thumb: var(--color-primary-border);
+  --scrollbar-thumb-hover: var(--color-primary);
+}
+
+/* Body background gradient - warm dark */
+body {
+  background: linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-tinted) 100%);
+}

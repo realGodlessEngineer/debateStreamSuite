@@ -1,0 +1,39 @@
+# Dependencies
+node_modules/
+
+# Electron build output
+dist/
+*.blockmap
+builder-debug.yml
+builder-effective-config.yaml
+
+# Environment variables
+.env
+
+# Runtime data files
+verse-cache.json
+*.bak
+soundboard.json
+show-config.json
+
+# Generated documentation
+PROJECT-KNOWLEDGE.md
+
+# Uploaded sounds (user data)
+sounds/
+
+# OS files
+.DS_Store
+Thumbs.db
+nul
+
+# Logs
+*.log
+npm-debug.log*
+
+# IDE
+.vscode/
+.idea/
+
+# Claude Code local settings
+.claude/

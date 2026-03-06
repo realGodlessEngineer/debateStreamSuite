@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self';">
+  <title>DebateStreamSuite</title>
+  <style>
+    :root {
+      --color-primary: #e63946;
+      --color-primary-dark: #b52d39;
+      --color-bg-primary: #0a0a0a;
+      --color-bg-secondary: #1a1a1a;
+      --color-bg-card: #1f1f1f;
+      --color-border: #2d2d2d;
+      --color-text-primary: #ffffff;
+      --color-text-secondary: #e0e0e0;
+      --color-text-muted: #999;
+      --color-success: #22c55e;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, var(--color-bg-primary) 0%, #1a0808 100%);
+      color: var(--color-text-secondary);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    h1 {
+      color: var(--color-primary);
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      color: var(--color-text-muted);
+      font-size: 14px;
+    }
+
+    .status-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 15px;
+      padding: 10px 20px;
+      background: rgba(34, 197, 94, 0.1);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      border-radius: 20px;
+      display: inline-flex;
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      background: var(--color-success);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .status-text {
+      font-size: 13px;
+      color: var(--color-success);
+      font-weight: 500;
+    }
+
+    .section {
+      background: var(--color-bg-card);
+      border: 1px solid var(--color-border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .section-icon {
+      font-size: 24px;
+    }
+
+    h2 {
+      color: var(--color-primary);
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    h3 {
+      color: var(--color-text-primary);
+      font-size: 14px;
+      font-weight: 600;
+      margin: 15px 0 10px 0;
+    }
+
+    h3:first-of-type {
+      margin-top: 0;
+    }
+
+    ol, ul {
+      margin-left: 20px;
+      line-height: 1.8;
+      font-size: 13px;
+    }
+
+    li {
+      margin-bottom: 5px;
+    }
+
+    code {
+      background: var(--color-bg-primary);
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 12px;
+      color: var(--color-primary);
+    }
+
+    .link-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 10px 0;
+      padding: 12px;
+      background: var(--color-bg-primary);
+      border-radius: 8px;
+    }
+
+    .link-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--color-text-muted);
+      min-width: 100px;
+    }
+
+    .link-url {
+      flex: 1;
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 12px;
+      color: var(--color-text-secondary);
+      word-break: break-all;
+    }
+
+    .btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--color-primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--color-primary-dark);
+    }
+
+    .btn-secondary {
+      background: #3a3a3a;
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background: #4a4a4a;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 8px;
+    }
+
+    .quick-actions {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      margin-top: 10px;
+    }
+
+    .action-card {
+      background: var(--color-bg-primary);
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      padding: 15px;
+      text-align: center;
+      transition: all 0.2s;
+    }
+
+    .action-card:hover {
+      border-color: var(--color-primary);
+      transform: translateY(-2px);
+    }
+
+    .action-card h4 {
+      color: var(--color-text-primary);
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+
+    .action-card p {
+      color: var(--color-text-muted);
+      font-size: 11px;
+      margin-bottom: 12px;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid var(--color-border);
+      color: var(--color-text-muted);
+      font-size: 12px;
+    }
+
+    .footer p {
+      margin-bottom: 5px;
+    }
+
+    .tray-note {
+      background: rgba(230, 57, 70, 0.1);
+      border: 1px solid rgba(230, 57, 70, 0.3);
+      border-radius: 8px;
+      padding: 12px 15px;
+      margin-top: 20px;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .tray-note-icon {
+      font-size: 18px;
+    }
+
+    .copy-feedback {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--color-success);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.3s;
+      pointer-events: none;
+    }
+
+    .copy-feedback.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>DebateStreamSuite</h1>
+      <p class="subtitle">Streaming Toolkit for Debates & Discussions</p>
+      <div class="status-bar">
+        <span class="status-dot"></span>
+        <span class="status-text">Server Running on Port <span id="port">3666</span></span>
+      </div>
+    </header>
+
+    <!-- Quick Actions -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-icon">🚀</span>
+        <h2>Quick Actions</h2>
+      </div>
+      <div class="quick-actions">
+        <div class="action-card">
+          <h4>📞 Caller Display</h4>
+          <p>Display caller name and pronouns</p>
+          <div class="btn-group" style="justify-content: center;">
+            <button class="btn btn-primary" onclick="openUrl('callerControl')">Open Control</button>
+            <button class="btn btn-secondary" onclick="copyUrl('callerDisplay')">Copy Link</button>
+          </div>
+        </div>
+        <div class="action-card">
+          <h4>📖 Bible &amp; Fallacies</h4>
+          <p>Display verses and logical fallacies</p>
+          <div class="btn-group" style="justify-content: center;">
+            <button class="btn btn-primary" onclick="openUrl('bibleControl')">Open Control</button>
+            <button class="btn btn-secondary" onclick="copyUrl('bibleDisplay')">Copy Link</button>
+          </div>
+        </div>
+        <div class="action-card">
+          <h4>🔊 Soundboard</h4>
+          <p>Play sound effects on stream</p>
+          <div class="btn-group" style="justify-content: center;">
+            <button class="btn btn-primary" onclick="openUrl('soundboard')">Open Control</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Caller Display Setup -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-icon">📞</span>
+        <h2>Caller Display Setup</h2>
+      </div>
+
+      <h3>OBS Browser Source</h3>
+      <ol>
+        <li>In OBS, click <strong>+</strong> under Sources</li>
+        <li>Select <strong>Browser</strong></li>
+        <li>Name it "Caller Display" and click OK</li>
+        <li>Enter the URL below</li>
+        <li>Set Width: <strong>1080</strong> and Height: <strong>1920</strong></li>
+        <li>Click OK</li>
+      </ol>
+
+      <div class="link-row">
+        <span class="link-label">Display URL:</span>
+        <span class="link-url" id="callerDisplayUrl">http://localhost:3666/display.html</span>
+        <button class="btn btn-secondary" onclick="copyUrl('callerDisplay')">Copy</button>
+      </div>
+
+      <h3>Custom Dock (Optional)</h3>
+      <ol>
+        <li>In OBS, go to <strong>Docks → Custom Browser Docks...</strong></li>
+        <li>Dock Name: <strong>Caller Control</strong></li>
+        <li>Enter the URL below and click Apply</li>
+      </ol>
+
+      <div class="link-row">
+        <span class="link-label">Control URL:</span>
+        <span class="link-url" id="callerControlUrl">http://localhost:3666/dock.html</span>
+        <button class="btn btn-secondary" onclick="copyUrl('callerControl')">Copy</button>
+      </div>
+    </div>
+
+    <!-- Bible Verse & Fallacy Display Setup -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-icon">📖</span>
+        <h2>Bible Verse &amp; Fallacy Display Setup</h2>
+      </div>
+      <p style="font-size: 12px; color: var(--color-text-muted); margin-bottom: 15px;">
+        Displays Bible scripture passages and logical fallacy definitions on stream. Both use the same display overlay &mdash; the control panel has tabs for verses and a searchable fallacy database.
+      </p>
+
+      <h3>OBS Browser Source</h3>
+      <ol>
+        <li>In OBS, click <strong>+</strong> under Sources</li>
+        <li>Select <strong>Browser</strong></li>
+        <li>Name it "Bible &amp; Fallacy Display" and click OK</li>
+        <li>Enter the URL below</li>
+        <li>Set Width: <strong>1920</strong> and Height: <strong>1080</strong></li>
+        <li>Click OK</li>
+      </ol>
+
+      <div class="link-row">
+        <span class="link-label">Display URL:</span>
+        <span class="link-url" id="bibleDisplayUrl">http://localhost:3666/bible-display.html</span>
+        <button class="btn btn-secondary" onclick="copyUrl('bibleDisplay')">Copy</button>
+      </div>
+
+      <h3>Custom Dock (Optional)</h3>
+      <ol>
+        <li>In OBS, go to <strong>Docks → Custom Browser Docks...</strong></li>
+        <li>Dock Name: <strong>Bible &amp; Fallacies</strong></li>
+        <li>Enter the URL below and click Apply</li>
+      </ol>
+
+      <div class="link-row">
+        <span class="link-label">Control URL:</span>
+        <span class="link-url" id="bibleControlUrl">http://localhost:3666/bible-control.html</span>
+        <button class="btn btn-secondary" onclick="copyUrl('bibleControl')">Copy</button>
+      </div>
+    </div>
+
+    <!-- Soundboard Setup -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-icon">🔊</span>
+        <h2>Soundboard Setup</h2>
+      </div>
+
+      <h3>Custom Dock</h3>
+      <ol>
+        <li>In OBS, go to <strong>Docks &rarr; Custom Browser Docks...</strong></li>
+        <li>Dock Name: <strong>Soundboard</strong></li>
+        <li>Enter the URL below and click Apply</li>
+      </ol>
+
+      <div class="link-row">
+        <span class="link-label">Control URL:</span>
+        <span class="link-url" id="soundboardUrl">http://localhost:3666/soundboard.html</span>
+        <button class="btn btn-secondary" onclick="copyUrl('soundboard')">Copy</button>
+      </div>
+    </div>
+
+    <div class="tray-note">
+      <span class="tray-note-icon">💡</span>
+      <span>This window minimizes to the system tray. Right-click the tray icon for quick access to all controls and links.</span>
+    </div>
+
+    <footer>
+      <p>DebateStreamSuite <span id="appVersion">v2.0.0</span></p>
+      <p>Server running at <span id="serverUrl">http://localhost:3666</span></p>
+    </footer>
+  </div>
+
+  <div class="copy-feedback" id="copyFeedback">✓ Copied to clipboard!</div>
+
+  <script>
+    // Initialize URLs and version from Electron API
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.electronAPI) {
+        const urls = window.electronAPI.urls;
+        const baseUrl = window.electronAPI.getBaseUrl();
+        const port = baseUrl.split(':').pop();
+
+        // Update port display
+        document.getElementById('port').textContent = port;
+        document.getElementById('serverUrl').textContent = baseUrl;
+
+        // Update version from package.json
+        if (window.electronAPI.version) {
+          document.getElementById('appVersion').textContent = 'v' + window.electronAPI.version;
+        }
+
+        // Update URL displays
+        document.getElementById('callerDisplayUrl').textContent = urls.callerDisplay;
+        document.getElementById('callerControlUrl').textContent = urls.callerControl;
+        document.getElementById('bibleDisplayUrl').textContent = urls.bibleDisplay;
+        document.getElementById('bibleControlUrl').textContent = urls.bibleControl;
+        document.getElementById('soundboardUrl').textContent = urls.soundboard;
+      }
+    });
+
+    // Copy URL to clipboard
+    function copyUrl(type) {
+      if (window.electronAPI) {
+        const urls = window.electronAPI.urls;
+        const url = urls[type];
+        window.electronAPI.copyToClipboard(url);
+        showCopyFeedback();
+      }
+    }
+
+    // Open URL in default browser
+    function openUrl(type) {
+      if (window.electronAPI) {
+        const urls = window.electronAPI.urls;
+        const url = urls[type];
+        window.electronAPI.openExternal(url);
+      }
+    }
+
+    // Show copy feedback toast
+    function showCopyFeedback() {
+      const feedback = document.getElementById('copyFeedback');
+      feedback.classList.add('visible');
+      setTimeout(() => {
+        feedback.classList.remove('visible');
+      }, 2000);
+    }
+  </script>
+</body>
+</html>

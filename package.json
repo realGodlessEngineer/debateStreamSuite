@@ -1,0 +1,57 @@
+{
+  "name": "debate-stream-suite",
+  "version": "2.2.0",
+  "description": "A comprehensive real-time streaming toolkit for debate and discussion livestreams",
+  "main": "electron/main.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "electron": "electron .",
+    "electron:dev": "cross-env NODE_ENV=development electron .",
+    "build": "electron-builder",
+    "build:win": "electron-builder --win",
+    "build:mac": "electron-builder --mac",
+    "build:linux": "electron-builder --linux",
+    "release": "npm version patch --no-git-tag-version && electron-builder --win",
+    "release:minor": "npm version minor --no-git-tag-version && electron-builder --win",
+    "release:major": "npm version major --no-git-tag-version && electron-builder --win"
+  },
+  "dependencies": {
+    "cheerio": "^1.1.2",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "multer": "^2.0.2",
+    "socket.io": "^4.6.1"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "electron": "^40.1.0",
+    "electron-builder": "^26.7.0",
+    "nodemon": "^3.0.1"
+  },
+  "build": {
+    "appId": "com.debatestreamsuite.app",
+    "productName": "DebateStreamSuite",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "electron/**/*",
+      "src/**/*",
+      "public/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "electron/icons/icon.ico"
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "electron/icons/icon.icns"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "electron/icons"
+    }
+  }
+}

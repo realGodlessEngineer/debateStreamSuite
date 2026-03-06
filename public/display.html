@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920, height=1080">
+  <title>Caller Display</title>
+  <link rel="stylesheet" href="css/themes/godless-engineer.css">
+  <link rel="stylesheet" href="css/display.css">
+</head>
+<body>
+  <!-- Title Bar (show title + hosts) - shown when no caller -->
+  <div id="titleBar" class="title-bar-overlay">
+    <!-- 2-host layout -->
+    <div class="title-bar-card two-host" id="titleBarTwoHost">
+      <div class="title-hosts-row">
+        <div class="title-host">
+          <div class="title-host-name" id="host1NameDisplay"></div>
+          <div class="title-host-pronouns" id="host1PronounsDisplay"></div>
+        </div>
+        <div class="title-host">
+          <div class="title-host-name" id="host2NameDisplay"></div>
+          <div class="title-host-pronouns" id="host2PronounsDisplay"></div>
+        </div>
+      </div>
+      <div class="title-show-row">
+        <div class="title-show-name" id="showTitleDisplay"></div>
+      </div>
+    </div>
+
+    <!-- 1-host layout -->
+    <div class="title-bar-card one-host" id="titleBarOneHost">
+      <div class="title-host-name" id="soloHostNameDisplay"></div>
+      <div class="title-host-pronouns" id="soloHostPronounsDisplay"></div>
+      <div class="title-show-name title-show-divider" id="soloShowTitleDisplay"></div>
+    </div>
+  </div>
+
+  <!-- Caller Card - shown when caller is set -->
+  <div id="callerDisplay" class="caller-overlay">
+    <!-- 2-host caller card (full width) -->
+    <div class="caller-card two-host" id="callerCardTwoHost">
+      <div class="caller-name" id="callerNameTwoHost"></div>
+      <div class="caller-pronouns" id="callerPronounsTwoHost"></div>
+    </div>
+
+    <!-- 1-host caller card (right-aligned compact) -->
+    <div class="caller-card one-host" id="callerCardOneHost">
+      <div class="caller-name" id="callerNameOneHost"></div>
+      <div class="caller-pronouns" id="callerPronounsOneHost"></div>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="js/sanitize.js"></script>
+  <script src="js/socket-connection.js"></script>
+  <script src="js/theme-loader.js"></script>
+  <script src="js/caller-display.js"></script>
+</body>
+</html>

@@ -1,0 +1,2570 @@
+{
+  "Accent-Fallacy": {
+    "name": "Accent Fallacy",
+    "slug": "Accent-Fallacy",
+    "definition": "When the meaning of a word, sentence, or entire idea is interpreted differently by changing where the accent falls.",
+    "aliases": [
+      "accentus",
+      "emphasis fallacy",
+      "fallacy of accent",
+      "fallacy of prosody",
+      "misleading accent"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Accent-Fallacy",
+    "scrapedAt": 1772335956922
+  },
+  "Accident-Fallacy": {
+    "name": "Accident Fallacy",
+    "slug": "Accident-Fallacy",
+    "definition": "When an attempt is made to apply a general rule to all situations when clearly there are exceptions to the rule. Simplistic rules or laws rarely take into consideration legitimate exceptions, and to ignore these exceptions is to bypass reason to preserve the illusion of a perfect law.  People like simplicity and would often rather keep simplicity at the cost of rationality.",
+    "aliases": [
+      "a dicto simpliciter ad dictum secundum quid",
+      "destroying the exception",
+      "dicto secundum quid ad dictum simpliciter",
+      "dicto simpliciter",
+      "converse accident",
+      "reverse accident",
+      "fallacy of the general rule",
+      "sweeping generalization"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Accident-Fallacy",
+    "scrapedAt": 1772335956922
+  },
+  "Ad-Fidentia": {
+    "name": "Ad Fidentia",
+    "slug": "Ad-Fidentia",
+    "definition": "Attacking the person’s self-confidence in place of the argument or the evidence.",
+    "aliases": [
+      "argumentum ad fidentia",
+      "against self-confidence"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Ad-Fidentia",
+    "scrapedAt": 1772335956922
+  },
+  "Ad-Hoc-Rescue": {
+    "name": "Ad Hoc Rescue",
+    "slug": "Ad-Hoc-Rescue",
+    "definition": "Very often we desperately want to be right and hold on to certain beliefs, despite any evidence presented to the contrary.  As a result, we begin to make up excuses as to why our belief could still be true, and is still true, despite the fact that we have no real evidence for what we are making up.",
+    "aliases": [
+      "making stuff up",
+      "MSU fallacy"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Ad-Hoc-Rescue",
+    "scrapedAt": 1772335956922
+  },
+  "Ad-Hominem-Abusive": {
+    "name": "Ad Hominem (Abusive)",
+    "slug": "Ad-Hominem-Abusive",
+    "definition": "Attacking the person making the argument, rather than the argument itself, when the attack on the person is completely irrelevant to the argument the person is making.",
+    "aliases": [
+      "argumentum ad hominem",
+      "personal abuse",
+      "personal attacks",
+      "abusive fallacy",
+      "appeal to the person",
+      "damning the source",
+      "name calling",
+      "refutation by caricature",
+      "against the person",
+      "against the man"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Ad-Hominem-Abusive",
+    "scrapedAt": 1772335956922
+  },
+  "Ad-Hominem-Circumstantial": {
+    "name": "Ad Hominem (Circumstantial)",
+    "slug": "Ad-Hominem-Circumstantial",
+    "definition": "Suggesting that the person who is making the argument is biased or predisposed to take a particular stance, and therefore, the argument is necessarily invalid.",
+    "aliases": [
+      "argumentum ad hominem",
+      "appeal to motive",
+      "appeal to personal interest",
+      "argument from motives",
+      "conflict of interest",
+      "faulty motives",
+      "naïve cynicism",
+      "questioning motives",
+      "vested interest"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Ad-Hominem-Circumstantial",
+    "scrapedAt": 1772335956922
+  },
+  "Ad-Hominem-Guilt-by-Association": {
+    "name": "Ad Hominem (Guilt by Association)",
+    "slug": "Ad-Hominem-Guilt-by-Association",
+    "definition": "When the source is viewed negatively because of its association with another person or group who is already viewed negatively.",
+    "aliases": [
+      "argumentum ad hominem",
+      "association fallacy",
+      "bad company fallacy",
+      "company that you keep fallacy",
+      "they’re not like us fallacy",
+      "transfer fallacy"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Ad-Hominem-Guilt-by-Association",
+    "scrapedAt": 1772335956922
+  },
+  "Ad-Hominem-Tu-quoque": {
+    "name": "Ad Hominem (Tu quoque)",
+    "slug": "Ad-Hominem-Tu-quoque",
+    "definition": "Claiming the argument is flawed by pointing out that the one making the argument is not acting consistently with the claims of the argument.",
+    "aliases": [
+      "argumentum ad hominem tu quoque",
+      "appeal to hypocrisy",
+      "you too fallacy",
+      "hypocrisy",
+      "personal inconsistency"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Ad-Hominem-Tu-quoque",
+    "scrapedAt": 1772335956922
+  },
+  "Affirmative-Conclusion-from-a-Negative-Premise": {
+    "name": "Affirmative Conclusion from a Negative Premise",
+    "slug": "Affirmative-Conclusion-from-a-Negative-Premise",
+    "definition": "The conclusion of a standard form categorical syllogism is affirmative, but at least one of the premises is negative. Any valid forms of categorical syllogisms that assert a negative premise must have a negative conclusion.",
+    "aliases": [
+      "illicit negative",
+      "drawing a negative conclusion from affirmative premises",
+      "fallacy of negative premises"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Affirmative-Conclusion-from-a-Negative-Premise",
+    "scrapedAt": 1772335956922
+  },
+  "Affirming-a-Disjunct": {
+    "name": "Affirming a Disjunct",
+    "slug": "Affirming-a-Disjunct",
+    "definition": "Making the false assumption that when presented with an either/or possibility, that if one of the options is true that the other one must be false.  This is when the “or” is not specifically defined as being exclusive.",
+    "aliases": [
+      "the fallacy of the alternative disjunct",
+      "false exclusionary disjunct",
+      "affirming one disjunct",
+      "the fallacy of the alternative syllogism",
+      "asserting an alternative",
+      "improper disjunctive syllogism",
+      "fallacy of the disjunctive syllogism"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Affirming-a-Disjunct",
+    "scrapedAt": 1772335956922
+  },
+  "Affirming-the-Consequent": {
+    "name": "Affirming the Consequent",
+    "slug": "Affirming-the-Consequent",
+    "definition": "An error in formal logic where if the consequent is said to be true, the antecedent is said to be true, as a result.",
+    "aliases": [
+      "converse error",
+      "fallacy of the consequent",
+      "asserting the consequent",
+      "affirmation of the consequent"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Affirming-the-Consequent",
+    "scrapedAt": 1772335956922
+  },
+  "Alleged-Certainty": {
+    "name": "Alleged Certainty",
+    "slug": "Alleged-Certainty",
+    "definition": "Asserting a conclusion without evidence or premises, through a statement that makes the conclusion appear certain when, in fact, it is not.",
+    "aliases": [
+      "assuming the conclusion"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Alleged-Certainty",
+    "scrapedAt": 1772335956922
+  },
+  "Alphabet-Soup": {
+    "name": "Alphabet Soup",
+    "slug": "Alphabet-Soup",
+    "definition": "The deliberate and excessive use of acronyms and abbreviations to appear more knowledgeable in the subject or confuse others.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Alphabet-Soup",
+    "scrapedAt": 1772335956922
+  },
+  "Alternative-Advance": {
+    "name": "Alternative Advance",
+    "slug": "Alternative-Advance",
+    "definition": "When one is presented with just two choices, both of which are essentially the same, just worded differently.  This technique is often used in sales.  Fallacious reasoning would be committed by the person accepting the options as the only options, which would most likely be on a subconscious level since virtually anyone—if they thought about it—would recognize other options exist.",
+    "aliases": [
+      "lose-lose situation"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Alternative-Advance",
+    "scrapedAt": 1772335956922
+  },
+  "Amazing-Familiarity": {
+    "name": "Amazing Familiarity",
+    "slug": "Amazing-Familiarity",
+    "definition": "The argument contains information that seems impossible to have obtained—like it came from an omniscient author. This kind of writing/storytelling is characteristic of fiction, so when it is used in an argument it should cast doubt.",
+    "aliases": [
+      "argument from omniscience",
+      "\"how the hell can you possibly know that?\""
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Amazing-Familiarity",
+    "scrapedAt": 1772335956922
+  },
+  "Ambiguity-Fallacy": {
+    "name": "Ambiguity Fallacy",
+    "slug": "Ambiguity-Fallacy",
+    "definition": "When an unclear phrase with multiple definitions is used within the argument; therefore, does not support the conclusion.  Some will say single words count for the ambiguity fallacy, which is really a specific form of a fallacy known as equivocation.",
+    "aliases": [
+      "ambiguous assertion",
+      "amphiboly",
+      "amphibology",
+      "semantical ambiguity",
+      "vagueness"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Ambiguity-Fallacy",
+    "scrapedAt": 1772335956922
+  },
+  "Anonymous-Authority": {
+    "name": "Anonymous Authority",
+    "slug": "Anonymous-Authority",
+    "definition": "When an unspecified source is used as evidence for the claim.  This is commonly indicated by phrases such as “They say that...”, “It has been said...”, “I heard that...”, “Studies show...”, or generalized groups such as, “scientists say...”",
+    "aliases": [
+      "appeal to anonymous authority"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Anonymous-Authority",
+    "scrapedAt": 1772335956922
+  },
+  "Anthropomorphism": {
+    "name": "Anthropomorphism",
+    "slug": "Anthropomorphism",
+    "definition": "The attributing of human characteristics and purposes to inanimate objects, animals, plants, or other natural phenomena, or to gods. This becomes a logical fallacy when used within the context of an argument.",
+    "aliases": [
+      "personification"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Anthropomorphism",
+    "scrapedAt": 1772335956922
+  },
+  "Appeal-to-Accomplishment": {
+    "name": "Appeal to Accomplishment",
+    "slug": "Appeal-to-Accomplishment",
+    "definition": "When the argument being made is sheltered from criticism based on the level of accomplishment of the one making the argument.  A form of this fallacy also occurs when arguments are evaluated on the accomplishments, or success, of the person making the argument, rather than on the merits of the argument itself.",
+    "aliases": [
+      "appeal to success"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Appeal-to-Accomplishment",
+    "scrapedAt": 1772335956922
+  },
+  "Appeal-to-Anger": {
+    "name": "Appeal to Anger",
+    "slug": "Appeal-to-Anger",
+    "definition": "When the emotions of anger, hatred, or rage are substituted for evidence in an argument.",
+    "aliases": [
+      "appeal to hatred",
+      "loathing",
+      "appeal to outrage",
+      "etc."
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Appeal-to-Anger",
+    "scrapedAt": 1772335956922
+  },
+  "Appeal-to-Authority": {
+    "name": "Appeal to Authority",
+    "slug": "Appeal-to-Authority",
+    "definition": "Insisting that a claim is true simply because a valid authority or expert on the issue said it was true, without any other supporting evidence offered. Also see the appeal to false authority.",
+    "aliases": [
+      "argument from authority",
+      "ipse dixit",
+      "argumentum ad verecundiam"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Appeal-to-Authority",
+    "scrapedAt": 1772335956922
+  },
+  "Appeal-to-Celebrity": {
+    "name": "Appeal to Celebrity",
+    "slug": "Appeal-to-Celebrity",
+    "definition": "Accepting a claim of a celebrity based on his or her celebrity status, not on the strength of the argument.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Appeal-to-Celebrity",
+    "scrapedAt": 1772335956922
+  },
+  "Appeal-to-Closure": {
+    "name": "Appeal to Closure",
+    "slug": "Appeal-to-Closure",
+    "definition": "Accepting evidence on the basis of wanting closure—or to be done with the issue. While the desire for closure is a real psychological phenomenon that does have an effect on the well-being of individuals, using \"closure\" as a reason for accepting evidence that would otherwise not be accepted, is fallacious.",
+    "aliases": [
+      "appeal to justice"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Appeal-to-Closure",
+    "scrapedAt": 1772335956922
+  },
+  "Appeal-to-Coincidence": {
+    "name": "Appeal to Coincidence",
+    "slug": "Appeal-to-Coincidence",
+    "definition": "Concluding that a result is due to chance when the evidence strongly suggests otherwise.  The appeal to luck variation uses luck in place of coincidence or chance.",
+    "aliases": [
+      "appeal to luck",
+      "appeal to bad luck",
+      "appeal to good luck"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Appeal-to-Coincidence",
+    "scrapedAt": 1772335956922
+  },
+  "Appeal-to-Common-Belief": {
+    "name": "Appeal to Common Belief",
+    "slug": "Appeal-to-Common-Belief",
+    "definition": "When the claim that most or many people in general or of a particular group accept a belief as true is presented as evidence for the claim. Accepting another person’s belief, or many people’s beliefs, without demanding evidence as to why that person accepts the belief, is lazy thinking and a dangerous way to accept information.",
+    "aliases": [
+      "argumentum ad populum",
+      "appeal to accepted belief",
+      "appeal to democracy",
+      "appeal to widespread belief",
+      "appeal to the masses",
+      "appeal to belief",
+      "appeal to the majority",
+      "argument by consensus",
+      "consensus fallacy",
+      "authority of the many",
+      "bandwagon fallacy",
+      "appeal to the number",
+      "argumentum ad numerum",
+      "argumentum consensus gentium",
+      "appeal to the mob",
+      "appeal to the gallery",
+      "consensus gentium",
+      "mob appeal",
+      "social conformance",
+      "value of community",
+      "vox populi"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Appeal-to-Common-Belief",
+    "scrapedAt": 1772335956922
+  },
+  "Appeal-to-Common-Folk": {
+    "name": "Appeal to Common Folk",
+    "slug": "Appeal-to-Common-Folk",
+    "definition": "In place of evidence, attempting to establish a connection to the audience based on being a “regular person” just like each of them.  Then suggesting that your proposition is something that all common folk believe or should accept.",
+    "aliases": [
+      "appeal to the common man"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Appeal-to-Common-Folk",
+    "scrapedAt": 1772335956922
+  },
+  "Appeal-to-Common-Sense": {
+    "name": "Appeal to Common Sense",
+    "slug": "Appeal-to-Common-Sense",
+    "definition": "Asserting that your conclusion or facts are just “common sense” when, in fact, they are not.We must argue as to why we believe something is common sense if there is any doubt that the belief is not common, rather than just asserting that it is.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Appeal-to-Common-Sense",
+    "scrapedAt": 1772335956922
+  },
+  "Appeal-to-Complexity": {
+    "name": "Appeal to Complexity",
+    "slug": "Appeal-to-Complexity",
+    "definition": "Concluding that just because you don’t understand the argument, the argument is not true, flawed, or improbable. This is a specific form of the argument from ignorance.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Appeal-to-Complexity",
+    "scrapedAt": 1772335956922
+  },
+  "Appeal-to-Consequences": {
+    "name": "Appeal to Consequences",
+    "slug": "Appeal-to-Consequences",
+    "definition": "Concluding that an idea or proposition is true or false because the consequences of it being true or false are desirable or undesirable.  The fallacy lies in the fact that the desirability is not related to the truth value of the idea or proposition.  This comes in two forms: the positive and negative.",
+    "aliases": [
+      "argumentum ad consequentiam",
+      "appeal to consequences of a belief",
+      "argument to the consequences",
+      "argument from [the] consequences"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Appeal-to-Consequences",
+    "scrapedAt": 1772335956922
+  },
+  "Appeal-to-Definition": {
+    "name": "Appeal to Definition",
+    "slug": "Appeal-to-Definition",
+    "definition": "Using a dictionary’s limited definition of a term as evidence that term cannot have another meaning, expanded meaning, or even conflicting meaning.",
+    "aliases": [
+      "appeal to the dictionary",
+      "victory by definition"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Appeal-to-Definition",
+    "scrapedAt": 1772335956922
+  },
+  "Appeal-to-Desperation": {
+    "name": "Appeal to Desperation",
+    "slug": "Appeal-to-Desperation",
+    "definition": "Arguing that your conclusion, solution, or proposition is right based on the fact that something must be done, and your solution is \"something.\"",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Appeal-to-Desperation",
+    "scrapedAt": 1772335956922
+  },
+  "Appeal-to-Emotion": {
+    "name": "Appeal to Emotion",
+    "slug": "Appeal-to-Emotion",
+    "definition": "This is the general category of many fallacies that use emotion in place of reason in order to attempt to win the argument.  It is a type of manipulation used in place of valid logic.",
+    "aliases": [
+      "appeal to pathos",
+      "argument by vehemence",
+      "playing on emotions",
+      "emotional appeal",
+      "for the children"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Appeal-to-Emotion",
+    "scrapedAt": 1772335956922
+  },
+  "Appeal-to-Equality": {
+    "name": "Appeal to Equality",
+    "slug": "Appeal-to-Equality",
+    "definition": "An assertion is deemed true or false based on an assumed pretense of equality, where what exactly is \"equal\" is not made clear, and not supported by the argument.",
+    "aliases": [
+      "appeal to egalitarianism",
+      "appeal to equity"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Appeal-to-Equality",
+    "scrapedAt": 1772335956922
+  },
+  "Appeal-to-Extremes": {
+    "name": "Appeal to Extremes",
+    "slug": "Appeal-to-Extremes",
+    "definition": "Erroneously attempting to make a reasonable argument into an absurd one, by taking the argument to the extremes.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Appeal-to-Extremes",
+    "scrapedAt": 1772335956922
+  },
+  "Appeal-to-Faith": {
+    "name": "Appeal to Faith",
+    "slug": "Appeal-to-Faith",
+    "definition": "This is an abandonment of reason in an argument and a call to faith, usually when reason clearly leads to disproving the conclusion of an argument.  It is the assertion that one must have (the right kind of) faith in order to understand the argument.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Appeal-to-Faith",
+    "scrapedAt": 1772335956922
+  },
+  "Appeal-to-False-Authority": {
+    "name": "Appeal to False Authority",
+    "slug": "Appeal-to-False-Authority",
+    "definition": "Using an alleged authority as evidence in your argument when the authority is not really an authority on the facts relevant to the argument.",
+    "aliases": [
+      "appeal to doubtful authority",
+      "appeal to dubious authority",
+      "appeal to improper authority",
+      "appeal to inappropriate authority",
+      "appeal to irrelevant authority",
+      "appeal to misplaced authority",
+      "appeal to unqualified authority",
+      "argument from false authority"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Appeal-to-False-Authority",
+    "scrapedAt": 1772335956922
+  },
+  "Appeal-to-Fear": {
+    "name": "Appeal to Fear",
+    "slug": "Appeal-to-Fear",
+    "definition": "When fear, not based on evidence or reason, is being used as the primary motivator to get others to accept an idea, proposition, or conclusion.",
+    "aliases": [
+      "argumentum in terrorem",
+      "argumentum ad metum",
+      "argument from adverse consequences",
+      "scare tactics"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Appeal-to-Fear",
+    "scrapedAt": 1772335956922
+  },
+  "Appeal-to-Flattery": {
+    "name": "Appeal to Flattery",
+    "slug": "Appeal-to-Flattery",
+    "definition": "When an attempt is made to win support for an argument, not by the strength of the argument, but by using flattery on those whom you want to accept your argument.  This fallacy is often the cause of people getting tricked into doing something they don’t really want to do.",
+    "aliases": [
+      "apple polishing",
+      "wheel greasing",
+      "brown nosing",
+      "appeal to pride / argumentum ad superbiam",
+      "appeal to vanity"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Appeal-to-Flattery",
+    "scrapedAt": 1772335956922
+  },
+  "Appeal-to-Force": {
+    "name": "Appeal to Force",
+    "slug": "Appeal-to-Force",
+    "definition": "When force, coercion, or even a threat of force is used in place of a reason in an attempt to justify a conclusion.",
+    "aliases": [
+      "argumentum ad baculum",
+      "argument to the cudgel",
+      "appeal to the stick"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Appeal-to-Force",
+    "scrapedAt": 1772335956922
+  },
+  "Appeal-to-Heaven": {
+    "name": "Appeal to Heaven",
+    "slug": "Appeal-to-Heaven",
+    "definition": "Asserting the conclusion must be accepted because it is the “will of God” or “the will of the gods”.  In the mind of those committing the fallacy, and those allowing to pass as a valid reason, the will of God is not only knowable, but the person making the argument knows it, and no other reason is necessary.",
+    "aliases": [
+      "deus vult",
+      "gott mit uns",
+      "manifest destiny",
+      "special covenant"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Appeal-to-Heaven",
+    "scrapedAt": 1772335956922
+  },
+  "Appeal-to-Intuition": {
+    "name": "Appeal to Intuition",
+    "slug": "Appeal-to-Intuition",
+    "definition": "Evaluating an argument based on \"intuition\" or \"gut feeling\" that is unable to be articulated, rather than evaluating the argument using reason.",
+    "aliases": [
+      "appeal to the gut"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Appeal-to-Intuition",
+    "scrapedAt": 1772335956922
+  },
+  "appeal-to-loyalty.html": {
+    "name": "Appeal to Loyalty",
+    "slug": "appeal-to-loyalty.html",
+    "definition": "When one is either implicitly or explicitly encouraged to consider loyalty when evaluating the argument when the truth of the argument is independent of loyalty. Alternatively, one considers loyalty in concluding that the argument is true, false, or not...",
+    "aliases": [
+      "appeal to patriotism"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/appeal-to-loyalty.html",
+    "scrapedAt": 1772335956922
+  },
+  "Appeal-to-Nature": {
+    "name": "Appeal to Nature",
+    "slug": "Appeal-to-Nature",
+    "definition": "When used as a fallacy, the belief or suggestion that “natural” is better than “unnatural” based on its naturalness. Many people adopt this as a default belief. It is the belief that is what is natural must be good (or any other positive, evaluative judgment) and that which is unnatural must be bad (or any other negative, evaluative judgment).",
+    "aliases": [
+      "Argumentum ad Naturam"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Appeal-to-Nature",
+    "scrapedAt": 1772335956922
+  },
+  "Appeal-to-Normality": {
+    "name": "Appeal to Normality",
+    "slug": "Appeal-to-Normality",
+    "definition": "Using social norms to determine what is good or bad.  It is the idea that normality is the standard of goodness.  This is fallacious because social norms are not the same as norms found in nature or norms that are synonymous with the ideal function of a created system.  The conclusion, \"therefore, it is good\" is often unspoken, but clearly implied.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Appeal-to-Normality",
+    "scrapedAt": 1772335956922
+  },
+  "Appeal-to-Novelty": {
+    "name": "Appeal to Novelty",
+    "slug": "Appeal-to-Novelty",
+    "definition": "Claiming that something that is new or modern is superior to the status quo, based exclusively on its newness.",
+    "aliases": [
+      "argumentum ad novitatem",
+      "appeal to the new",
+      "ad novitam [sometimes spelled as]"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Appeal-to-Novelty",
+    "scrapedAt": 1772335956922
+  },
+  "Appeal-to-Pity": {
+    "name": "Appeal to Pity",
+    "slug": "Appeal-to-Pity",
+    "definition": "The attempt to distract from the truth of the conclusion by the use of pity.",
+    "aliases": [
+      "ad misericordiam",
+      "appeal to sympathy",
+      "appeal to victimhood"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Appeal-to-Pity",
+    "scrapedAt": 1772335956922
+  },
+  "Appeal-to-Popularity": {
+    "name": "Appeal to Popularity",
+    "slug": "Appeal-to-Popularity",
+    "definition": "Using the popularity of a premise or proposition as evidence for its truthfulness.  This is a fallacy which is very difficult to spot because our “common sense” tells us that if something is popular, it must be good/true/valid, but this is not so, especially in a society where clever marketing, social and political weight, and money can buy popularity.",
+    "aliases": [
+      "argumentum ad numeram",
+      "appeal to common belief"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Appeal-to-Popularity",
+    "scrapedAt": 1772335956922
+  },
+  "Appeal-to-Possibility": {
+    "name": "Appeal to Possibility",
+    "slug": "Appeal-to-Possibility",
+    "definition": "When a conclusion is assumed not because it is probably true, but because it is possible that it is true, no matter how improbable.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Appeal-to-Possibility",
+    "scrapedAt": 1772335956922
+  },
+  "Appeal-to-Ridicule": {
+    "name": "Appeal to Ridicule",
+    "slug": "Appeal-to-Ridicule",
+    "definition": "Presenting the argument in such a way that makes the argument look ridiculous, usually by misrepresenting the argument or the use of exaggeration.",
+    "aliases": [
+      "reductio ad ridiculum",
+      "appeal to mockery",
+      "the horse laugh"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Appeal-to-Ridicule",
+    "scrapedAt": 1772335956922
+  },
+  "Appeal-to-Self-evident-Truth": {
+    "name": "Appeal to Self-evident Truth",
+    "slug": "Appeal-to-Self-evident-Truth",
+    "definition": "Making the claim that something is \"self-evident\" when it is not self-evident in place of arguing a claim with reason. In everyday terms, something is \"self-evident\" when understanding what it means immediately results in knowing that it is true, such as 2+2=4.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Appeal-to-Self-evident-Truth",
+    "scrapedAt": 1772335956922
+  },
+  "Appeal-to-Spite": {
+    "name": "Appeal to Spite",
+    "slug": "Appeal-to-Spite",
+    "definition": "Substituting spite (petty ill will or hatred with the disposition to irritate, annoy, or thwart) for evidence in an argument, or as a reason to support or reject a claim.",
+    "aliases": [
+      "argumentum ad odium"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Appeal-to-Spite",
+    "scrapedAt": 1772335956922
+  },
+  "Appeal-to-Stupidity": {
+    "name": "Appeal to Stupidity",
+    "slug": "Appeal-to-Stupidity",
+    "definition": "Attempting to get the audience to devalue reason and intellectual discourse, or devaluing reason and intellectual discourse based on the rhetoric of an arguer.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Appeal-to-Stupidity",
+    "scrapedAt": 1772335956922
+  },
+  "Appeal-to-the-Law": {
+    "name": "Appeal to the Law",
+    "slug": "Appeal-to-the-Law",
+    "definition": "When following the law is assumed to be the morally correct thing to do, without justification, or when breaking the law is assumed to be the morally wrong thing to do, without justification.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Appeal-to-the-Law",
+    "scrapedAt": 1772335956922
+  },
+  "Appeal-to-the-Moon": {
+    "name": "Appeal to the Moon",
+    "slug": "Appeal-to-the-Moon",
+    "definition": "Using the argument, “If we can put a man on the moon, we could...” as evidence for the argument.",
+    "aliases": [
+      "argumentum ad lunam"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Appeal-to-the-Moon",
+    "scrapedAt": 1772335956922
+  },
+  "Appeal-to-Tradition": {
+    "name": "Appeal to Tradition",
+    "slug": "Appeal-to-Tradition",
+    "definition": "Using historical preferences of the people (tradition), either in general or as specific as the historical preferences of a single individual, as evidence that the historical preference is correct.  Traditions are often passed from generation to generation with no other explanation besides, “this is the way it has always been done”—which is not a reason, it is an absence of a reason.",
+    "aliases": [
+      "argumentum ad antiquitatem",
+      "appeal to common practice",
+      "appeal to antiquity",
+      "appeal to traditional wisdom",
+      "proof from tradition",
+      "appeal to past practice",
+      "traditional wisdom"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Appeal-to-Tradition",
+    "scrapedAt": 1772335956922
+  },
+  "Appeal-to-Trust": {
+    "name": "Appeal to Trust",
+    "slug": "Appeal-to-Trust",
+    "definition": "The belief that if a source is considered trustworthy or untrustworthy, then any information from that source must be true or false, respectively. This is problematic because each argument, claim, or proposition should be evaluated on its own merits.",
+    "aliases": [
+      "appeal to distrust [opposite]",
+      "appeal to trustworthiness"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Appeal-to-Trust",
+    "scrapedAt": 1772335956922
+  },
+  "Argument-by-Emotive-Language": {
+    "name": "Argument by Emotive Language",
+    "slug": "Argument-by-Emotive-Language",
+    "definition": "Substituting facts and evidence with words that stir up emotion, with the attempt to manipulate others into accepting the truth of the argument.",
+    "aliases": [
+      "loaded words",
+      "loaded language",
+      "euphemisms"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Argument-by-Emotive-Language",
+    "scrapedAt": 1772335956922
+  },
+  "Argument-by-Fast-Talking": {
+    "name": "Argument by Fast Talking",
+    "slug": "Argument-by-Fast-Talking",
+    "definition": "When fast talking is seen as intelligence and/or confidence in the truth of one’s argument; therefore, seen as evidence of the truth of the argument itself.  The fallacy is also committed by the person doing the talking when he or she is deliberately attempting not to allow the audience enough time to process the argument; therefore, either accepting it or at least not rejecting it.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Argument-by-Fast-Talking",
+    "scrapedAt": 1772335956922
+  },
+  "Argument-by-Gibberish": {
+    "name": "Argument by Gibberish",
+    "slug": "Argument-by-Gibberish",
+    "definition": "When incomprehensible jargon or plain incoherent gibberish is used to give the appearance of a strong argument, in place of evidence or valid reasons to accept the argument.",
+    "aliases": [
+      "bafflement",
+      "argument by [prestigious] jargon"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Argument-by-Gibberish",
+    "scrapedAt": 1772335956922
+  },
+  "Argument-by-Personal-Charm": {
+    "name": "Argument by Personal Charm",
+    "slug": "Argument-by-Personal-Charm",
+    "definition": "When an argument is made stronger by the personal characteristics of the person making the argument, often referred to as “charm”.",
+    "aliases": [
+      "sex appeal [form of]",
+      "flamboyance",
+      "eloquence"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Argument-by-Personal-Charm",
+    "scrapedAt": 1772335956922
+  },
+  "Argument-by-Pigheadedness": {
+    "name": "Argument by Pigheadedness",
+    "slug": "Argument-by-Pigheadedness",
+    "definition": "This is a refusal to accept a well-proven argument for one of many reasons related to stubbornness.",
+    "aliases": [
+      "argument by stubbornness",
+      "invincible ignorance fallacy"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Argument-by-Pigheadedness",
+    "scrapedAt": 1772335956922
+  },
+  "Argument-by-Repetition": {
+    "name": "Argument by Repetition",
+    "slug": "Argument-by-Repetition",
+    "definition": "Repeating an argument or a premise over and over again in place of better supporting evidence.",
+    "aliases": [
+      "argument from nagging",
+      "proof by assertion"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Argument-by-Repetition",
+    "scrapedAt": 1772335956922
+  },
+  "Argument-by-Selective-Reading": {
+    "name": "Argument by Selective Reading",
+    "slug": "Argument-by-Selective-Reading",
+    "definition": "When a series of arguments or claims is made and the opponent acts as if the weakest argument was the best one made. This is a form of cherry picking and very similar to the selective attention fallacy.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Argument-by-Selective-Reading",
+    "scrapedAt": 1772335956922
+  },
+  "Argument-from-Age": {
+    "name": "Argument from Age",
+    "slug": "Argument-from-Age",
+    "definition": "The misconception that previous generations had superior wisdom to modern man, thus conclusions that rely on this wisdom are seen accepted as true or more true than they actually are.",
+    "aliases": [
+      "wisdom of the ancients"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Argument-from-Age",
+    "scrapedAt": 1772335956922
+  },
+  "Argument-from-Fallacy": {
+    "name": "Argument from Fallacy",
+    "slug": "Argument-from-Fallacy",
+    "definition": "Concluding that the truth value of an argument is false based on the fact that the argument contains a fallacy.",
+    "aliases": [
+      "argumentum ad logicam",
+      "disproof by fallacy",
+      "argument to logic",
+      "fallacy fallacy",
+      "fallacist's fallacy",
+      "bad reasons fallacy [form of]"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Argument-from-Fallacy",
+    "scrapedAt": 1772335956922
+  },
+  "Argument-from-False-Authority": {
+    "name": "Argument from False Authority",
+    "slug": "Argument-from-False-Authority",
+    "definition": "When a person making a claim is presented as an expert who should be trusted when his or her expertise is not in the area being discussed.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Argument-from-False-Authority",
+    "scrapedAt": 1772335956922
+  },
+  "Argument-from-Hearsay": {
+    "name": "Argument from Hearsay",
+    "slug": "Argument-from-Hearsay",
+    "definition": "Presenting the testimony of a source that is not an eyewitness to the event in question.  It has been conclusively demonstrated that with each passing of information, via analog transmission, the message content changes.  Each small change can and often does lead to many more significant changes, as in the butterfly effect in chaos theory.",
+    "aliases": [
+      "the telephone game",
+      "Chinese whispers",
+      "anecdotal evidence",
+      "anecdotal fallacy/Volvo fallacy [form of]"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Argument-from-Hearsay",
+    "scrapedAt": 1772335956922
+  },
+  "Argument-from-Ignorance": {
+    "name": "Argument from Ignorance",
+    "slug": "Argument-from-Ignorance",
+    "definition": "The assumption of a conclusion or fact based primarily on lack of evidence to the contrary.  Usually best described by, “absence of evidence is not evidence of absence.”",
+    "aliases": [
+      "ad ignorantiam",
+      "appeal to ignorance",
+      "appeal to mystery [form of]",
+      "black swan fallacy [form of]",
+      "toupee fallacy [form of]"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Argument-from-Ignorance",
+    "scrapedAt": 1772335956922
+  },
+  "Argument-from-Incredulity": {
+    "name": "Argument from Incredulity",
+    "slug": "Argument-from-Incredulity",
+    "definition": "Concluding that because you can't or refuse to believe something, it must not be true, improbable, or the argument must be flawed.",
+    "aliases": [
+      "argument from personal astonishment",
+      "argument from personal incredulity",
+      "personal incredulity"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Argument-from-Incredulity",
+    "scrapedAt": 1772335956922
+  },
+  "Argument-from-Silence": {
+    "name": "Argument from Silence",
+    "slug": "Argument-from-Silence",
+    "definition": "Drawing a conclusion based on the silence of the opponent, when the opponent is refusing to give evidence for any reason.",
+    "aliases": [
+      "argumentum e silentio"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Argument-from-Silence",
+    "scrapedAt": 1772335956922
+  },
+  "Argument-of-the-Beard": {
+    "name": "Argument of the Beard",
+    "slug": "Argument-of-the-Beard",
+    "definition": "When one argues that no useful distinction can be made between two extremes, just because there is no definable moment or point on the spectrum where the two extremes meet.  The name comes from the heap paradox in philosophy, using a man’s beard as an example.  At what point does a man go from clean-shaven to having a beard?",
+    "aliases": [
+      "fallacy of the beard",
+      "heap fallacy",
+      "heap paradox fallacy",
+      "bald man fallacy",
+      "continuum fallacy",
+      "line drawing fallacy",
+      "sorites fallacy"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Argument-of-the-Beard",
+    "scrapedAt": 1772335956922
+  },
+  "Argument-to-Moderation": {
+    "name": "Argument to Moderation",
+    "slug": "Argument-to-Moderation",
+    "definition": "Asserting that given any two positions, there exists a compromise between them that must be correct.",
+    "aliases": [
+      "argumentum ad temperantiam",
+      "middle ground",
+      "false compromise",
+      "gray fallacy",
+      "golden mean fallacy",
+      "fallacy of the mean",
+      "splitting the difference"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Argument-to-Moderation",
+    "scrapedAt": 1772335956922
+  },
+  "Argument-to-the-Purse": {
+    "name": "Argument to the Purse",
+    "slug": "Argument-to-the-Purse",
+    "definition": "Concluding that the truth value of the argument is true or false based on the financial status of the author of the argument.",
+    "aliases": [
+      "argumentum ad crumenam",
+      "appeal to poverty or argumentum ad lazarum",
+      "appeal to wealth",
+      "appeal to money"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Argument-to-the-Purse",
+    "scrapedAt": 1772335956922
+  },
+  "Arguments": {
+    "name": "Arguments",
+    "slug": "Arguments",
+    "definition": "When we hear the word “argument,” we tend to think of an adversarial confrontational between two or more people, with bickering, defensiveness, and increased negative emotions.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Arguments",
+    "scrapedAt": 1772335956922
+  },
+  "Avoiding-the-Issue": {
+    "name": "Avoiding the Issue",
+    "slug": "Avoiding-the-Issue",
+    "definition": "When an arguer responds to an argument by not addressing the points of the argument.  Unlike the strawman fallacy, avoiding the issue does not create an unrelated argument to divert attention, it simply avoids the argument.",
+    "aliases": [
+      "avoiding the question [form of]",
+      "missing the point",
+      "straying off the subject",
+      "digressing",
+      "distraction [form of]"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Avoiding-the-Issue",
+    "scrapedAt": 1772335956922
+  },
+  "Base-Rate-Fallacy": {
+    "name": "Base Rate Fallacy",
+    "slug": "Base-Rate-Fallacy",
+    "definition": "Ignoring statistical information in favor of using irrelevant information, that one incorrectly believes to be relevant, to make a judgment.  This usually stems from the irrational belief that statistics don’t apply in a situation, for one reason or another when, in fact, they do.",
+    "aliases": [
+      "neglecting base rates",
+      "base rate neglect",
+      "prosecutor's fallacy [form of]"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Base-Rate-Fallacy",
+    "scrapedAt": 1772335956922
+  },
+  "Begging-the-Question": {
+    "name": "Begging the Question",
+    "slug": "Begging-the-Question",
+    "definition": "Any form of argument where the conclusion is assumed in one of the premises.  Many people use the phrase “begging the question” incorrectly when they use it to mean, “prompts one to ask the question”.  That is NOT the correct usage. Begging the question is a form of circular reasoning.",
+    "aliases": [
+      "petitio principii",
+      "assuming the initial point",
+      "assuming the answer",
+      "chicken and the egg argument",
+      "circulus in probando",
+      "circular reasoning [form of]",
+      "vicious circle"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Begging-the-Question",
+    "scrapedAt": 1772335956922
+  },
+  "Biased-Sample-Fallacy": {
+    "name": "Biased Sample Fallacy",
+    "slug": "Biased-Sample-Fallacy",
+    "definition": "Drawing a conclusion about a population based on a sample that is biased, or chosen in order to make it appear the population on average is different than it actually is.",
+    "aliases": [
+      "biased statistics",
+      "loaded sample",
+      "prejudiced statistics",
+      "prejudiced sample",
+      "loaded statistics",
+      "biased induction",
+      "biased generalization",
+      "biased generalizing",
+      "unrepresentative sample",
+      "unrepresentative generalization"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Biased-Sample-Fallacy",
+    "scrapedAt": 1772335956922
+  },
+  "Blind-Authority-Fallacy": {
+    "name": "Blind Authority Fallacy",
+    "slug": "Blind-Authority-Fallacy",
+    "definition": "Asserting that a proposition is true solely on the authority making the claim. It is often the case that those who blindly follow an authority ignore any counter-evidence to the authority’s claim, no matter how strong. The authority could be anyone or anything, including parents, a coach, a boss, a military leader, a document, or a god.",
+    "aliases": [
+      "blind obedience",
+      "the \"team player\" appeal",
+      "Nuremberg defense",
+      "divine authority [form of]",
+      "appeal to/argument from blind authority"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Blind-Authority-Fallacy",
+    "scrapedAt": 1772335956922
+  },
+  "Broken-Window-Fallacy": {
+    "name": "Broken Window Fallacy",
+    "slug": "Broken-Window-Fallacy",
+    "definition": "The illusion that destruction and money spent in recovery from destruction, is a net-benefit to society.  A broader application of this fallacy is the general tendency to overlook opportunity costs, or that which is unseen, either in a financial sense or other.",
+    "aliases": [
+      "glazier's fallacy"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Broken-Window-Fallacy",
+    "scrapedAt": 1772335956922
+  },
+  "Bulverism": {
+    "name": "Bulverism",
+    "slug": "Bulverism",
+    "definition": "This is a combination of circular reasoning and the genetic fallacy. It is the assumption and assertion that an argument is flawed or false because of their suspected motives, social identity, or other characteristic associated with their identity.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Bulverism",
+    "scrapedAt": 1772335956922
+  },
+  "Causal-Reductionism": {
+    "name": "Causal Reductionism",
+    "slug": "Causal-Reductionism",
+    "definition": "Assuming a single cause or reason when there were actually multiple causes or reasons.  Logical Form:",
+    "aliases": [
+      "complex cause",
+      "fallacy of the single cause",
+      "causal oversimplification",
+      "reduction fallacy"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Causal-Reductionism",
+    "scrapedAt": 1772335956922
+  },
+  "Cherry-Picking": {
+    "name": "Cherry Picking",
+    "slug": "Cherry-Picking",
+    "definition": "When only select evidence is presented in order to persuade the audience to accept a position, and evidence that would go against the position is withheld.  The stronger the withheld evidence, the more fallacious the argument.  Logical Form:",
+    "aliases": [
+      "ignoring inconvenient data",
+      "suppressed evidence",
+      "fallacy of incomplete evidence",
+      "argument by selective observation",
+      "argument by half-truth",
+      "card stacking",
+      "fallacy of exclusion",
+      "ignoring the counter evidence",
+      "one-sided assessment",
+      "slanting",
+      "one-sidedness"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Cherry-Picking",
+    "scrapedAt": 1772335956922
+  },
+  "Circular-Definition": {
+    "name": "Circular Definition",
+    "slug": "Circular-Definition",
+    "definition": "A circular definition is defining a term by using the term in the definition.  Ironically, that definition is partly guilty by my use of the term “definition” in the definition.  Okay, I am using definition way too much. Damn!  I just did it again.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Circular-Definition",
+    "scrapedAt": 1772335956922
+  },
+  "Circular-Reasoning": {
+    "name": "Circular Reasoning",
+    "slug": "Circular-Reasoning",
+    "definition": "A type of reasoning in which the proposition is supported by the premises, which is supported by the proposition, creating a circle in reasoning where no useful information is being shared.  This fallacy is often quite humorous.",
+    "aliases": [
+      "circulus in demonstrando",
+      "paradoxical thinking",
+      "circular argument",
+      "circular cause and consequence",
+      "reasoning in a circle"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Circular-Reasoning",
+    "scrapedAt": 1772335956922
+  },
+  "Commutation-of-Conditionals": {
+    "name": "Commutation of Conditionals",
+    "slug": "Commutation-of-Conditionals",
+    "definition": "Switching the antecedent and the consequent in a logical argument.",
+    "aliases": [
+      "the fallacy of the consequent",
+      "converting a conditional"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Commutation-of-Conditionals",
+    "scrapedAt": 1772335956922
+  },
+  "Complex-Question-Fallacy": {
+    "name": "Complex Question Fallacy",
+    "slug": "Complex-Question-Fallacy",
+    "definition": "A question that has a presupposition built in, which implies something but protects the one asking the question from accusations of false claims.  It is a form of misleading discourse, and it is a fallacy when the audience does not detect the assumed information implicit in the question, and accepts it as a fact.",
+    "aliases": [
+      "plurium interrogationum",
+      "many questions fallacy",
+      "fallacy of presupposition",
+      "loaded question",
+      "trick question",
+      "false question"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Complex-Question-Fallacy",
+    "scrapedAt": 1772335956922
+  },
+  "Conflicting-Conditions": {
+    "name": "Conflicting Conditions",
+    "slug": "Conflicting-Conditions",
+    "definition": "When the argument is self-contradictory and cannot possibly be true.",
+    "aliases": [
+      "contradictio in adjecto",
+      "a self-contradiction",
+      "self-refuting idea"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Conflicting-Conditions",
+    "scrapedAt": 1772335956922
+  },
+  "Confusing-an-Explanation-with-an-Excuse": {
+    "name": "Confusing an Explanation with an Excuse",
+    "slug": "Confusing-an-Explanation-with-an-Excuse",
+    "definition": "Treating an explanation of a fact as if it were a justification of the fact, a valid reason for the fact, or evidence for the fact.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Confusing-an-Explanation-with-an-Excuse",
+    "scrapedAt": 1772335956922
+  },
+  "Confusing-Currently-Unexplained-with-Unexplainable": {
+    "name": "Confusing Currently Unexplained with Unexplainable",
+    "slug": "Confusing-Currently-Unexplained-with-Unexplainable",
+    "definition": "Making the assumption that what cannot currently be explained is, therefore, unexplainable (impossible to explain). This is a problem because we cannot know the future and what conditions might arise that offer an explanation. It is also important to note that we cannot assume the currently unexplained is explainable.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Confusing-Currently-Unexplained-with-Unexplainable",
+    "scrapedAt": 1772335956922
+  },
+  "Conjunction-Fallacy": {
+    "name": "Conjunction Fallacy",
+    "slug": "Conjunction-Fallacy",
+    "definition": "The conjunction fallacy occurs when one estimates a conjunctive statement (this and that) to be more probable than at least one of its component statements. It is the assumption that more specific conditions are more probable than general ones.  This fallacy usually stems from thinking the choices are alternatives, rather than members of the same set.  The fallacy is further exacerbated by priming the audience with information leading them to choose the subset as the more probable option.",
+    "aliases": [
+      "conjunction effect"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Conjunction-Fallacy",
+    "scrapedAt": 1772335956922
+  },
+  "Conspiracy-Theory": {
+    "name": "Conspiracy Theory",
+    "slug": "Conspiracy-Theory",
+    "definition": "Explaining that your claim cannot be proven or verified because the truth is being hidden and/or evidence destroyed by a group of two or more people.  When that reason is challenged as not being true or accurate, the challenge is often presented as just another attempt to cover up the truth, and presented as further evidence that the original claim is true.",
+    "aliases": [
+      "canceling hypothesis",
+      "canceling hypotheses",
+      "cover-ups"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Conspiracy-Theory",
+    "scrapedAt": 1772335956922
+  },
+  "Contextomy": {
+    "name": "Contextomy",
+    "slug": "Contextomy",
+    "definition": "Removing a passage from its surrounding matter in such a way as to distort its intended meaning.",
+    "aliases": [
+      "fallacy of quoting out of context",
+      "quoting out of context"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Contextomy",
+    "scrapedAt": 1772335956922
+  },
+  "deceptive-sharing.html": {
+    "name": "Deceptive Sharing",
+    "slug": "deceptive-sharing.html",
+    "definition": "haring an article, post, or meme on social media with the intent to influence public perception to perceive a statistically rare event as a common event. The cognitive bias behind this fallacy is the availability heuristic that causes us to have a skewed perception of reality based on specific examples that easily come to mind.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/deceptive-sharing.html",
+    "scrapedAt": 1772335956922
+  },
+  "Definist-Fallacy": {
+    "name": "Definist Fallacy",
+    "slug": "Definist-Fallacy",
+    "definition": "Defining a term in such a way that makes one’s position much easier to defend.",
+    "aliases": [
+      "persuasive definition fallacy",
+      "redefinition"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Definist-Fallacy",
+    "scrapedAt": 1772335956922
+  },
+  "Denying-a-Conjunct": {
+    "name": "Denying a Conjunct",
+    "slug": "Denying-a-Conjunct",
+    "definition": "A formal fallacy in which the first premise states that at least one of the two conjuncts (antecedent and consequent) is false and concludes that the other conjunct must be true.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Denying-a-Conjunct",
+    "scrapedAt": 1772335956922
+  },
+  "Denying-the-Antecedent": {
+    "name": "Denying the Antecedent",
+    "slug": "Denying-the-Antecedent",
+    "definition": "It is a fallacy in formal logic where in a standard if/then premise, the antecedent (what comes after the “if”) is made not true, then it is concluded that the consequent (what comes after the “then”) is not true.",
+    "aliases": [
+      "inverse error",
+      "inverse fallacy"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Denying-the-Antecedent",
+    "scrapedAt": 1772335956922
+  },
+  "Denying-the-Correlative": {
+    "name": "Denying the Correlative",
+    "slug": "Denying-the-Correlative",
+    "definition": "Introducing alternatives when, in fact, there are none.  This could happen when you have two mutually exclusive statements (correlative conjunction) presented as choices, and instead of picking one or the other, introduce a third -- usually as  a distraction from having to choose between the two alternatives presented.",
+    "aliases": [
+      "denying the correlative conjunction"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Denying-the-Correlative",
+    "scrapedAt": 1772335956922
+  },
+  "Disjunction-Fallacy": {
+    "name": "Disjunction Fallacy",
+    "slug": "Disjunction-Fallacy",
+    "definition": "Similar to the conjunction fallacy, the disjunction fallacy occurs when one estimates a disjunctive statement (this or that) to be less probable than at least one of its component statements.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Disjunction-Fallacy",
+    "scrapedAt": 1772335956922
+  },
+  "Distinction-Without-a-Difference": {
+    "name": "Distinction Without a Difference",
+    "slug": "Distinction-Without-a-Difference",
+    "definition": "The assertion that a position is different from another position based on the language when, in fact, both positions are the same -- at least in practice or practical terms.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Distinction-Without-a-Difference",
+    "scrapedAt": 1772335956922
+  },
+  "Double-Standard": {
+    "name": "Double Standard",
+    "slug": "Double-Standard",
+    "definition": "Judging two situations by different standards when, in fact, you should be using the same standard. Used in argumentation to unfairly support or reject an argument.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Double-Standard",
+    "scrapedAt": 1772335956922
+  },
+  "Ecological-Fallacy": {
+    "name": "Ecological Fallacy",
+    "slug": "Ecological-Fallacy",
+    "definition": "The interpretation of statistical data where inferences about the nature of individuals are deduced from inference for the group to which those individuals belong.",
+    "aliases": [
+      "ecological inference fallacy"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Ecological-Fallacy",
+    "scrapedAt": 1772335956922
+  },
+  "Equivocation": {
+    "name": "Equivocation",
+    "slug": "Equivocation",
+    "definition": "Using an ambiguous term in more than one sense, thus making an argument misleading.",
+    "aliases": [
+      "doublespeak"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Equivocation",
+    "scrapedAt": 1772335956922
+  },
+  "Etymological-Fallacy": {
+    "name": "Etymological Fallacy",
+    "slug": "Etymological-Fallacy",
+    "definition": "The assumption that the present day meaning of a word should be/is similar to the historical meaning.  This fallacy ignores the evolution of language and heart of linguistics.  This fallacy is usually committed when one finds the historical meaning of a word more palatable or conducive to his or her argument.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Etymological-Fallacy",
+    "scrapedAt": 1772335956922
+  },
+  "Exclusive-Premises": {
+    "name": "Exclusive Premises",
+    "slug": "Exclusive-Premises",
+    "definition": "A standard form categorical syllogism that has two negative premises either in the form of  “no X are Y” or “some X are not Y”.",
+    "aliases": [
+      "fallacy of exclusive premises"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Exclusive-Premises",
+    "scrapedAt": 1772335956922
+  },
+  "Existential-Fallacy": {
+    "name": "Existential Fallacy",
+    "slug": "Existential-Fallacy",
+    "definition": "A formal logical fallacy, which is committed when a categorical syllogism employs two universal premises (“all”) to arrive at a particular (“some”) conclusion.",
+    "aliases": [
+      "existential instantiation"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Existential-Fallacy",
+    "scrapedAt": 1772335956922
+  },
+  "Extended-Analogy": {
+    "name": "Extended Analogy",
+    "slug": "Extended-Analogy",
+    "definition": "Suggesting that because two things are alike in some way and one of those things is like something else, then both things must be like that \"something else\".",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Extended-Analogy",
+    "scrapedAt": 1772335956922
+  },
+  "fact-to-fiction_fallacy.html": {
+    "name": "Fact-to-fiction Fallacy",
+    "slug": "fact-to-fiction_fallacy.html",
+    "definition": "Attempting to support a narrative or argument with facts that don't support the narrative or argument. The distinguishing characteristic of the ...",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/fact-to-fiction_fallacy.html",
+    "scrapedAt": 1772335956922
+  },
+  "Failure-to-Elucidate": {
+    "name": "Failure to Elucidate",
+    "slug": "Failure-to-Elucidate",
+    "definition": "When the definition is made more difficult to understand than the word or concept being defined.",
+    "aliases": [
+      "obscurum per obscurius"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Failure-to-Elucidate",
+    "scrapedAt": 1772335956922
+  },
+  "Fake-Precision": {
+    "name": "Fake Precision",
+    "slug": "Fake-Precision",
+    "definition": "Using implausibly precise statistics to give the appearance of truth and certainty, or using negligible difference in data to draw incorrect inferences.",
+    "aliases": [
+      "over-precision",
+      "false precision",
+      "misplaced precision",
+      "spurious accuracy"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Fake-Precision",
+    "scrapedAt": 1772335956922
+  },
+  "Fallacy-of-the-Undistributed-Middle": {
+    "name": "Fallacy of (the) Undistributed Middle",
+    "slug": "Fallacy-of-the-Undistributed-Middle",
+    "definition": "A formal fallacy in a categorical syllogism where the middle term, or the term that does not appear in the conclusion, is not distributed to the other two terms.",
+    "aliases": [
+      "maldistributed middle",
+      "undistributed middle term"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Fallacy-of-the-Undistributed-Middle",
+    "scrapedAt": 1772335956922
+  },
+  "Fallacy-of-Composition": {
+    "name": "Fallacy of Composition",
+    "slug": "Fallacy-of-Composition",
+    "definition": "Inferring that something is true of the whole from the fact that it is true of some part of the whole.  This is the opposite of the fallacy of division.",
+    "aliases": [
+      "composition fallacy",
+      "exception fallacy",
+      "faulty induction"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Fallacy-of-Composition",
+    "scrapedAt": 1772335956922
+  },
+  "Fallacy-of-Division": {
+    "name": "Fallacy of Division",
+    "slug": "Fallacy-of-Division",
+    "definition": "Inferring that something is true of one or more of the parts from the fact that it is true of the whole.  This is the opposite of the fallacy of composition.",
+    "aliases": [
+      "false division",
+      "faulty deduction",
+      "division fallacy"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Fallacy-of-Division",
+    "scrapedAt": 1772335956922
+  },
+  "Fallacy-of-Every-and-All": {
+    "name": "Fallacy of Every and All",
+    "slug": "Fallacy-of-Every-and-All",
+    "definition": "When an argument contains both universal quantifiers and existential quantifiers (all, some, none, every) with different meanings, and the order of the quantifiers is reversed. This is a specific form of equivocation.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Fallacy-of-Every-and-All",
+    "scrapedAt": 1772335956922
+  },
+  "Fallacy-of-Four-Terms": {
+    "name": "Fallacy of Four Terms",
+    "slug": "Fallacy-of-Four-Terms",
+    "definition": "This fallacy occurs in a categorical syllogism when the syllogism has four terms rather than the requisite three (in a sense, it cannot be a categorical syllogism to begin with!)  If it takes on this form, it is invalid.  The equivocation fallacy can also fit this fallacy because the same term is used in two different ways, making four distinct terms, although only appearing to be three.",
+    "aliases": [
+      "quaternio terminorum",
+      "ambiguous middle term"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Fallacy-of-Four-Terms",
+    "scrapedAt": 1772335956922
+  },
+  "Fallacy-of-Opposition": {
+    "name": "Fallacy of Opposition",
+    "slug": "Fallacy-of-Opposition",
+    "definition": "Asserting that those who disagree with you must be wrong and not thinking straight, primarily based on the fact that they are the opposition.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Fallacy-of-Opposition",
+    "scrapedAt": 1772335956922
+  },
+  "False-Attribution": {
+    "name": "False Attribution",
+    "slug": "False-Attribution",
+    "definition": "Appealing to an irrelevant, unqualified, unidentified, biased or fabricated source in support of an argument.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/False-Attribution",
+    "scrapedAt": 1772335956922
+  },
+  "False-Conversion": {
+    "name": "False Conversion",
+    "slug": "False-Conversion",
+    "definition": "The formal fallacy where the subject and the predicate terms of the proposition are switched (conversion) in the conclusion, in a proposition that uses “all” in its premise (type “A” forms), or “some/not” (type “O” forms).",
+    "aliases": [
+      "illicit conversion",
+      "[illicit] inductive conversion"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/False-Conversion",
+    "scrapedAt": 1772335956922
+  },
+  "False-Dilemma": {
+    "name": "False Dilemma",
+    "slug": "False-Dilemma",
+    "definition": "When only two choices are presented yet more exist, or a spectrum of possible choices exists between two extremes.  False dilemmas are usually characterized by “either this or that” language, but can also be characterized by omissions of choices.  Another variety is the false trilemma, which is when three choices are presented when more exist.",
+    "aliases": [
+      "all-or-nothing fallacy",
+      "false dichotomy [form of]",
+      "the either-or fallacy",
+      "either-or reasoning",
+      "fallacy of false choice",
+      "fallacy of false alternatives",
+      "black-and-white thinking",
+      "the fallacy of exhaustive hypotheses",
+      "bifurcation",
+      "excluded middle",
+      "no middle ground",
+      "polarization"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/False-Dilemma",
+    "scrapedAt": 1772335956922
+  },
+  "False-Effect": {
+    "name": "False Effect",
+    "slug": "False-Effect",
+    "definition": "Claiming that the cause is true or false based on what we know about the effect in a claim of causality that has not been properly established. The cause is often an implied claim, and it is this claim that is being deemed true or false, right or wrong.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/False-Effect",
+    "scrapedAt": 1772335956922
+  },
+  "False-Equivalence": {
+    "name": "False Equivalence",
+    "slug": "False-Equivalence",
+    "definition": "An argument or claim in which two completely opposing arguments appear to be logically equivalent when in fact they are not.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/False-Equivalence",
+    "scrapedAt": 1772335956922
+  },
+  "Fantasy-Projection": {
+    "name": "Fantasy Projection",
+    "slug": "Fantasy-Projection",
+    "definition": "Confusing subjective experiences, usually very emotionally charged, with objective reality, then suggesting or demanding that others accept the subjective experience as objective reality.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Fantasy-Projection",
+    "scrapedAt": 1772335956922
+  },
+  "Far-Fetched-Hypothesis": {
+    "name": "Far-Fetched Hypothesis",
+    "slug": "Far-Fetched-Hypothesis",
+    "definition": "Offering a bizarre (far-fetched) hypothesis as the correct explanation without first ruling out more mundane explanations.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Far-Fetched-Hypothesis",
+    "scrapedAt": 1772335956922
+  },
+  "Faulty-Comparison": {
+    "name": "Faulty Comparison",
+    "slug": "Faulty-Comparison",
+    "definition": "Comparing one thing to another that is really not related, in order to make one thing look more or less desirable than it really is.",
+    "aliases": [
+      "bad comparison",
+      "false comparison",
+      "inconsistent comparison [form of]"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Faulty-Comparison",
+    "scrapedAt": 1772335956922
+  },
+  "Gadarene-Swine-Fallacy": {
+    "name": "Gadarene Swine Fallacy",
+    "slug": "Gadarene-Swine-Fallacy",
+    "definition": "The assumption that because an individual is not in formation with the group, that the individual must be the one off course. It is possible that the one who appears off course is the only one on the right course.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Gadarene-Swine-Fallacy",
+    "scrapedAt": 1772335956922
+  },
+  "Galileo-Fallacy": {
+    "name": "Galileo Fallacy",
+    "slug": "Galileo-Fallacy",
+    "definition": "The claim that because an idea is forbidden, prosecuted, detested, or otherwise mocked, it must be true, or should be given more credibility. This originates from Galileo Galilei's famous persecution by the Roman Catholic Church for his defense of heliocentrism when the commonly accepted belief at the time was an earth-centered universe.",
+    "aliases": [
+      "Galileo argument",
+      "Galileo defense",
+      "Galileo gambit",
+      "Galileo wannabe"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Galileo-Fallacy",
+    "scrapedAt": 1772335956922
+  },
+  "Gamblers-Fallacy": {
+    "name": "Gambler’s Fallacy",
+    "slug": "Gamblers-Fallacy",
+    "definition": "Reasoning that, in a situation that is pure random chance, the outcome can be affected by previous outcomes.",
+    "aliases": [
+      "the Monte Carlo fallacy",
+      "the doctrine of the maturity of chances"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Gamblers-Fallacy",
+    "scrapedAt": 1772335956922
+  },
+  "Genetic-Fallacy": {
+    "name": "Genetic Fallacy",
+    "slug": "Genetic-Fallacy",
+    "definition": "Basing the truth claim of an argument on the origin of its claims or premises.",
+    "aliases": [
+      "fallacy of origins",
+      "fallacy of virtue"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Genetic-Fallacy",
+    "scrapedAt": 1772335956922
+  },
+  "gish-gallop.html": {
+    "name": "Gish Gallop",
+    "slug": "gish-gallop.html",
+    "definition": "Overwhelming an interlocutor with as many arguments as possible, without regard for accuracy or strength of the arguments. This is especially disingenuous when the interlocutor is not allowed to interrupt and address the arguments...",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/gish-gallop.html",
+    "scrapedAt": 1772335956922
+  },
+  "Hasty-Generalization": {
+    "name": "Hasty Generalization",
+    "slug": "Hasty-Generalization",
+    "definition": "Drawing a conclusion based on a small sample size, rather than looking at statistics that are much more in line with the typical or average situation.",
+    "aliases": [
+      "argument from small numbers",
+      "statistics of small numbers",
+      "insufficient statistics",
+      "argument by generalization",
+      "faulty generalization",
+      "hasty induction",
+      "inductive generalization",
+      "insufficient sample",
+      "lonely fact fallacy",
+      "over generality",
+      "overgeneralization",
+      "unrepresentative sample"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Hasty-Generalization",
+    "scrapedAt": 1772335956922
+  },
+  "Having-Your-Cake": {
+    "name": "Having Your Cake",
+    "slug": "Having-Your-Cake",
+    "definition": "Making an argument, or responding to one, in such a way that it does not make it at all clear what your position is.  This puts you in a position to back out of your claim at any time and go in a new direction without penalty, claiming that you were “right” all along.",
+    "aliases": [
+      "failure to assert",
+      "diminished claim",
+      "failure to choose sides"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Having-Your-Cake",
+    "scrapedAt": 1772335956922
+  },
+  "Hedging": {
+    "name": "Hedging",
+    "slug": "Hedging",
+    "definition": "Refining your claim simply to avoid counter evidence and then acting as if your revised claim is the same as the original.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Hedging",
+    "scrapedAt": 1772335956922
+  },
+  "Historians-Fallacy": {
+    "name": "Historian’s Fallacy",
+    "slug": "Historians-Fallacy",
+    "definition": "Judging a person's decision in the light of new information not available at the time.",
+    "aliases": [
+      "retrospective determinism",
+      "hindsight"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Historians-Fallacy",
+    "scrapedAt": 1772335956922
+  },
+  "Homunculus-Fallacy": {
+    "name": "Homunculus Fallacy",
+    "slug": "Homunculus-Fallacy",
+    "definition": "An argument that accounts for a phenomenon in terms of the very phenomenon that it is supposed to explain, which results in an infinite regress.",
+    "aliases": [
+      "homunculus argument",
+      "infinite regress"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Homunculus-Fallacy",
+    "scrapedAt": 1772335956922
+  },
+  "Hot-Hand-Fallacy": {
+    "name": "Hot Hand Fallacy",
+    "slug": "Hot-Hand-Fallacy",
+    "definition": "The hot hand fallacy is the irrational belief that if you win or lose several chance games in a row, you are either “hot” or “cold,” respectively, meaning that the streak is likely to continue and has to do with something other than pure probability.",
+    "aliases": [
+      "hot hand phenomenon"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Hot-Hand-Fallacy",
+    "scrapedAt": 1772335956922
+  },
+  "Hypnotic-Bait-and-Switch": {
+    "name": "Hypnotic Bait and Switch",
+    "slug": "Hypnotic-Bait-and-Switch",
+    "definition": "Stating several uncontroversially true statements in succession, followed by a claim that the arguer wants the audience to accept as true.  This is a propaganda technique, but also a fallacy when the audience lends more credibility to the last claim because it was preceded by true statements.  The negative can also be used in the same way.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Hypnotic-Bait-and-Switch",
+    "scrapedAt": 1772335956922
+  },
+  "Hypothesis-Contrary-to-Fact": {
+    "name": "Hypothesis Contrary to Fact",
+    "slug": "Hypothesis-Contrary-to-Fact",
+    "definition": "Offering a poorly supported claim about what might have happened in the past or future, if (the hypothetical part) circumstances or conditions were different.  The fallacy also entails treating future hypothetical situations as if they are fact.",
+    "aliases": [
+      "counterfactual fallacy",
+      "speculative fallacy",
+      "\"what if\" fallacy",
+      "wouldchuck"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Hypothesis-Contrary-to-Fact",
+    "scrapedAt": 1772335956922
+  },
+  "Identity-Fallacy": {
+    "name": "Identity Fallacy",
+    "slug": "Identity-Fallacy",
+    "definition": "When one's argument is evaluated based on their physical or social identity, i.e., their social class, generation, ethnic group, gender or sexual orientation, profession, occupation or subgroup when the strength of the argument is independent of identity.",
+    "aliases": [
+      "identity politics"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Identity-Fallacy",
+    "scrapedAt": 1772335956922
+  },
+  "If-By-Whiskey": {
+    "name": "If-By-Whiskey",
+    "slug": "If-By-Whiskey",
+    "definition": "A response to a question that is contingent on the questioner’s opinions and makes use of words with strong connotations.  This fallacy appears to support both sides of an issue -- a tactic common in politics.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/If-By-Whiskey",
+    "scrapedAt": 1772335956922
+  },
+  "Illicit-Contraposition": {
+    "name": "Illicit Contraposition",
+    "slug": "Illicit-Contraposition",
+    "definition": "A formal fallacy where switching the subject and predicate terms of a categorical proposition, then negating each, results in an invalid argument form.  The examples below make this more clear.  This is a fallacy only for type “E” and type “I” forms, or forms using the words “no” and “some”, respectively.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Illicit-Contraposition",
+    "scrapedAt": 1772335956922
+  },
+  "Illicit-Major": {
+    "name": "Illicit Major",
+    "slug": "Illicit-Major",
+    "definition": "Any form of a categorical syllogism in which the major term is distributed in the conclusion, but not in the major premise.",
+    "aliases": [
+      "illicit process of the major term"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Illicit-Major",
+    "scrapedAt": 1772335956922
+  },
+  "Illicit-Minor": {
+    "name": "Illicit Minor",
+    "slug": "Illicit-Minor",
+    "definition": "Any form of a categorical syllogism in which the minor term is distributed in the conclusion, but not in the minor premise.",
+    "aliases": [
+      "illicit process of the minor term"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Illicit-Minor",
+    "scrapedAt": 1772335956922
+  },
+  "Illicit-Substitution-of-Identicals": {
+    "name": "Illicit Substitution of Identicals",
+    "slug": "Illicit-Substitution-of-Identicals",
+    "definition": "A formal fallacy due to confusing the knowing of a thing (extension) with the knowing of it under all its various names or descriptions (intension).",
+    "aliases": [
+      "hooded man fallacy",
+      "masked man fallacy",
+      "intensional fallacy"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Illicit-Substitution-of-Identicals",
+    "scrapedAt": 1772335956922
+  },
+  "imposter-fallacy.html": {
+    "name": "Imposter Fallacy",
+    "slug": "imposter-fallacy.html",
+    "definition": "When one suggests or claims, with insufficient evidence, that the group outliers who are viewed as damaging to the group are primarily made up of infiltrators of another group with the purpose of making the infiltrated group look bad.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/imposter-fallacy.html",
+    "scrapedAt": 1772335956922
+  },
+  "Incomplete-Comparison": {
+    "name": "Incomplete Comparison",
+    "slug": "Incomplete-Comparison",
+    "definition": "An incomplete assertion that cannot possibly be refuted. This is popular in advertising.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Incomplete-Comparison",
+    "scrapedAt": 1772335956922
+  },
+  "Inconsistency": {
+    "name": "Inconsistency",
+    "slug": "Inconsistency",
+    "definition": "In terms of a fallacious argument, two or more propositions are asserted that cannot both possibly be true.  In a more general sense, holding two or more views/beliefs that cannot be all be true together.  Quotes from Yogi Berra (even if apocryphal) are great examples of fallacies, especially inconsistencies.",
+    "aliases": [
+      "internal contradiction",
+      "logical inconsistency"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Inconsistency",
+    "scrapedAt": 1772335956922
+  },
+  "Inflation-of-Conflict": {
+    "name": "Inflation of Conflict",
+    "slug": "Inflation-of-Conflict",
+    "definition": "Reasoning that because authorities cannot agree precisely on an issue, no conclusions can be reached at all, and minimizing the credibility of the authorities, as a result.  This is a form of black and white thinking -- either we know the exact truth, or we know nothing at all.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Inflation-of-Conflict",
+    "scrapedAt": 1772335956922
+  },
+  "Insignificant-Cause": {
+    "name": "Insignificant Cause",
+    "slug": "Insignificant-Cause",
+    "definition": "An explanation that posits one minor factor, out of several that contributed, as its sole cause. This fallacy also occurs when an explanation is requested, and the one that is given is not sufficient to entirely explain the incident yet it is passed off as if it is sufficient.",
+    "aliases": [
+      "fallacy of insignificant",
+      "genuine but insignificant cause",
+      "insufficient cause"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Insignificant-Cause",
+    "scrapedAt": 1772335956922
+  },
+  "Jumping-to-Conclusions": {
+    "name": "Jumping to Conclusions",
+    "slug": "Jumping-to-Conclusions",
+    "definition": "Drawing a conclusion without taking the needed time to evaluate the evidence or reason through the argument.",
+    "aliases": [
+      "hasty conclusion",
+      "hasty decision",
+      "leaping to conclusions",
+      "specificity"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Jumping-to-Conclusions",
+    "scrapedAt": 1772335956922
+  },
+  "Just-Because-Fallacy": {
+    "name": "Just Because Fallacy",
+    "slug": "Just-Because-Fallacy",
+    "definition": "Refusing to respond to give reasons or evidence for a claim by stating yourself as the ultimate authority on the matter.  This is usually indicated by the phrases, “just trust me”, “because I said so”, “you’ll see”, or “just because”.  The just because fallacy is not conducive to the goal of argumentation -- that is coming to a mutually agreeable solution.  Nor is it helpful in helping the other person understand why you are firm on your position. “Just because” is not a reason that speaks to the question itself; it is simply a deflection to authority (legitimate or not).",
+    "aliases": [
+      "trust me",
+      "mother knows best fallacy",
+      "because I said so",
+      "you’ll see"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Just-Because-Fallacy",
+    "scrapedAt": 1772335956922
+  },
+  "Just-In-Case-Fallacy": {
+    "name": "Just In Case Fallacy",
+    "slug": "Just-In-Case-Fallacy",
+    "definition": "Making an argument based on the worst-case scenario rather than the most probable scenario, allowing fear to prevail over reason.",
+    "aliases": [
+      "worst case scenario fallacy"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Just-In-Case-Fallacy",
+    "scrapedAt": 1772335956922
+  },
+  "Kettle-Logic": {
+    "name": "Kettle Logic",
+    "slug": "Kettle-Logic",
+    "definition": "Making (usually) multiple, contradicting arguments, in an attempt to support a single point or idea.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Kettle-Logic",
+    "scrapedAt": 1772335956922
+  },
+  "Least-Plausible-Hypothesis": {
+    "name": "Least Plausible Hypothesis",
+    "slug": "Least-Plausible-Hypothesis",
+    "definition": "Choosing more unreasonable explanations for phenomena over more defensible ones.  In judging the validity of hypotheses or conclusions from observation, the scientific method relies upon the Principle of Parsimony, also known as Occam’s Razor, which states, all things being equal, the simplest explanation of a phenomenon that requires the fewest assumptions is the preferred explanation until it can be disproved.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Least-Plausible-Hypothesis",
+    "scrapedAt": 1772335956922
+  },
+  "Limited-Depth": {
+    "name": "Limited Depth",
+    "slug": "Limited-Depth",
+    "definition": "Failing to appeal to an underlying cause, and instead simply appealing to membership in a category.  In other words, simply asserting what you are trying to explain without actually explaining anything.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Limited-Depth",
+    "scrapedAt": 1772335956922
+  },
+  "Limited-Scope": {
+    "name": "Limited Scope",
+    "slug": "Limited-Scope",
+    "definition": "The theory doesn't explain anything other than the phenomenon it explains (that one thing), and at best, is likely to be incomplete.  This is often done by just redefining a term or phrase rather than explaining it.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Limited-Scope",
+    "scrapedAt": 1772335956922
+  },
+  "Logic-Chopping": {
+    "name": "Logic Chopping",
+    "slug": "Logic-Chopping",
+    "definition": "Using the technical tools of logic in an unhelpful and pedantic manner by focusing on trivial details instead of directly addressing the main issue in dispute.  Irrelevant over precision.",
+    "aliases": [
+      "quibbling",
+      "nit-picking",
+      "smokescreen",
+      "splitting-hairs",
+      "trivial objections"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Logic-Chopping",
+    "scrapedAt": 1772335956922
+  },
+  "Ludic-Fallacy": {
+    "name": "Ludic Fallacy",
+    "slug": "Ludic-Fallacy",
+    "definition": "Assuming flawless statistical models apply to situations where they actually don’t.  This can result in the over-confidence in probability theory or simply not knowing exactly where it applies as opposed to chaotic situations or situations with external influences too subtle or numerous to predict.",
+    "aliases": [
+      "ludus"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Ludic-Fallacy",
+    "scrapedAt": 1772335956922
+  },
+  "Lying-with-Statistics": {
+    "name": "Lying with Statistics",
+    "slug": "Lying-with-Statistics",
+    "definition": "This can be seen as an entire class of fallacies that result in presenting statistical data in a very biased way, and of course, interpreting statistics without questioning the methods behind collecting and presenting the data.",
+    "aliases": [
+      "statistical fallacy/fallacies",
+      "misunderstanding the nature of statistics [form of]",
+      "fallacy of curve fitting",
+      "the fallacy of overfitting"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Lying-with-Statistics",
+    "scrapedAt": 1772335956922
+  },
+  "Magical-Thinking": {
+    "name": "Magical Thinking",
+    "slug": "Magical-Thinking",
+    "definition": "Making causal connections or correlations between two events not based on logic or evidence, but primarily based on superstition.  Magical thinking often causes one to experience irrational fear of performing certain acts or having certain thoughts because they assume a correlation with their acts and threatening calamities.",
+    "aliases": [
+      "superstitious thinking"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Magical-Thinking",
+    "scrapedAt": 1772335956922
+  },
+  "mcnamara_fallacy.html": {
+    "name": "McNamara Fallacy",
+    "slug": "mcnamara_fallacy.html",
+    "definition": "When a decision is based solely on quantitative observations (i.e., metrics, hard data, statistics) and all qualitative factors are ignored.",
+    "aliases": [
+      "quantitative fallacy",
+      "Skittles fallacy"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/mcnamara_fallacy.html",
+    "scrapedAt": 1772335956922
+  },
+  "Meaningless-Question": {
+    "name": "Meaningless Question",
+    "slug": "Meaningless-Question",
+    "definition": "Asking a question that cannot be answered with any sort of rational meaning. This is the textual equivalent of dividing by zero.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Meaningless-Question",
+    "scrapedAt": 1772335956922
+  },
+  "Methodology": {
+    "name": "Methodology",
+    "slug": "Methodology",
+    "definition": "As discussed in the preface, the core fallacies detailed in this book date back thousands of years to Aristotle. Academic resources were used when possible when compiling this list of fallacies.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Methodology",
+    "scrapedAt": 1772335956922
+  },
+  "Misleading-Vividness": {
+    "name": "Misleading Vividness",
+    "slug": "Misleading-Vividness",
+    "definition": "A small number of dramatic and vivid events are taken to outweigh a significant amount of statistical evidence.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Misleading-Vividness",
+    "scrapedAt": 1772335956922
+  },
+  "Missing-Data-Fallacy": {
+    "name": "Missing Data Fallacy",
+    "slug": "Missing-Data-Fallacy",
+    "definition": "Refusing to admit ignorance to the hypothesis and/or the conclusion, but insisting that your ignorance has to do with missing data that validate both the hypothesis and conclusion.",
+    "aliases": [
+      "missing information fallacy"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Missing-Data-Fallacy",
+    "scrapedAt": 1772335956922
+  },
+  "Modal-Scope-Fallacy": {
+    "name": "Modal (Scope) Fallacy",
+    "slug": "Modal-Scope-Fallacy",
+    "definition": "Modal logic studies ways in which propositions can be true or false, the most common being necessity and possibility.  Some propositions are necessarily true/false, and others are possibly true/false.  In short, a modal fallacy involves making a formal argument invalid by confusing the scope of what is actually necessary or possible.",
+    "aliases": [
+      "fallacy of modal logic",
+      "misconditionalization",
+      "fallacy of neccessity"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Modal-Scope-Fallacy",
+    "scrapedAt": 1772335956922
+  },
+  "Moralistic-Fallacy": {
+    "name": "Moralistic Fallacy",
+    "slug": "Moralistic-Fallacy",
+    "definition": "When the conclusion expresses what is, based only on what one believes ought to be, or what isn’t is based on what one believes ought not to be.",
+    "aliases": [
+      "moral fallacy"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Moralistic-Fallacy",
+    "scrapedAt": 1772335956922
+  },
+  "Moving-the-Goalposts": {
+    "name": "Moving the Goalposts",
+    "slug": "Moving-the-Goalposts",
+    "definition": "Demanding from an opponent that he or she address more and more points after the initial counter-argument has been satisfied refusing to conceded or accept the opponent’s argument.",
+    "aliases": [
+      "gravity game",
+      "raising the bar",
+      "argument by demanding impossible perfection [form of]"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Moving-the-Goalposts",
+    "scrapedAt": 1772335956922
+  },
+  "Multiple-Comparisons-Fallacy": {
+    "name": "Multiple Comparisons Fallacy",
+    "slug": "Multiple-Comparisons-Fallacy",
+    "definition": "Claiming that unexpected trends that occur through random chance alone in a data set with a large number of variables are meaningful.",
+    "aliases": [
+      "multiple comparisons",
+      "multiplicity",
+      "multiple testing problem",
+      "the look-elsewhere effect"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Multiple-Comparisons-Fallacy",
+    "scrapedAt": 1772335956922
+  },
+  "Naturalistic-Fallacy": {
+    "name": "Naturalistic Fallacy",
+    "slug": "Naturalistic-Fallacy",
+    "definition": "When the conclusion expresses what ought to be, based only on what is, or what ought not to be, based on what is not.",
+    "aliases": [
+      "is-ought fallacy",
+      "arguing from is to ought",
+      "is-should fallacy"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Naturalistic-Fallacy",
+    "scrapedAt": 1772335956922
+  },
+  "Negating-Antecedent-and-Consequent": {
+    "name": "Negating Antecedent and Consequent",
+    "slug": "Negating-Antecedent-and-Consequent",
+    "definition": "A formal fallacy where in the valid transpositional form of an argument, we fail to switch the antecedent and consequent.",
+    "aliases": [
+      "improper transposition"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Negating-Antecedent-and-Consequent",
+    "scrapedAt": 1772335956922
+  },
+  "Negative-Conclusion-from-Affirmative-Premises": {
+    "name": "Negative Conclusion from Affirmative Premises",
+    "slug": "Negative-Conclusion-from-Affirmative-Premises",
+    "definition": "The conclusion of a standard form categorical syllogism is negative, but both of the premises are positive.  Any valid forms of categorical syllogisms that assert a negative conclusion must have at least one negative premise.",
+    "aliases": [
+      "illicit affirmative"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Negative-Conclusion-from-Affirmative-Premises",
+    "scrapedAt": 1772335956922
+  },
+  "Nirvana-Fallacy": {
+    "name": "Nirvana Fallacy",
+    "slug": "Nirvana-Fallacy",
+    "definition": "Comparing a realistic solution with an idealized one, and discounting or even dismissing the realistic solution as a result of comparing to a “perfect world” or impossible standard.  Ignoring the fact that improvements are often good enough reason.",
+    "aliases": [
+      "perfect solution fallacy",
+      "perfectionist fallacy"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Nirvana-Fallacy",
+    "scrapedAt": 1772335956922
+  },
+  "No-True-Scotsman": {
+    "name": "No True Scotsman",
+    "slug": "No-True-Scotsman",
+    "definition": "When a universal (“all”, “every”, etc.) claim is refuted, rather than conceding the point or meaningfully revising the claim, the claim is altered by going from universal to specific, and failing to give any objective criteria for the specificity.",
+    "aliases": [
+      "appeal to purity [form of]",
+      "no true Christian",
+      "no true crossover fallacy [form of]"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/No-True-Scotsman",
+    "scrapedAt": 1772335956922
+  },
+  "Non-Sequitur": {
+    "name": "Non Sequitur",
+    "slug": "Non-Sequitur",
+    "definition": "When the conclusion does not follow from the premises.  In more informal reasoning, it can be when what is presented as evidence or reason is irrelevant or adds very little support to the conclusion.",
+    "aliases": [
+      "derailment",
+      "“that does not follow”",
+      "irrelevant reason",
+      "invalid inference",
+      "non-support",
+      "argument by scenario [form of]",
+      "false premise [form of]",
+      "questionable premise [form of]",
+      "non-sequitur"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Non-Sequitur",
+    "scrapedAt": 1772335956922
+  },
+  "Notable-Effort": {
+    "name": "Notable Effort",
+    "slug": "Notable-Effort",
+    "definition": "Accepting good effort as a valid reason to accept the truth of the conclusion, even though the effort is unrelated to the truth.",
+    "aliases": [
+      "“E” is for effort"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Notable-Effort",
+    "scrapedAt": 1772335956922
+  },
+  "nutpicking-fallacy.html": {
+    "name": "Nutpicking Fallacy",
+    "slug": "nutpicking-fallacy.html",
+    "definition": "When someone presents an atypical or weak member of a group as if they are a typical or strong representative.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/nutpicking-fallacy.html",
+    "scrapedAt": 1772335956922
+  },
+  "Overextended-Outrage": {
+    "name": "Overextended Outrage",
+    "slug": "Overextended-Outrage",
+    "definition": "This is a form of poor statistical thinking where one or more statistically rare cases are implied to be the norm or the trend (without evidence) for the purpose of expressing or inciting outrage toward an entire group. It is a form of extreme stereotyping.",
+    "aliases": [
+      "overextended moral outrage",
+      "overextended political outrage"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Overextended-Outrage",
+    "scrapedAt": 1772335956922
+  },
+  "Oversimplified-Cause-Fallacy": {
+    "name": "Oversimplified Cause Fallacy",
+    "slug": "Oversimplified-Cause-Fallacy",
+    "definition": "When a contributing factor is assumed to be the cause, or when a complex array of causal factors is reduced to a single cause. It is a form of simplistic thinking that implies something is either a cause, or it is not. It overlooks the important fact that, especially when referring to human behavior, causes are very complex and multi-dimensional.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Oversimplified-Cause-Fallacy",
+    "scrapedAt": 1772335956922
+  },
+  "Overwhelming-Exception": {
+    "name": "Overwhelming Exception",
+    "slug": "Overwhelming-Exception",
+    "definition": "A generalization that is technically accurate, but has one or more qualifications which eliminate so many cases that the resulting argument is significantly weaker than the arguer implies.  In many cases, the listed exceptions are given in place of evidence or support for the claim, not in addition to evidence or support for the claim.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Overwhelming-Exception",
+    "scrapedAt": 1772335956922
+  },
+  "Package-Deal-Fallacy": {
+    "name": "Package-Deal Fallacy",
+    "slug": "Package-Deal-Fallacy",
+    "definition": "Assuming things that are often grouped together must always be grouped together, or the assumption that the ungrouping will have significantly more severe effects than anticipated.",
+    "aliases": [
+      "false conjunction"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Package-Deal-Fallacy",
+    "scrapedAt": 1772335956922
+  },
+  "Poisoning-the-Well": {
+    "name": "Poisoning the Well",
+    "slug": "Poisoning-the-Well",
+    "definition": "To commit a preemptive ad hominem attack against an opponent.  That is, to prime the audience with adverse information about the opponent from the start, in an attempt to make your claim more acceptable or discount the credibility of your opponent’s claim.",
+    "aliases": [
+      "discrediting",
+      "smear tactics",
+      "appeal to ethos [form of]"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Poisoning-the-Well",
+    "scrapedAt": 1772335956922
+  },
+  "Political-Correctness-Fallacy": {
+    "name": "Political Correctness Fallacy",
+    "slug": "Political-Correctness-Fallacy",
+    "definition": "This is a common one in recent history.  It is the assumption or admission that two or more groups, individuals, or ideas of groups or individuals, are equal, of equal value, or both true, based on the recent phenomenon of political correctness, which is defined as, a term which denotes language, ideas, policies, and behavior seen as seeking to minimize social and institutional offense in occupational, gender, racial, cultural, sexual orientation, certain other religions, beliefs or ideologies, disability, and age-related contexts, and, as purported by the term, doing so to an excessive extent.",
+    "aliases": [
+      "PC fallacy"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Political-Correctness-Fallacy",
+    "scrapedAt": 1772335956922
+  },
+  "https://www.logicallyfallacious.com/post-hoc.html": {
+    "name": "Post Hoc",
+    "slug": "https://www.logicallyfallacious.com/post-hoc.html",
+    "definition": "Claiming that because event Y followed event X, event Y must have been caused by event X, without properly establishing causality.",
+    "aliases": [
+      "post hoc ergo propter hoc",
+      "after this therefore because of this",
+      "post hoc rationalization"
+    ],
+    "url": "https://www.logicallyfallacious.com/post-hoc.html",
+    "scrapedAt": 1772335956922
+  },
+  "Post-Designation": {
+    "name": "Post-Designation",
+    "slug": "Post-Designation",
+    "definition": "Drawing a conclusion from correlations observed in a given sample, but only after the sample has already been drawn, and without declaring in advance what correlations the experimenter was expecting to find.  This is related to the multiple comparisons fallacy.",
+    "aliases": [
+      "fishing for data"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Post-Designation",
+    "scrapedAt": 1772335956922
+  },
+  "pragmatic-fallacy.html": {
+    "name": "Pragmatic Fallacy",
+    "slug": "pragmatic-fallacy.html",
+    "definition": "Claiming that something is true because the person making the claim has experienced, or is referring to someone who has experienced, some practical benefit from believing the thing to be true.",
+    "aliases": [
+      "appeal to practicality"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/pragmatic-fallacy.html",
+    "scrapedAt": 1772335956922
+  },
+  "Prejudicial-Language": {
+    "name": "Prejudicial Language",
+    "slug": "Prejudicial-Language",
+    "definition": "Loaded or emotive terms used to attach value or moral goodness to believing the proposition.",
+    "aliases": [
+      "variant imagization"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Prejudicial-Language",
+    "scrapedAt": 1772335956922
+  },
+  "Proof-by-Intimidation": {
+    "name": "Proof by Intimidation",
+    "slug": "Proof-by-Intimidation",
+    "definition": "Making an argument purposely difficult to understand in an attempt to intimidate your audience in accepting it, or accepting an argument without evidence or being intimidated to question the authority or a priori assumptions of the one making the argument.",
+    "aliases": [
+      "argumentum verbosium",
+      "proof by verbosity",
+      "fallacy of intimidation"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Proof-by-Intimidation",
+    "scrapedAt": 1772335956922
+  },
+  "Proof-Surrogate": {
+    "name": "Proof Surrogate",
+    "slug": "Proof-Surrogate",
+    "definition": "A claim masquerading as proof or evidence, when no such proof or evidence is actually being offered.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Proof-Surrogate",
+    "scrapedAt": 1772335956922
+  },
+  "Proving-Non-Existence": {
+    "name": "Proving Non-Existence",
+    "slug": "Proving-Non-Existence",
+    "definition": "Demanding that one proves the non-existence of something in place for providing adequate evidence for the existence of that something.  Although it may be possible to prove non-existence in special situations, such as showing that a container does not contain certain items, one cannot prove universal or absolute non-existence.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Proving-Non-Existence",
+    "scrapedAt": 1772335956922
+  },
+  "Pseudo-Logical-Fallacies": {
+    "name": "Pseudo-Logical Fallacies",
+    "slug": "Pseudo-Logical-Fallacies",
+    "definition": "There are many so-called logical fallacies that can be found on the Internet that don’t meet one or more of these criteria, yet people will still refer to them as logical fallacies. Since there are no objective criteria for most logical fallacies, people can call anything a logical fallacy if they want.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Pseudo-Logical-Fallacies",
+    "scrapedAt": 1772335956922
+  },
+  "Psychogenetic-Fallacy": {
+    "name": "Psychogenetic Fallacy",
+    "slug": "Psychogenetic-Fallacy",
+    "definition": "Inferring some psychological reason why an argument is made then assuming it is invalid, as a result.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Psychogenetic-Fallacy",
+    "scrapedAt": 1772335956922
+  },
+  "Quantifier-Shift-Fallacy": {
+    "name": "Quantifier-Shift Fallacy",
+    "slug": "Quantifier-Shift-Fallacy",
+    "definition": "A fallacy of reversing the order of two quantifiers.",
+    "aliases": [
+      "illicit quantifier shift"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Quantifier-Shift-Fallacy",
+    "scrapedAt": 1772335956922
+  },
+  "Quantum-Physics-Fallacy": {
+    "name": "Quantum Physics Fallacy",
+    "slug": "Quantum-Physics-Fallacy",
+    "definition": "Using quantum physics in an attempt to support your claim, when in no way is your claim related to quantum physics.  One can also use the weirdness of the principles of quantum physics to cast doubt on the well-established laws of the macro world.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Quantum-Physics-Fallacy",
+    "scrapedAt": 1772335956922
+  },
+  "Questionable-Cause": {
+    "name": "Questionable Cause",
+    "slug": "Questionable-Cause",
+    "definition": "Concluding that one thing caused another, simply because they are regularly associated.",
+    "aliases": [
+      "cum hoc ergo propter hoc",
+      "butterfly logic",
+      "ignoring a common cause",
+      "neglecting a common cause",
+      "confusing correlation and causation",
+      "confusing cause and effect",
+      "false cause",
+      "third cause",
+      "third-cause fallacy",
+      "juxtaposition [form of]",
+      "reversing causality/wrong direction [form of]"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Questionable-Cause",
+    "scrapedAt": 1772335956922
+  },
+  "Rationalization": {
+    "name": "Rationalization",
+    "slug": "Rationalization",
+    "definition": "Offering false or inauthentic excuses for our claim because we know the real reasons are much less persuasive or more embarrassing to share, or harsher than the manufactured ones given.",
+    "aliases": [
+      "making excuses"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Rationalization",
+    "scrapedAt": 1772335956922
+  },
+  "Reasoning": {
+    "name": "Reasoning",
+    "slug": "Reasoning",
+    "definition": "Humans have the capacity to establish and verify facts, to change and justify beliefs, and in general, to make sense of things.  We do this by reason, and the process of doing so is called reasoning.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Reasoning",
+    "scrapedAt": 1772335956922
+  },
+  "Red-Herring": {
+    "name": "Red Herring",
+    "slug": "Red-Herring",
+    "definition": "Attempting to redirect the argument to another issue that to which the person doing the redirecting can better respond. While it is similar to the avoiding the issue fallacy, the red herring is a deliberate diversion of attention with the intention of trying to abandon the original argument.",
+    "aliases": [
+      "Ignoratio elenchi",
+      "beside the point",
+      "misdirection [form of]",
+      "changing the subject",
+      "false emphasis",
+      "the Chewbacca defense",
+      "irrelevant conclusion",
+      "irrelevant thesis",
+      "clouding the issue",
+      "ignorance of refutation"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Red-Herring",
+    "scrapedAt": 1772335956922
+  },
+  "Reductio-ad-Absurdum": {
+    "name": "Reductio ad Absurdum",
+    "slug": "Reductio-ad-Absurdum",
+    "definition": "A mode of argumentation or a form of argument in which a proposition is disproven by following its implications logically to an absurd conclusion.  Arguments which use universals such as, “always”, “never”, “everyone”, “nobody”, etc., are prone to being reduced to absurd conclusions.  The fallacy is in the argument that could be reduced to absurdity -- so in essence, reductio ad absurdum is a technique to expose the fallacy.",
+    "aliases": [
+      "reduce to absurdity"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Reductio-ad-Absurdum",
+    "scrapedAt": 1772335956922
+  },
+  "Reductio-ad-Hitlerum": {
+    "name": "Reductio ad Hitlerum",
+    "slug": "Reductio-ad-Hitlerum",
+    "definition": "The attempt to make an argument analogous with Hitler or the Nazi party.  Hitler is probably the most universally despised figure in history, so any connection to Hitler, or his beliefs, can (erroneously) cause others to view the argument in a similar light.  However, this fallacy is becoming more well known as is the fact that it is most often a desperate attempt to render the truth claim of the argument invalid out of lack of a good counter argument.",
+    "aliases": [
+      "argumentum ad Hitlerum",
+      "playing the Nazi card",
+      "Hitler card"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Reductio-ad-Hitlerum",
+    "scrapedAt": 1772335956922
+  },
+  "Regression-Fallacy": {
+    "name": "Regression Fallacy",
+    "slug": "Regression-Fallacy",
+    "definition": "Ascribing a cause where none exists in situations where natural fluctuations exist while failing to account for these natural fluctuations.",
+    "aliases": [
+      "regressive fallacy"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Regression-Fallacy",
+    "scrapedAt": 1772335956922
+  },
+  "Reification": {
+    "name": "Reification",
+    "slug": "Reification",
+    "definition": "When an abstraction (abstract belief or hypothetical construct) is treated as if it were a concrete, real event or physical entity -- when an idea is treated as if had a real existence.",
+    "aliases": [
+      "abstraction",
+      "concretism",
+      "fallacy of misplaced concreteness",
+      "hypostatisation",
+      "pathetic fallacy [form of]"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Reification",
+    "scrapedAt": 1772335956922
+  },
+  "Relative-Privation": {
+    "name": "Relative Privation",
+    "slug": "Relative-Privation",
+    "definition": "Trying to make a scenario appear better or worse by comparing it to the best or worst case scenario.",
+    "aliases": [
+      "it could be worse",
+      "it could be better"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Relative-Privation",
+    "scrapedAt": 1772335956922
+  },
+  "Retrogressive-Causation": {
+    "name": "Retrogressive Causation",
+    "slug": "Retrogressive-Causation",
+    "definition": "Invoking the cause to eliminate the effect, or calling on the source to relieve the effect of the source.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Retrogressive-Causation",
+    "scrapedAt": 1772335956922
+  },
+  "Righteousness-Fallacy": {
+    "name": "Righteousness Fallacy",
+    "slug": "Righteousness-Fallacy",
+    "definition": "Assuming that just because a person's intentions are good, they have the truth or facts on their side. Also see self-righteousness fallacy.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Righteousness-Fallacy",
+    "scrapedAt": 1772335956922
+  },
+  "Rights-To-Ought-Fallacy": {
+    "name": "Rights To Ought Fallacy",
+    "slug": "Rights-To-Ought-Fallacy",
+    "definition": "When one conflates a reason for one's rights (constitutional or other) with what one should do.  This is common among staunch defenders of \"rights\"...",
+    "aliases": [
+      "constitutional rights fallacy"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Rights-To-Ought-Fallacy",
+    "scrapedAt": 1772335956922
+  },
+  "Scapegoating": {
+    "name": "Scapegoating",
+    "slug": "Scapegoating",
+    "definition": "Unfairly blaming an unpopular person or group of people for a problem or a person or group that is an easy target for such blame.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Scapegoating",
+    "scrapedAt": 1772335956922
+  },
+  "Selective-Attention": {
+    "name": "Selective Attention",
+    "slug": "Selective-Attention",
+    "definition": "Focusing your attention on certain aspects of the argument while completely ignoring or missing other parts.  This usually results in irrelevant rebuttals, strawman fallacies, and unnecessarily drawn-out arguments.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Selective-Attention",
+    "scrapedAt": 1772335956922
+  },
+  "Self-Righteousness-Fallacy": {
+    "name": "Self-Righteousness Fallacy",
+    "slug": "Self-Righteousness-Fallacy",
+    "definition": "Assuming that just because your intentions are good, you have the truth or facts on your side. Also see righteousness fallacy.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Self-Righteousness-Fallacy",
+    "scrapedAt": 1772335956922
+  },
+  "Self-Sealing-Argument": {
+    "name": "Self-Sealing Argument",
+    "slug": "Self-Sealing-Argument",
+    "definition": "An argument or position is self-sealing if and only if no evidence can be brought against it no matter what.",
+    "aliases": [
+      "vacuous argument"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Self-Sealing-Argument",
+    "scrapedAt": 1772335956922
+  },
+  "Shifting-of-the-Burden-of-Proof": {
+    "name": "Shifting of the Burden of Proof",
+    "slug": "Shifting-of-the-Burden-of-Proof",
+    "definition": "Making a claim that needs justification, then demanding that the opponent justifies the opposite of the claim. The burden of proof is a legal and philosophical concept with differences in each domain.",
+    "aliases": [
+      "onus probandi",
+      "burden of proof [general concept]",
+      "burden of proof fallacy",
+      "misplaced burden of proof",
+      "shifting the burden of proof"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Shifting-of-the-Burden-of-Proof",
+    "scrapedAt": 1772335956922
+  },
+  "Shoehorning": {
+    "name": "Shoehorning",
+    "slug": "Shoehorning",
+    "definition": "The process of force-fitting some current affair into one's personal, political, or religious agenda.  Many people aren't aware of how easy it is to make something look like confirmation of a claim after the fact, especially if the source of the confirmation is something in which they already believe, like Biblical prophecies, psychic predictions, astrological horoscopes, fortune cookies, and more.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Shoehorning",
+    "scrapedAt": 1772335956922
+  },
+  "Slippery-Slope": {
+    "name": "Slippery Slope",
+    "slug": "Slippery-Slope",
+    "definition": "When a relatively insignificant first event is suggested to lead to a more significant event, which in turn leads to a more significant event, and so on, until some ultimate, significant event is reached, where the connection of each event is not only unwarranted but with each step it becomes more and more improbable.  Many events are usually present in this fallacy, but only two are actually required -- usually connected by “the next thing you know...”",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Slippery-Slope",
+    "scrapedAt": 1772335956922
+  },
+  "Special-Pleading": {
+    "name": "Special Pleading",
+    "slug": "Special-Pleading",
+    "definition": "Applying standards, principles, and/or rules to other people or circumstances, while making oneself or certain circumstances exempt from the same critical criteria, without providing adequate justification.  Special pleading is often a result of strong emotional beliefs that interfere with reason.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Special-Pleading",
+    "scrapedAt": 1772335956922
+  },
+  "Spin-Doctoring": {
+    "name": "Spin Doctoring",
+    "slug": "Spin-Doctoring",
+    "definition": "Presenting information in a deceptive way that results in others interpreting the information in such a way that does not reflect reality but is how you want the information to be interpreted.",
+    "aliases": [
+      "spinning"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Spin-Doctoring",
+    "scrapedAt": 1772335956922
+  },
+  "Spiritual-Fallacy": {
+    "name": "Spiritual Fallacy",
+    "slug": "Spiritual-Fallacy",
+    "definition": "Insisting that something meant to be literal is actually “spiritual” in as an explanation or justification for something that otherwise would not fit in an explanation.",
+    "aliases": [
+      "spiritual excuse"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Spiritual-Fallacy",
+    "scrapedAt": 1772335956922
+  },
+  "Spotlight-Fallacy": {
+    "name": "Spotlight Fallacy",
+    "slug": "Spotlight-Fallacy",
+    "definition": "Assuming that the media’s coverage of a certain class or category is representative of the class or category in whole.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Spotlight-Fallacy",
+    "scrapedAt": 1772335956922
+  },
+  "Statement-of-Conversion": {
+    "name": "Statement of Conversion",
+    "slug": "Statement-of-Conversion",
+    "definition": "Accepting the truth of a claim based on a conversion story without considering any evidence for the truth of the claim.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Statement-of-Conversion",
+    "scrapedAt": 1772335956922
+  },
+  "Stereotyping-the-fallacy": {
+    "name": "Stereotyping (the fallacy)",
+    "slug": "Stereotyping-the-fallacy",
+    "definition": "The general beliefs that we use to categorize people, objects, and events while assuming those beliefs are accurate generalizations of the whole group.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Stereotyping-the-fallacy",
+    "scrapedAt": 1772335956922
+  },
+  "Stolen-Concept-Fallacy": {
+    "name": "Stolen Concept Fallacy",
+    "slug": "Stolen-Concept-Fallacy",
+    "definition": "Requiring the truth of the something that you are simultaneously trying to disprove.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Stolen-Concept-Fallacy",
+    "scrapedAt": 1772335956922
+  },
+  "Strawman-Fallacy": {
+    "name": "Strawman Fallacy",
+    "slug": "Strawman-Fallacy",
+    "definition": "Substituting a person’s actual position or argument with a distorted, exaggerated, or misrepresented version of the position of the argument.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Strawman-Fallacy",
+    "scrapedAt": 1772335956922
+  },
+  "Style-Over-Substance": {
+    "name": "Style Over Substance",
+    "slug": "Style-Over-Substance",
+    "definition": "When the arguer embellishes the argument with compelling language or rhetoric, and/or visual aesthetics.",
+    "aliases": [
+      "argument by slogan [form of]",
+      "cliché thinking - or thought-terminating cliché",
+      "argument by rhyme [form of]",
+      "argument by poetic language [form of]"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Style-Over-Substance",
+    "scrapedAt": 1772335956922
+  },
+  "Subjectivist-Fallacy": {
+    "name": "Subjectivist Fallacy",
+    "slug": "Subjectivist-Fallacy",
+    "definition": "Claiming something is true for one person, but not for someone else when, in fact, it is true for everyone (objective) as demonstrated by empirical evidence.",
+    "aliases": [
+      "relativist fallacy"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Subjectivist-Fallacy",
+    "scrapedAt": 1772335956922
+  },
+  "Subverted-Support": {
+    "name": "Subverted Support",
+    "slug": "Subverted-Support",
+    "definition": "The attempt to explain some phenomenon that does not actually occur or there is no evidence that it does.  It is a form of  begging the question.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Subverted-Support",
+    "scrapedAt": 1772335956922
+  },
+  "Sunk-Cost-Fallacy": {
+    "name": "Sunk-Cost Fallacy",
+    "slug": "Sunk-Cost-Fallacy",
+    "definition": "Reasoning that further investment is warranted on the fact that the resources already invested will be lost otherwise, not taking into consideration the overall losses involved in the further investment.",
+    "aliases": [
+      "argument from inertia",
+      "concorde fallacy",
+      "finish the job fallacy"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Sunk-Cost-Fallacy",
+    "scrapedAt": 1772335956922
+  },
+  "Suppressed-Correlative": {
+    "name": "Suppressed Correlative",
+    "slug": "Suppressed-Correlative",
+    "definition": "The attempt to redefine a correlative (one of two mutually exclusive options) so that one alternative encompasses the other, i.e. making one alternative impossible. The redefinition, therefore, makes the word it is redefining essentially meaningless.",
+    "aliases": [
+      "fallacy of lost contrast",
+      "fallacy of the suppressed relative"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Suppressed-Correlative",
+    "scrapedAt": 1772335956922
+  },
+  "Survivorship-Fallacy": {
+    "name": "Survivorship Fallacy",
+    "slug": "Survivorship-Fallacy",
+    "definition": "Best summed up as \"dead men don't tell tales.\" In its general form, the survivorship fallacy is basing a conclusion on a limited number of \"winner\" testimonies due to the fact we cannot or do not hear the testimonies of the losers. This is based on the cognitive bias called the survivorship bias.",
+    "aliases": [
+      "survivorship bias"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Survivorship-Fallacy",
+    "scrapedAt": 1772335956922
+  },
+  "Texas-Sharpshooter-Fallacy": {
+    "name": "Texas Sharpshooter Fallacy",
+    "slug": "Texas-Sharpshooter-Fallacy",
+    "definition": "Ignoring the difference while focusing on the similarities, thus coming to an inaccurate conclusion.  Similar to the  gambler’s fallacy, this is an example of inserting meaning into randomness.  This is also similar to the post-designation fallacy.",
+    "aliases": [
+      "clustering illusion"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Texas-Sharpshooter-Fallacy",
+    "scrapedAt": 1772335956922
+  },
+  "Tokenism": {
+    "name": "Tokenism",
+    "slug": "Tokenism",
+    "definition": "Interpreting a token gesture as an adequate substitute for the real thing.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Tokenism",
+    "scrapedAt": 1772335956922
+  },
+  "Traitorous-Critic-Fallacy": {
+    "name": "Traitorous Critic Fallacy",
+    "slug": "Traitorous-Critic-Fallacy",
+    "definition": "Responding to criticism by attacking a person's perceived favorability to an out-group or dislike to the in-group as the underlying reason for the criticism rather than addressing the criticism itself, and suggesting that they stay away from the issue and/or leave the in-group.",
+    "aliases": [
+      "ergo decedo"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Traitorous-Critic-Fallacy",
+    "scrapedAt": 1772335956922
+  },
+  "Two-Wrongs-Make-a-Right": {
+    "name": "Two Wrongs Make a Right",
+    "slug": "Two-Wrongs-Make-a-Right",
+    "definition": "When a person attempts to justify an action against another person because the other person did take or would take the same action against him or her.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Two-Wrongs-Make-a-Right",
+    "scrapedAt": 1772335956923
+  },
+  "Type-Token-Fallacy": {
+    "name": "Type-Token Fallacy",
+    "slug": "Type-Token-Fallacy",
+    "definition": "The type-token fallacy is committed when a word can refer to either a type (representing an abstract descriptive concept) or a token (representing an object that instantiates a concept) and is used in a way that makes it unclear which it refers to. This is a more specific form of the ambiguity fallacy.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Type-Token-Fallacy",
+    "scrapedAt": 1772335956923
+  },
+  "Unfalsifiability": {
+    "name": "Unfalsifiability",
+    "slug": "Unfalsifiability",
+    "definition": "Confidently asserting that a theory or hypothesis is true or false even though the theory or hypothesis cannot possibly be contradicted by an observation or the outcome of any physical experiment, usually without strong evidence or good reasons.",
+    "aliases": [
+      "untestability"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Unfalsifiability",
+    "scrapedAt": 1772335956923
+  },
+  "https://www.logicallyfallacious.com/fallacies/unreasonable-inclusion-fallacy.html": {
+    "name": "Unreasonable Inclusion Fallacy",
+    "slug": "https://www.logicallyfallacious.com/fallacies/unreasonable-inclusion-fallacy.html",
+    "definition": "Attempting to broaden the criteria for inclusion in an ill-famed group or associated with a negative label to the point where the term's definition is changed substantially to condemn or criminalize a far less malicious or deleterious behavior.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/fallacies/unreasonable-inclusion-fallacy.html",
+    "scrapedAt": 1772335956923
+  },
+  "Unwarranted-Contrast": {
+    "name": "Unwarranted Contrast",
+    "slug": "Unwarranted-Contrast",
+    "definition": "Assuming that implicature means implication, when it logically does not.  Implicature is a relation between the fact that someone makes a statement and a proposition.  Implication is a relation between propositions, that is the meanings of statements.",
+    "aliases": [
+      "some are/some are not"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Unwarranted-Contrast",
+    "scrapedAt": 1772335956923
+  },
+  "Use-Mention-Error.html": {
+    "name": "Use-Mention Error",
+    "slug": "Use-Mention-Error.html",
+    "definition": "Confusing the word used to describe a thing, with the thing itself.  To avoid this error, it is customary to put the word used to describe the thing in quotes.",
+    "aliases": [
+      "UME"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Use-Mention-Error.html",
+    "scrapedAt": 1772335956923
+  },
+  "Weak-Analogy": {
+    "name": "Weak Analogy",
+    "slug": "Weak-Analogy",
+    "definition": "When an analogy is used to prove or disprove an argument, but the analogy is too dissimilar to be effective, that is, it is unlike the argument more than it is like the argument.",
+    "aliases": [
+      "bad analogy",
+      "false analogy",
+      "faulty analogy",
+      "questionable analogy",
+      "argument from spurious similarity",
+      "false metaphor"
+    ],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Weak-Analogy",
+    "scrapedAt": 1772335956923
+  },
+  "Willed-Ignorance": {
+    "name": "Willed Ignorance",
+    "slug": "Willed-Ignorance",
+    "definition": "Refusing to change one’s mind or consider conflicting information based on a desire to maintain one's existing beliefs.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Willed-Ignorance",
+    "scrapedAt": 1772335956923
+  },
+  "Wishful-Thinking": {
+    "name": "Wishful Thinking",
+    "slug": "Wishful-Thinking",
+    "definition": "When the desire for something to be true is used in place of/or as evidence for the truthfulness of the claim.  Wishful thinking, more as a cognitive bias than a logical fallacy, can also cause one to evaluate evidence very differently based on the desired outcome.",
+    "aliases": [],
+    "url": "https://www.logicallyfallacious.com/logicalfallacies/Wishful-Thinking",
+    "scrapedAt": 1772335956923
+  }
+}

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Soundboard Control</title>
+  <link rel="stylesheet" href="css/themes/godless-engineer.css">
+  <link rel="stylesheet" href="css/soundboard.css">
+</head>
+<body>
+  <!-- Title Bar -->
+  <div class="title-bar">
+    <h1><span class="status-dot" id="statusDot"></span> Soundboard</h1>
+    <div class="title-bar-actions">
+      <button class="btn-info" id="showManageBtn">
+        <span>&#9998;</span> Manage
+      </button>
+      <button class="btn-settings" id="showSettingsBtn" title="Settings">&#9881;&#65039;</button>
+    </div>
+  </div>
+
+  <!-- Manage Sounds Modal -->
+  <div class="modal-overlay" id="manageModal">
+    <div class="modal manage-modal">
+      <div class="modal-header">
+        <h2>Manage Sounds</h2>
+        <button class="btn-close" id="closeManageBtn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <!-- Upload Section -->
+        <h3>Add New Sound</h3>
+        <form id="uploadForm" class="upload-form">
+          <div class="form-compact">
+            <div class="upload-area" id="uploadArea">
+              <div class="upload-icon">&#128266;</div>
+              <div class="upload-text">Click or drag audio file here</div>
+              <div class="upload-hint">MP3, WAV, OGG, WebM, M4A (max 10MB)</div>
+              <input type="file" id="audioFile" accept=".mp3,.wav,.ogg,.webm,.m4a" hidden>
+            </div>
+            <div class="upload-file-name" id="uploadFileName"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-compact form-flex">
+              <input type="text" id="soundName" placeholder="Sound name" required>
+            </div>
+            <div class="form-compact">
+              <button type="button" class="emoji-picker-btn" id="emojiPickerBtn" title="Pick emoji">&#128266;</button>
+              <input type="hidden" id="soundEmoji" value="🔊">
+            </div>
+          </div>
+          <button type="submit" class="dock-btn btn-update" id="uploadBtn" disabled>Upload Sound</button>
+        </form>
+
+        <!-- Emoji Picker -->
+        <div class="emoji-picker" id="emojiPicker">
+          <div class="emoji-picker-header">
+            <span>Choose an Emoji</span>
+            <button class="btn-close-sm" id="closeEmojiPicker">&times;</button>
+          </div>
+          <div class="emoji-custom-input">
+            <input type="text" id="customEmojiInput" placeholder="Paste any emoji or type :code:" maxlength="20">
+            <button type="button" class="btn-custom-emoji" id="customEmojiBtn">Use</button>
+          </div>
+          <div class="emoji-grid" id="emojiGrid"></div>
+        </div>
+
+        <!-- Sound List -->
+        <h3>Your Sounds <span class="sound-count" id="soundCount">(0)</span></h3>
+        <div class="sound-list" id="soundList">
+          <div class="sound-list-empty">No sounds uploaded yet</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Sound Modal -->
+  <div class="modal-overlay" id="editModal">
+    <div class="modal edit-modal">
+      <div class="modal-header">
+        <h2>Edit Sound</h2>
+        <button class="btn-close" id="closeEditBtn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-compact">
+          <input type="text" id="editSoundName" placeholder="Sound name">
+        </div>
+        <div class="form-row">
+          <div class="form-compact form-flex">
+            <label class="form-label">Emoji</label>
+          </div>
+          <div class="form-compact">
+            <button type="button" class="emoji-picker-btn" id="editEmojiPickerBtn" title="Pick emoji">&#128266;</button>
+            <input type="hidden" id="editSoundEmoji" value="🔊">
+          </div>
+        </div>
+        <!-- Edit Emoji Picker -->
+        <div class="emoji-picker" id="editEmojiPicker">
+          <div class="emoji-picker-header">
+            <span>Choose an Emoji</span>
+            <button class="btn-close-sm" id="closeEditEmojiPicker">&times;</button>
+          </div>
+          <div class="emoji-custom-input">
+            <input type="text" id="editCustomEmojiInput" placeholder="Paste any emoji or type :code:" maxlength="20">
+            <button type="button" class="btn-custom-emoji" id="editCustomEmojiBtn">Use</button>
+          </div>
+          <div class="emoji-grid" id="editEmojiGrid"></div>
+        </div>
+        <div class="button-row">
+          <button class="dock-btn btn-update" id="saveEditBtn">Save</button>
+          <button class="dock-btn btn-clear" id="cancelEditBtn">Cancel</button>
+        </div>
+        <input type="hidden" id="editSoundId">
+      </div>
+    </div>
+  </div>
+
+  <!-- Soundboard Grid -->
+  <div class="dock-container">
+    <div class="soundboard-grid" id="soundboardGrid">
+      <div class="soundboard-empty">
+        <div class="soundboard-empty-icon">&#128266;</div>
+        <div>No sounds added yet</div>
+        <div class="soundboard-empty-hint">Click "Manage" to add sounds</div>
+      </div>
+    </div>
+
+    <!-- Paging Controls -->
+    <div class="paging-bar" id="pagingBar">
+      <button class="page-btn" id="prevPageBtn" disabled>&#9664;</button>
+      <span class="page-info">
+        Page <span id="currentPage">1</span> of <span id="totalPages">1</span>
+      </span>
+      <button class="page-btn" id="nextPageBtn" disabled>&#9654;</button>
+    </div>
+
+    <!-- Now Playing -->
+    <div class="now-playing" id="nowPlaying">
+      <div class="now-playing-label">Now Playing</div>
+      <div class="now-playing-info">
+        <span class="now-playing-emoji" id="nowPlayingEmoji"></span>
+        <span class="now-playing-name" id="nowPlayingName"></span>
+      </div>
+      <button class="dock-btn btn-stop-sound" id="stopSoundBtn">&#9632; Stop</button>
+    </div>
+  </div>
+
+  <!-- Hidden audio element -->
+  <audio id="audioPlayer" preload="none"></audio>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="js/sanitize.js"></script>
+  <script src="js/socket-connection.js"></script>
+  <script src="js/theme-loader.js"></script>
+  <script src="js/settings-modal.js"></script>
+  <script src="js/soundboard-control.js"></script>
+  <script>
+    // Settings modal
+    document.getElementById('showSettingsBtn').addEventListener('click', () => {
+      SettingsModal.open();
+    });
+  </script>
+</body>
+</html>

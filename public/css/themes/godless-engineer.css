@@ -1,0 +1,78 @@
+/**
+ * Godless Engineer Theme
+ * A sleek red/black dark theme
+ */
+
+:root {
+  /* Theme Metadata */
+  --theme-name: 'Godless Engineer';
+  --theme-description: 'Sleek red/black dark theme';
+
+  /* Brand Colors */
+  --color-primary: #e63946;
+  --color-primary-dark: #b52d39;
+  --color-primary-light: #ff5a67;
+  --color-primary-glow: rgba(230, 57, 70, 0.4);
+  --color-primary-subtle: rgba(230, 57, 70, 0.2);
+  --color-primary-border: rgba(230, 57, 70, 0.3);
+
+  /* Accent (for connected status, etc.) */
+  --color-accent: #dc2626;
+  --color-accent-dark: #b91c1c;
+  --color-accent-glow: rgba(220, 38, 38, 0.3);
+
+  /* Background Colors */
+  --color-bg-primary: #0a0a0a;
+  --color-bg-secondary: #0d0d0d;
+  --color-bg-tertiary: #1a1a1a;
+  --color-bg-tinted: #1a0808;
+  --color-bg-card: rgba(255, 255, 255, 0.03);
+  --color-bg-card-solid: #1f1f1f;
+  --color-bg-input: rgba(0, 0, 0, 0.5);
+  --color-bg-input-solid: #0a0a0a;
+  --color-bg-hover: rgba(255, 255, 255, 0.08);
+  --color-bg-dark: #0d0d0d;
+
+  /* Surface Colors */
+  --color-surface-border: #2d2d2d;
+  --color-surface-elevated: #1f1f1f;
+
+  /* Text Colors */
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #e0e0e0;
+  --color-text-muted: #b0b0b0;
+  --color-text-dim: #808080;
+  --color-text-dimmer: #606060;
+
+  /* Status Colors */
+  --color-success: #22c55e;
+  --color-success-bg: rgba(34, 197, 94, 0.2);
+  --color-success-border: rgba(34, 197, 94, 0.5);
+  --color-error: #ff6b6b;
+  --color-error-bg: rgba(220, 53, 69, 0.2);
+  --color-error-border: rgba(220, 53, 69, 0.5);
+  --color-warning: #f59e0b;
+  --color-warning-bg: rgba(245, 158, 11, 0.2);
+  --color-warning-border: rgba(245, 158, 11, 0.5);
+
+  /* Connected Status */
+  --color-connected: #22c55e;
+  --color-connected-glow: rgba(34, 197, 94, 0.5);
+  --color-disconnected: #991b1b;
+
+  /* Shadows */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 20px rgba(230, 57, 70, 0.4);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.7);
+  --shadow-glow: 0 0 20px rgba(180, 30, 30, 0.2);
+
+  /* Scrollbar */
+  --scrollbar-track: transparent;
+  --scrollbar-thumb: var(--color-primary-border);
+  --scrollbar-thumb-hover: var(--color-primary);
+}
+
+/* Body background gradient */
+body {
+  background: linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-tinted) 100%);
+}

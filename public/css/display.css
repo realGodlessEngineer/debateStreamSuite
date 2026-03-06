@@ -1,0 +1,258 @@
+/**
+ * Caller Display Overlay Styles
+ * For OBS Browser Source - Landscape (1920x1080)
+ * Supports 1-host and 2-host layouts with animated transitions
+ * Uses theme variables from css/themes/*.css
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: transparent;
+  color: #ffffff;
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ========================================
+   Title Bar Overlay
+   ======================================== */
+
+.title-bar-overlay {
+  position: absolute;
+  bottom: 40px;
+  left: 40px;
+  right: 40px;
+  z-index: 10;
+  opacity: 0;
+  transform: translateY(100px);
+  pointer-events: none;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.title-bar-overlay.visible {
+  animation: bounceIn 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.title-bar-overlay.hiding {
+  animation: slideOut 0.4s ease-in forwards;
+}
+
+/* Title bar card - shared base */
+.title-bar-card {
+  background: linear-gradient(135deg, var(--color-bg-dark, #0d0d0d) 0%, var(--color-bg-tinted, #1a0808) 100%);
+  border-radius: 16px;
+  box-shadow:
+    0 10px 40px rgba(0, 0, 0, 0.7),
+    var(--shadow-glow, 0 0 30px rgba(180, 30, 30, 0.2));
+  border: 2px solid var(--color-primary-border, rgba(180, 30, 30, 0.4));
+  display: none;
+  max-width: 100%;
+}
+
+.title-bar-card.active {
+  display: block;
+}
+
+/* ========================================
+   2-Host Title Bar Layout
+   ======================================== */
+
+.title-bar-card.two-host {
+  padding: 30px 50px 24px;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.title-hosts-row {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  gap: 40px;
+}
+
+.title-host {
+  flex: 1;
+  text-align: center;
+}
+
+.title-host-name {
+  font-size: 3em;
+  font-weight: 700;
+  color: #ffffff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  line-height: 1.2;
+}
+
+.title-host-pronouns {
+  font-size: 1.4em;
+  font-weight: 500;
+  color: var(--color-primary, #e63946);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  margin-top: 4px;
+}
+
+.title-show-row {
+  text-align: center;
+  margin-top: 16px;
+}
+
+.title-show-name {
+  font-size: 2em;
+  font-weight: 600;
+  color: var(--color-text-muted, #ccc);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  letter-spacing: 0.5px;
+}
+
+/* ========================================
+   1-Host Title Bar Layout
+   ======================================== */
+
+.title-bar-card.one-host {
+  padding: 24px 40px;
+  display: none;
+  text-align: center;
+  flex-shrink: 1;
+  min-width: 500px;
+}
+
+.title-bar-card.one-host.active {
+  display: inline-block;
+}
+
+.title-show-divider {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--color-primary-border, rgba(180, 30, 30, 0.3));
+}
+
+/* ========================================
+   Caller Overlay
+   ======================================== */
+
+.caller-overlay {
+  position: absolute;
+  bottom: 40px;
+  left: 40px;
+  right: 40px;
+  z-index: 20;
+  opacity: 0;
+  transform: translateY(100px);
+  pointer-events: none;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.caller-overlay.visible {
+  animation: bounceIn 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.caller-overlay.hiding {
+  animation: slideOut 0.4s ease-in forwards;
+}
+
+/* Caller cards */
+.caller-card {
+  background: linear-gradient(135deg, var(--color-bg-dark, #0d0d0d) 0%, var(--color-bg-tinted, #1a0808) 100%);
+  border-radius: 16px;
+  box-shadow:
+    0 10px 40px rgba(0, 0, 0, 0.7),
+    var(--shadow-glow, 0 0 30px rgba(180, 30, 30, 0.2));
+  border: 2px solid var(--color-primary-border, rgba(180, 30, 30, 0.4));
+  text-align: center;
+  display: none;
+  max-width: 100%;
+}
+
+.caller-card.active {
+  display: block;
+}
+
+/* 2-host caller card - full width lower third */
+.caller-card.two-host {
+  padding: 30px 50px;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+/* 1-host caller card - right-aligned, responsive */
+.caller-card.one-host {
+  padding: 24px 40px;
+  display: none;
+  text-align: center;
+  flex-shrink: 1;
+  min-width: 500px;
+}
+
+.caller-card.one-host.active {
+  display: inline-block;
+}
+
+/* Caller Name */
+.caller-name {
+  font-size: 3.2em;
+  font-weight: 700;
+  color: #ffffff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  line-height: 1.2;
+}
+
+/* Caller Pronouns */
+.caller-pronouns {
+  font-size: 1.6em;
+  font-weight: 500;
+  color: var(--color-primary, #e63946);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  margin-top: 4px;
+}
+
+/* ========================================
+   Animations
+   ======================================== */
+
+/* Bounce in from bottom */
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: translateY(100px);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-12px);
+  }
+  70% {
+    transform: translateY(5px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Slide out downward */
+@keyframes slideOut {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(80px);
+  }
+}
