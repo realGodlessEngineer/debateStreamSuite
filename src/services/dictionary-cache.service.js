@@ -1,20 +1,13 @@
 /**
  * Dictionary cache service
- * Handles persistent storage and retrieval of word definitions
+ * Handles persistent storage and retrieval of word definitions via SQLite
  * @module services/dictionary-cache
  */
 
-const { SERVER } = require('../config/constants');
 const createLogger = require('../utils/logger');
-const { readJsonSafe, createWriteQueue } = require('../utils/safe-file');
+const DatabaseService = require('./database.service');
 
 const log = createLogger('DictCache');
-
-// Serialized write queue for atomic saves
-const saveQueued = createWriteQueue(SERVER.DICTIONARY_CACHE_FILE);
-
-// In-memory cache store
-let cache = {};
 
 /**
  * Extracts uppercase first letter for grouping
@@ -35,43 +28,57 @@ const extractFirstLetter = (word) => {
 const createKey = (word, lang) => `${word.toLowerCase()}|${lang}`;
 
 /**
+ * Safely parses JSON with a fallback for corrupt data
+ * @param {string} json - JSON string
+ * @param {*} fallback - Fallback value
+ * @returns {*} Parsed value or fallback
+ */
+const safeParse = (json, fallback = []) => {
+  try {
+    return JSON.parse(json || JSON.stringify(fallback));
+  } catch {
+    return fallback;
+  }
+};
+
+/**
+ * Converts a database row to a definition object
+ * @param {Object} row - Database row
+ * @returns {Object} Definition object
+ */
+const rowToEntry = (row) => ({
+  key: row.key,
+  reference: row.reference,
+  version: row.version,
+  versionName: row.version_name,
+  text: row.text,
+  firstLetter: row.first_letter,
+  phonetic: row.phonetic,
+  etymology: row.etymology,
+  audioUrl: row.audio_url,
+  verses: safeParse(row.verses_json),
+  totalVerses: row.total_verses,
+  timestamp: row.timestamp,
+});
+
+/**
  * Dictionary Cache Service API
  */
 const DictionaryCacheService = {
   /**
-   * Loads cache from disk with backup fallback
+   * Loads cache (no-op for SQLite, kept for API compatibility)
    * @returns {boolean} Success status
    */
   load() {
-    const { data, source } = readJsonSafe(SERVER.DICTIONARY_CACHE_FILE);
-
-    if (!data) {
-      log.info('No existing dictionary cache found, starting fresh');
+    try {
+      const db = DatabaseService.getDb();
+      const count = db.prepare('SELECT COUNT(*) as count FROM dictionary_entries').get().count;
+      log.info(`${count} cached definitions available`);
+      return true;
+    } catch (error) {
+      log.error('Failed to access dictionary cache:', error.message);
       return false;
     }
-
-    if (source === 'backup') {
-      log.warn('Loaded dictionary cache from backup file — primary was corrupted');
-    }
-
-    if (typeof data !== 'object' || Array.isArray(data)) {
-      log.error('Loaded dictionary cache is not a valid object, ignoring');
-      return false;
-    }
-
-    cache = data;
-    log.info(`Loaded ${Object.keys(cache).length} cached definitions`);
-    return true;
-  },
-
-  /**
-   * Saves cache to disk using atomic write queue
-   * @returns {Promise<boolean>} Success status
-   */
-  async save() {
-    const ok = await saveQueued(cache);
-    if (!ok) log.error('Failed to save dictionary cache');
-    return ok;
   },
 
   /**
@@ -81,7 +88,9 @@ const DictionaryCacheService = {
    * @returns {boolean} Exists in cache
    */
   has(word, lang) {
-    return createKey(word, lang) in cache;
+    const db = DatabaseService.getDb();
+    const row = db.prepare('SELECT 1 FROM dictionary_entries WHERE key = ?').get(createKey(word, lang));
+    return !!row;
   },
 
   /**
@@ -91,7 +100,9 @@ const DictionaryCacheService = {
    * @returns {Object|null} Cached definition or null
    */
   get(word, lang) {
-    return cache[createKey(word, lang)] || null;
+    const db = DatabaseService.getDb();
+    const row = db.prepare('SELECT * FROM dictionary_entries WHERE key = ?').get(createKey(word, lang));
+    return row ? rowToEntry(row) : null;
   },
 
   /**
@@ -100,7 +111,9 @@ const DictionaryCacheService = {
    * @returns {Object|null} Cached definition or null
    */
   getByKey(key) {
-    return cache[key] || null;
+    const db = DatabaseService.getDb();
+    const row = db.prepare('SELECT * FROM dictionary_entries WHERE key = ?').get(key);
+    return row ? rowToEntry(row) : null;
   },
 
   /**
@@ -109,19 +122,23 @@ const DictionaryCacheService = {
    * @returns {Object} Cached definition with metadata
    */
   add(wordData) {
+    const db = DatabaseService.getDb();
     const key = createKey(wordData.reference, wordData.version);
     const firstLetter = extractFirstLetter(wordData.reference);
+    const timestamp = Date.now();
 
-    const cachedEntry = {
-      ...wordData,
-      firstLetter,
-      timestamp: Date.now(),
-    };
+    db.prepare(`
+      INSERT OR REPLACE INTO dictionary_entries (key, reference, version, version_name, text, first_letter, phonetic, etymology, audio_url, verses_json, total_verses, timestamp)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      key, wordData.reference, wordData.version, wordData.versionName || '',
+      wordData.text || '', firstLetter, wordData.phonetic || '',
+      wordData.etymology || '', wordData.audioUrl || '',
+      wordData.verses ? JSON.stringify(wordData.verses) : '[]',
+      wordData.totalVerses || 0, timestamp
+    );
 
-    cache = { ...cache, [key]: cachedEntry };
-    this.save();
-
-    return cachedEntry;
+    return { ...wordData, key, firstLetter, timestamp };
   },
 
   /**
@@ -130,22 +147,19 @@ const DictionaryCacheService = {
    * @returns {boolean} Success status
    */
   remove(key) {
-    if (!(key in cache)) return false;
-
-    const { [key]: _removed, ...remaining } = cache;
-    cache = remaining;
-    this.save();
-
-    return true;
+    const db = DatabaseService.getDb();
+    const result = db.prepare('DELETE FROM dictionary_entries WHERE key = ?').run(key);
+    return result.changes > 0;
   },
 
   /**
    * Clears all cached definitions
-   * @returns {Promise<boolean>} Success status
+   * @returns {boolean} Success status
    */
-  async clear() {
-    cache = {};
-    return this.save();
+  clear() {
+    const db = DatabaseService.getDb();
+    db.prepare('DELETE FROM dictionary_entries').run();
+    return true;
   },
 
   /**
@@ -153,23 +167,26 @@ const DictionaryCacheService = {
    * @returns {Object} Definitions grouped by letter
    */
   getAllByLetter() {
-    const byLetter = Object.entries(cache).reduce((acc, [key, entry]) => {
+    const db = DatabaseService.getDb();
+    const rows = db.prepare('SELECT * FROM dictionary_entries ORDER BY first_letter, reference').all();
+
+    const byLetter = {};
+    for (const row of rows) {
+      const entry = rowToEntry(row);
       const letter = entry.firstLetter || extractFirstLetter(entry.reference);
-      const existing = acc[letter] || [];
-      return {
-        ...acc,
-        [letter]: [...existing, { key, ...entry }],
-      };
-    }, {});
+      if (!byLetter[letter]) byLetter[letter] = [];
+      byLetter[letter].push(entry);
+    }
 
     const sortedLetters = Object.keys(byLetter).sort();
 
-    return sortedLetters.reduce((acc, letter) => ({
-      ...acc,
-      [letter]: byLetter[letter].sort((a, b) =>
+    const result = {};
+    for (const letter of sortedLetters) {
+      result[letter] = byLetter[letter].sort((a, b) =>
         a.reference.toLowerCase().localeCompare(b.reference.toLowerCase())
-      ),
-    }), {});
+      );
+    }
+    return result;
   },
 
   /**
@@ -177,15 +194,16 @@ const DictionaryCacheService = {
    * @returns {Object} Cache stats
    */
   getStats() {
-    const entries = Object.values(cache);
+    const db = DatabaseService.getDb();
+    const stats = db.prepare(`
+      SELECT COUNT(*) as totalVerses, MIN(timestamp) as oldestEntry, MAX(timestamp) as newestEntry
+      FROM dictionary_entries
+    `).get();
+
     return {
-      totalVerses: entries.length,
-      oldestEntry: entries.length
-        ? Math.min(...entries.map((v) => v.timestamp))
-        : null,
-      newestEntry: entries.length
-        ? Math.max(...entries.map((v) => v.timestamp))
-        : null,
+      totalVerses: stats.totalVerses,
+      oldestEntry: stats.totalVerses > 0 ? stats.oldestEntry : null,
+      newestEntry: stats.totalVerses > 0 ? stats.newestEntry : null,
     };
   },
 };

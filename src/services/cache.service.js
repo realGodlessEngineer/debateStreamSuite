@@ -1,21 +1,14 @@
 /**
  * Verse cache service
- * Handles persistent storage and retrieval of Bible verses
+ * Handles persistent storage and retrieval of Bible verses via SQLite
  * @module services/cache
  */
 
-const fs = require('fs');
-const { SERVER, BIBLE_BOOK_ORDER } = require('../config/constants');
+const { BIBLE_BOOK_ORDER } = require('../config/constants');
 const createLogger = require('../utils/logger');
-const { readJsonSafe, createWriteQueue } = require('../utils/safe-file');
+const DatabaseService = require('./database.service');
 
 const log = createLogger('Cache');
-
-// Serialized write queue for atomic saves
-const saveQueued = createWriteQueue(SERVER.CACHE_FILE);
-
-// In-memory cache store
-let cache = {};
 
 /**
  * Extracts book name from a Bible reference
@@ -34,16 +27,6 @@ const extractBookName = (reference) => {
  * @returns {string} Cache key
  */
 const createKey = (reference, version) => `${reference}|${version}`;
-
-/**
- * Parses a cache key into reference and version
- * @param {string} key - Cache key
- * @returns {Object} { reference, version }
- */
-const parseKey = (key) => {
-  const [reference, version] = key.split('|');
-  return { reference, version };
-};
 
 /**
  * Gets the biblical order index for a book
@@ -76,44 +59,38 @@ const sortByChapterVerse = (a, b) => {
 };
 
 /**
+ * Converts a database row to a verse object
+ * @param {Object} row - Database row
+ * @returns {Object} Verse object
+ */
+const rowToVerse = (row) => ({
+  key: row.key,
+  reference: row.reference,
+  version: row.version,
+  versionName: row.version_name,
+  text: row.text,
+  book: row.book,
+  timestamp: row.timestamp,
+});
+
+/**
  * Cache Service API
  */
 const CacheService = {
   /**
-   * Loads cache from disk with backup fallback
+   * Loads cache (no-op for SQLite, kept for API compatibility)
    * @returns {boolean} Success status
    */
   load() {
-    const { data, source } = readJsonSafe(SERVER.CACHE_FILE);
-
-    if (!data) {
-      log.info('No existing cache found, starting fresh');
+    try {
+      const db = DatabaseService.getDb();
+      const count = db.prepare('SELECT COUNT(*) as count FROM bible_verses').get().count;
+      log.info(`${count} cached Bible verses available`);
+      return true;
+    } catch (error) {
+      log.error('Failed to access Bible verse cache:', error.message);
       return false;
     }
-
-    if (source === 'backup') {
-      log.warn('Loaded cache from backup file — primary was corrupted');
-    }
-
-    // Validate it's an object (cache is a dict, not an array)
-    if (typeof data !== 'object' || Array.isArray(data)) {
-      log.error('Loaded cache is not a valid object, ignoring');
-      return false;
-    }
-
-    cache = data;
-    log.info(`Loaded ${Object.keys(cache).length} cached verses`);
-    return true;
-  },
-
-  /**
-   * Saves cache to disk using atomic write queue
-   * @returns {Promise<boolean>} Success status
-   */
-  async save() {
-    const ok = await saveQueued(cache);
-    if (!ok) log.error('Failed to save cache');
-    return ok;
   },
 
   /**
@@ -123,8 +100,9 @@ const CacheService = {
    * @returns {boolean} Exists in cache
    */
   has(reference, version) {
-    const key = createKey(reference, version);
-    return key in cache;
+    const db = DatabaseService.getDb();
+    const row = db.prepare('SELECT 1 FROM bible_verses WHERE key = ?').get(createKey(reference, version));
+    return !!row;
   },
 
   /**
@@ -134,8 +112,9 @@ const CacheService = {
    * @returns {Object|null} Cached verse or null
    */
   get(reference, version) {
-    const key = createKey(reference, version);
-    return cache[key] || null;
+    const db = DatabaseService.getDb();
+    const row = db.prepare('SELECT * FROM bible_verses WHERE key = ?').get(createKey(reference, version));
+    return row ? rowToVerse(row) : null;
   },
 
   /**
@@ -144,7 +123,9 @@ const CacheService = {
    * @returns {Object|null} Cached verse or null
    */
   getByKey(key) {
-    return cache[key] || null;
+    const db = DatabaseService.getDb();
+    const row = db.prepare('SELECT * FROM bible_verses WHERE key = ?').get(key);
+    return row ? rowToVerse(row) : null;
   },
 
   /**
@@ -153,19 +134,17 @@ const CacheService = {
    * @returns {Object} Cached verse with metadata
    */
   add(verseData) {
+    const db = DatabaseService.getDb();
     const key = createKey(verseData.reference, verseData.version);
     const book = extractBookName(verseData.reference);
+    const timestamp = Date.now();
 
-    const cachedVerse = {
-      ...verseData,
-      book,
-      timestamp: Date.now(),
-    };
+    db.prepare(`
+      INSERT OR REPLACE INTO bible_verses (key, reference, version, version_name, text, book, timestamp)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `).run(key, verseData.reference, verseData.version, verseData.versionName || '', verseData.text || '', book, timestamp);
 
-    cache = { ...cache, [key]: cachedVerse };
-    this.save();
-
-    return cachedVerse;
+    return { ...verseData, key, book, timestamp };
   },
 
   /**
@@ -174,22 +153,19 @@ const CacheService = {
    * @returns {boolean} Success status
    */
   remove(key) {
-    if (!(key in cache)) return false;
-
-    const { [key]: _removed, ...remaining } = cache;
-    cache = remaining;
-    this.save();
-
-    return true;
+    const db = DatabaseService.getDb();
+    const result = db.prepare('DELETE FROM bible_verses WHERE key = ?').run(key);
+    return result.changes > 0;
   },
 
   /**
    * Clears all cached verses
-   * @returns {Promise<boolean>} Success status
+   * @returns {boolean} Success status
    */
-  async clear() {
-    cache = {};
-    return this.save();
+  clear() {
+    const db = DatabaseService.getDb();
+    db.prepare('DELETE FROM bible_verses').run();
+    return true;
   },
 
   /**
@@ -197,32 +173,31 @@ const CacheService = {
    * @returns {Object} Verses grouped by book
    */
   getAllByBook() {
-    // Group by book
-    const byBook = Object.entries(cache).reduce((acc, [key, verse]) => {
-      const book = verse.book || extractBookName(verse.reference);
-      const existing = acc[book] || [];
-      return {
-        ...acc,
-        [book]: [...existing, { key, ...verse }],
-      };
-    }, {});
+    const db = DatabaseService.getDb();
+    const rows = db.prepare('SELECT * FROM bible_verses ORDER BY book, reference').all();
 
-    // Sort books by biblical order
+    const byBook = {};
+    for (const row of rows) {
+      const verse = rowToVerse(row);
+      const book = verse.book || extractBookName(verse.reference);
+      if (!byBook[book]) byBook[book] = [];
+      byBook[book].push(verse);
+    }
+
     const sortedBookNames = Object.keys(byBook).sort((a, b) => {
       const indexA = getBookIndex(a);
       const indexB = getBookIndex(b);
-
       if (indexA === -1 && indexB === -1) return a.localeCompare(b);
       if (indexA === -1) return 1;
       if (indexB === -1) return -1;
       return indexA - indexB;
     });
 
-    // Build result with sorted verses within each book
-    return sortedBookNames.reduce((acc, book) => ({
-      ...acc,
-      [book]: byBook[book].sort(sortByChapterVerse),
-    }), {});
+    const result = {};
+    for (const book of sortedBookNames) {
+      result[book] = byBook[book].sort(sortByChapterVerse);
+    }
+    return result;
   },
 
   /**
@@ -230,15 +205,16 @@ const CacheService = {
    * @returns {Object} Cache stats
    */
   getStats() {
-    const entries = Object.values(cache);
+    const db = DatabaseService.getDb();
+    const stats = db.prepare(`
+      SELECT COUNT(*) as totalVerses, MIN(timestamp) as oldestEntry, MAX(timestamp) as newestEntry
+      FROM bible_verses
+    `).get();
+
     return {
-      totalVerses: entries.length,
-      oldestEntry: entries.length
-        ? Math.min(...entries.map((v) => v.timestamp))
-        : null,
-      newestEntry: entries.length
-        ? Math.max(...entries.map((v) => v.timestamp))
-        : null,
+      totalVerses: stats.totalVerses,
+      oldestEntry: stats.totalVerses > 0 ? stats.oldestEntry : null,
+      newestEntry: stats.totalVerses > 0 ? stats.newestEntry : null,
     };
   },
 };

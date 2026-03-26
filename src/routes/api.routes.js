@@ -185,7 +185,9 @@ router.post('/fetch-quran-verse', async (req, res) => {
     res.json({ ...cachedVerse, fromCache: false });
   } catch (error) {
     log.error('Error fetching Quran verse:', error.message);
-    res.status(500).json({ error: error.message || 'Failed to fetch Quran verse. Please try again.' });
+    const isUserError = error.message.includes('not found') || error.message.includes('Invalid');
+    res.status(isUserError ? 400 : 500)
+      .json({ error: isUserError ? error.message : 'Failed to fetch Quran verse. Please try again.' });
   }
 });
 
@@ -283,8 +285,9 @@ router.post('/fetch-definition', async (req, res) => {
     res.json({ ...cachedEntry, fromCache: false });
   } catch (error) {
     log.error('Error fetching definition:', error.message);
-    res.status(error.message.includes('not found') ? 404 : 500)
-      .json({ error: error.message || 'Failed to fetch definition. Please try again.' });
+    const isNotFound = error.message.includes('not found');
+    res.status(isNotFound ? 404 : 500)
+      .json({ error: isNotFound ? 'Word not found. Check the spelling.' : 'Failed to fetch definition. Please try again.' });
   }
 });
 

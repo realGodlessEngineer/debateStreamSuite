@@ -1,36 +1,55 @@
 /**
  * Fallacy database service
- * Handles loading and querying the logical fallacies database
+ * Handles loading and querying the logical fallacies database via SQLite
  * @module services/fallacy
  */
 
-const fs = require('fs');
-const { SERVER } = require('../config/constants');
 const createLogger = require('../utils/logger');
+const DatabaseService = require('./database.service');
 
 const log = createLogger('Fallacy');
 
-// In-memory fallacy store
-let fallacies = {};
+/**
+ * Safely parses JSON with a fallback for corrupt data
+ * @param {string} json - JSON string
+ * @param {*} fallback - Fallback value
+ * @returns {*} Parsed value or fallback
+ */
+const safeParse = (json, fallback = []) => {
+  try {
+    return JSON.parse(json || JSON.stringify(fallback));
+  } catch {
+    return fallback;
+  }
+};
+
+/**
+ * Converts a database row to a fallacy object
+ * @param {Object} row - Database row
+ * @returns {Object} Fallacy object
+ */
+const rowToFallacy = (row) => ({
+  name: row.name,
+  slug: row.slug,
+  definition: row.definition,
+  aliases: safeParse(row.aliases_json),
+  url: row.url,
+  scrapedAt: row.scraped_at,
+});
 
 const FallacyService = {
   /**
-   * Loads fallacies from disk (synchronous, called at startup only)
+   * Loads fallacies (validates table access, kept for API compatibility)
    * @returns {boolean} Success status
    */
   load() {
     try {
-      if (fs.existsSync(SERVER.FALLACY_DB_FILE)) {
-        const data = fs.readFileSync(SERVER.FALLACY_DB_FILE, 'utf8');
-        fallacies = JSON.parse(data);
-        log.info(`Loaded ${Object.keys(fallacies).length} fallacies`);
-        return true;
-      }
-      log.warn('Fallacy database not found. Run: node src/scripts/scrape-fallacies.js');
-      return false;
+      const db = DatabaseService.getDb();
+      const count = db.prepare('SELECT COUNT(*) as count FROM fallacies').get().count;
+      log.info(`${count} fallacies available`);
+      return true;
     } catch (error) {
-      log.error('Error loading fallacies:', error.message);
-      fallacies = {};
+      log.error('Failed to access fallacies:', error.message);
       return false;
     }
   },
@@ -40,7 +59,9 @@ const FallacyService = {
    * @returns {Array} Array of fallacy objects
    */
   getAll() {
-    return Object.values(fallacies).sort((a, b) => a.name.localeCompare(b.name));
+    const db = DatabaseService.getDb();
+    const rows = db.prepare('SELECT * FROM fallacies ORDER BY name COLLATE NOCASE').all();
+    return rows.map(rowToFallacy);
   },
 
   /**
@@ -49,7 +70,9 @@ const FallacyService = {
    * @returns {Object|null} Fallacy or null
    */
   getBySlug(slug) {
-    return fallacies[slug] || null;
+    const db = DatabaseService.getDb();
+    const row = db.prepare('SELECT * FROM fallacies WHERE slug = ?').get(slug);
+    return row ? rowToFallacy(row) : null;
   },
 
   /**
@@ -60,23 +83,19 @@ const FallacyService = {
   search(query) {
     if (!query) return this.getAll();
 
-    const term = query.toLowerCase();
-    return Object.values(fallacies)
-      .filter((f) => {
-        return (
-          f.name.toLowerCase().includes(term) ||
-          f.definition.toLowerCase().includes(term) ||
-          f.aliases.some((a) => a.toLowerCase().includes(term))
-        );
-      })
-      .sort((a, b) => {
-        // Prioritize name matches
-        const aNameMatch = a.name.toLowerCase().includes(term);
-        const bNameMatch = b.name.toLowerCase().includes(term);
-        if (aNameMatch && !bNameMatch) return -1;
-        if (!aNameMatch && bNameMatch) return 1;
-        return a.name.localeCompare(b.name);
-      });
+    const db = DatabaseService.getDb();
+    const escaped = query.toLowerCase().replace(/[%_]/g, '\\$&');
+    const term = `%${escaped}%`;
+
+    const rows = db.prepare(`
+      SELECT * FROM fallacies
+      WHERE LOWER(name) LIKE ? ESCAPE '\\' OR LOWER(definition) LIKE ? ESCAPE '\\' OR LOWER(aliases_json) LIKE ? ESCAPE '\\'
+      ORDER BY
+        CASE WHEN LOWER(name) LIKE ? ESCAPE '\\' THEN 0 ELSE 1 END,
+        name COLLATE NOCASE
+    `).all(term, term, term, term);
+
+    return rows.map(rowToFallacy);
   },
 
   /**
@@ -84,7 +103,8 @@ const FallacyService = {
    * @returns {number} Total count
    */
   getCount() {
-    return Object.keys(fallacies).length;
+    const db = DatabaseService.getDb();
+    return db.prepare('SELECT COUNT(*) as count FROM fallacies').get().count;
   },
 };
 

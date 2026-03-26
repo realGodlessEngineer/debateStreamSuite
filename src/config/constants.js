@@ -10,6 +10,7 @@ const path = require('path');
  */
 const SERVER = Object.freeze({
   PORT: process.env.PORT || 3666,
+  DB_FILE: path.join(__dirname, '../../references.db'),
   CACHE_FILE: path.join(__dirname, '../../verse-cache.json'),
   QURAN_CACHE_FILE: path.join(__dirname, '../../quran-cache.json'),
   DICTIONARY_CACHE_FILE: path.join(__dirname, '../../dictionary-cache.json'),

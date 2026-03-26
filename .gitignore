@@ -12,6 +12,11 @@ builder-effective-config.yaml
 
 # Runtime data files
 verse-cache.json
+quran-cache.json
+dictionary-cache.json
+references.db
+references.db-wal
+references.db-shm
 *.bak
 soundboard.json
 show-config.json

@@ -17,6 +17,7 @@ const path = require('path');
 const { SERVER } = require('./config/constants');
 
 // Services
+const DatabaseService = require('./services/database.service');
 const CacheService = require('./services/cache.service');
 const QuranCacheService = require('./services/quran-cache.service');
 const DictionaryCacheService = require('./services/dictionary-cache.service');
@@ -71,6 +72,12 @@ HostsService.ensureHostsMapping();
 // Load services with error handling
 const createLogger = require('./utils/logger');
 const initLog = createLogger('Init');
+
+// Initialize database first (all cache services depend on it)
+if (!DatabaseService.initialize()) {
+  initLog.error('Fatal: database initialization failed. Exiting.');
+  process.exit(1);
+}
 
 const services = [
   { name: 'Cache', fn: () => CacheService.load() },
@@ -149,6 +156,7 @@ server.listen(SERVER.PORT, () => {
 
 const shutdown = () => {
   console.log('\nShutting down gracefully...');
+  DatabaseService.close();
   server.close(() => {
     console.log('Server closed');
     process.exit(0);

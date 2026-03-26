@@ -1,20 +1,14 @@
 /**
  * Quran verse cache service
- * Handles persistent storage and retrieval of Quran verses
+ * Handles persistent storage and retrieval of Quran verses via SQLite
  * @module services/quran-cache
  */
 
-const { SERVER, QURAN_SURAH_ORDER } = require('../config/constants');
+const { QURAN_SURAH_ORDER } = require('../config/constants');
 const createLogger = require('../utils/logger');
-const { readJsonSafe, createWriteQueue } = require('../utils/safe-file');
+const DatabaseService = require('./database.service');
 
 const log = createLogger('QuranCache');
-
-// Serialized write queue for atomic saves
-const saveQueued = createWriteQueue(SERVER.QURAN_CACHE_FILE);
-
-// In-memory cache store
-let cache = {};
 
 /**
  * Extracts surah name from a Quran reference
@@ -65,43 +59,55 @@ const sortByAyah = (a, b) => {
 };
 
 /**
+ * Safely parses JSON with a fallback for corrupt data
+ * @param {string} json - JSON string
+ * @param {*} fallback - Fallback value
+ * @returns {*} Parsed value or fallback
+ */
+const safeParse = (json, fallback = []) => {
+  try {
+    return JSON.parse(json || JSON.stringify(fallback));
+  } catch {
+    return fallback;
+  }
+};
+
+/**
+ * Converts a database row to a verse object
+ * @param {Object} row - Database row
+ * @returns {Object} Verse object
+ */
+const rowToVerse = (row) => ({
+  key: row.key,
+  reference: row.reference,
+  version: row.version,
+  versionName: row.version_name,
+  text: row.text,
+  surahName: row.surah_name,
+  surahNumber: row.surah_number,
+  verses: safeParse(row.verses_json),
+  totalVerses: row.total_verses,
+  timestamp: row.timestamp,
+});
+
+/**
  * Quran Cache Service API
  */
 const QuranCacheService = {
   /**
-   * Loads cache from disk with backup fallback
+   * Loads cache (no-op for SQLite, kept for API compatibility)
    * @returns {boolean} Success status
    */
   load() {
-    const { data, source } = readJsonSafe(SERVER.QURAN_CACHE_FILE);
-
-    if (!data) {
-      log.info('No existing Quran cache found, starting fresh');
+    try {
+      const db = DatabaseService.getDb();
+      const count = db.prepare('SELECT COUNT(*) as count FROM quran_verses').get().count;
+      log.info(`${count} cached Quran verses available`);
+      return true;
+    } catch (error) {
+      log.error('Failed to access Quran verse cache:', error.message);
       return false;
     }
-
-    if (source === 'backup') {
-      log.warn('Loaded Quran cache from backup file — primary was corrupted');
-    }
-
-    if (typeof data !== 'object' || Array.isArray(data)) {
-      log.error('Loaded Quran cache is not a valid object, ignoring');
-      return false;
-    }
-
-    cache = data;
-    log.info(`Loaded ${Object.keys(cache).length} cached Quran verses`);
-    return true;
-  },
-
-  /**
-   * Saves cache to disk using atomic write queue
-   * @returns {Promise<boolean>} Success status
-   */
-  async save() {
-    const ok = await saveQueued(cache);
-    if (!ok) log.error('Failed to save Quran cache');
-    return ok;
   },
 
   /**
@@ -111,7 +117,9 @@ const QuranCacheService = {
    * @returns {boolean} Exists in cache
    */
   has(reference, edition) {
-    return createKey(reference, edition) in cache;
+    const db = DatabaseService.getDb();
+    const row = db.prepare('SELECT 1 FROM quran_verses WHERE key = ?').get(createKey(reference, edition));
+    return !!row;
   },
 
   /**
@@ -121,7 +129,9 @@ const QuranCacheService = {
    * @returns {Object|null} Cached verse or null
    */
   get(reference, edition) {
-    return cache[createKey(reference, edition)] || null;
+    const db = DatabaseService.getDb();
+    const row = db.prepare('SELECT * FROM quran_verses WHERE key = ?').get(createKey(reference, edition));
+    return row ? rowToVerse(row) : null;
   },
 
   /**
@@ -130,7 +140,9 @@ const QuranCacheService = {
    * @returns {Object|null} Cached verse or null
    */
   getByKey(key) {
-    return cache[key] || null;
+    const db = DatabaseService.getDb();
+    const row = db.prepare('SELECT * FROM quran_verses WHERE key = ?').get(key);
+    return row ? rowToVerse(row) : null;
   },
 
   /**
@@ -139,19 +151,22 @@ const QuranCacheService = {
    * @returns {Object} Cached verse with metadata
    */
   add(verseData) {
+    const db = DatabaseService.getDb();
     const key = createKey(verseData.reference, verseData.version);
     const surahName = verseData.surahName || extractSurahName(verseData.reference);
+    const timestamp = Date.now();
 
-    const cachedVerse = {
-      ...verseData,
-      surahName,
-      timestamp: Date.now(),
-    };
+    db.prepare(`
+      INSERT OR REPLACE INTO quran_verses (key, reference, version, version_name, text, surah_name, surah_number, verses_json, total_verses, timestamp)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      key, verseData.reference, verseData.version, verseData.versionName || '',
+      verseData.text || '', surahName, verseData.surahNumber || 0,
+      verseData.verses ? JSON.stringify(verseData.verses) : '[]',
+      verseData.totalVerses || 0, timestamp
+    );
 
-    cache = { ...cache, [key]: cachedVerse };
-    this.save();
-
-    return cachedVerse;
+    return { ...verseData, key, surahName, timestamp };
   },
 
   /**
@@ -160,22 +175,19 @@ const QuranCacheService = {
    * @returns {boolean} Success status
    */
   remove(key) {
-    if (!(key in cache)) return false;
-
-    const { [key]: _removed, ...remaining } = cache;
-    cache = remaining;
-    this.save();
-
-    return true;
+    const db = DatabaseService.getDb();
+    const result = db.prepare('DELETE FROM quran_verses WHERE key = ?').run(key);
+    return result.changes > 0;
   },
 
   /**
    * Clears all cached verses
-   * @returns {Promise<boolean>} Success status
+   * @returns {boolean} Success status
    */
-  async clear() {
-    cache = {};
-    return this.save();
+  clear() {
+    const db = DatabaseService.getDb();
+    db.prepare('DELETE FROM quran_verses').run();
+    return true;
   },
 
   /**
@@ -183,29 +195,31 @@ const QuranCacheService = {
    * @returns {Object} Verses grouped by surah
    */
   getAllBySurah() {
-    const bySurah = Object.entries(cache).reduce((acc, [key, verse]) => {
+    const db = DatabaseService.getDb();
+    const rows = db.prepare('SELECT * FROM quran_verses ORDER BY surah_name, reference').all();
+
+    const bySurah = {};
+    for (const row of rows) {
+      const verse = rowToVerse(row);
       const surah = verse.surahName || extractSurahName(verse.reference);
-      const existing = acc[surah] || [];
-      return {
-        ...acc,
-        [surah]: [...existing, { key, ...verse }],
-      };
-    }, {});
+      if (!bySurah[surah]) bySurah[surah] = [];
+      bySurah[surah].push(verse);
+    }
 
     const sortedSurahNames = Object.keys(bySurah).sort((a, b) => {
       const indexA = getSurahIndex(a);
       const indexB = getSurahIndex(b);
-
       if (indexA === -1 && indexB === -1) return a.localeCompare(b);
       if (indexA === -1) return 1;
       if (indexB === -1) return -1;
       return indexA - indexB;
     });
 
-    return sortedSurahNames.reduce((acc, surah) => ({
-      ...acc,
-      [surah]: bySurah[surah].sort(sortByAyah),
-    }), {});
+    const result = {};
+    for (const surah of sortedSurahNames) {
+      result[surah] = bySurah[surah].sort(sortByAyah);
+    }
+    return result;
   },
 
   /**
@@ -213,15 +227,16 @@ const QuranCacheService = {
    * @returns {Object} Cache stats
    */
   getStats() {
-    const entries = Object.values(cache);
+    const db = DatabaseService.getDb();
+    const stats = db.prepare(`
+      SELECT COUNT(*) as totalVerses, MIN(timestamp) as oldestEntry, MAX(timestamp) as newestEntry
+      FROM quran_verses
+    `).get();
+
     return {
-      totalVerses: entries.length,
-      oldestEntry: entries.length
-        ? Math.min(...entries.map((v) => v.timestamp))
-        : null,
-      newestEntry: entries.length
-        ? Math.max(...entries.map((v) => v.timestamp))
-        : null,
+      totalVerses: stats.totalVerses,
+      oldestEntry: stats.totalVerses > 0 ? stats.oldestEntry : null,
+      newestEntry: stats.totalVerses > 0 ? stats.newestEntry : null,
     };
   },
 };
