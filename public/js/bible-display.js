@@ -239,7 +239,14 @@
   // ============================================
 
   socket.on('verseUpdate', (data) => {
-    elements.container.classList.remove('fallacy-mode');
+    elements.container.classList.remove('fallacy-mode', 'quran-mode', 'dictionary-mode');
+
+    if (data.source === 'quran') {
+      elements.container.classList.add('quran-mode');
+    } else if (data.source === 'dictionary') {
+      elements.container.classList.add('dictionary-mode');
+    }
+
     handleVerseUpdate(data);
   });
 

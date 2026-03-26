@@ -16,7 +16,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   urls: {
     callerControl: `${BASE_URL}/dock.html`,
     callerDisplay: `${BASE_URL}/display.html`,
-    bibleControl: `${BASE_URL}/bible-control.html`,
+    bibleControl: `${BASE_URL}/reference-control.html`,
     bibleDisplay: `${BASE_URL}/bible-display.html`,
     soundboard: `${BASE_URL}/soundboard.html`
   }

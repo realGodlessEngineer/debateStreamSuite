@@ -18,6 +18,8 @@ const { SERVER } = require('./config/constants');
 
 // Services
 const CacheService = require('./services/cache.service');
+const QuranCacheService = require('./services/quran-cache.service');
+const DictionaryCacheService = require('./services/dictionary-cache.service');
 const FallacyService = require('./services/fallacy.service');
 const HostsService = require('./services/hosts.service');
 const SoundboardService = require('./services/soundboard.service');
@@ -72,6 +74,8 @@ const initLog = createLogger('Init');
 
 const services = [
   { name: 'Cache', fn: () => CacheService.load() },
+  { name: 'QuranCache', fn: () => QuranCacheService.load() },
+  { name: 'DictionaryCache', fn: () => DictionaryCacheService.load() },
   { name: 'Fallacies', fn: () => FallacyService.load() },
   { name: 'Soundboard', fn: () => SoundboardService.load() },
   { name: 'ShowConfig', fn: () => ShowConfigService.load() },
@@ -110,8 +114,8 @@ server.listen(SERVER.PORT, () => {
 ║    Control Panel: http://localhost:${SERVER.PORT}/dock.html           ║
 ║    OBS Display:   http://localhost:${SERVER.PORT}/display.html        ║
 ╠══════════════════════════════════════════════════════════════╣
-║  Bible Verse Display:                                        ║
-║    Control Panel: http://localhost:${SERVER.PORT}/bible-control.html  ║
+║  Reference Repository:                                       ║
+║    Control Panel: http://localhost:${SERVER.PORT}/reference-control.html ║
 ║    OBS Display:   http://localhost:${SERVER.PORT}/bible-display.html  ║
 ╠══════════════════════════════════════════════════════════════╣
 ║  Soundboard:                                                 ║

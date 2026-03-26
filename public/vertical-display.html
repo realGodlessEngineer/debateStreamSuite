@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1080, height=1920">
+  <title>Vertical Display</title>
+  <link rel="stylesheet" href="css/themes/godless-engineer.css">
+  <link rel="stylesheet" href="css/vertical-display.css">
+</head>
+<body>
+  <!-- Show Info (top) - always visible when config exists -->
+  <div id="showInfo" class="show-info-overlay">
+    <div class="show-info-card">
+      <div class="show-title" id="showTitleDisplay"></div>
+      <div class="hosts-container" id="hostsContainer">
+        <div class="host-card" id="host1Card">
+          <div class="host-name" id="host1NameDisplay"></div>
+          <div class="host-pronouns" id="host1PronounsDisplay"></div>
+        </div>
+        <div class="host-card hidden" id="host2Card">
+          <div class="host-name" id="host2NameDisplay"></div>
+          <div class="host-pronouns" id="host2PronounsDisplay"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Caller Card (bottom) - shown when caller is set -->
+  <div id="callerDisplay" class="caller-overlay">
+    <div class="caller-card">
+      <div class="caller-label">Caller</div>
+      <div class="caller-name" id="callerNameDisplay"></div>
+      <div class="caller-pronouns" id="callerPronounsDisplay"></div>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="js/sanitize.js"></script>
+  <script src="js/socket-connection.js"></script>
+  <script src="js/theme-loader.js"></script>
+  <script src="js/vertical-display.js"></script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+{
+  "necessity|en": {
+    "reference": "Necessity",
+    "version": "en",
+    "versionName": "Dictionary",
+    "text": "noun 1: The quality or state of being necessary, unavoidable, or absolutely requisite. (e.g., \"I bought a new table out of necessity. My old one was ruined.\") | noun 2: The condition of being needy; desperate need; lack | noun 3: Something necessary; a requisite; something indispensable. (e.g., \"A tent is a necessity if you plan on camping.\") | noun 4: Something which makes an act or an event unavoidable; an irresistible force; overruling power | noun 5: The negation of freedom in voluntary action; the subjection of all phenomena, whether material or spiritual, to inevitable causation; necessitarianism. | noun 6: Greater utilitarian good; used in justification of a criminal act. (e.g., \"doctrine of necessity\") | noun 7: (in the plural) Indispensable requirements (of life).",
+    "verses": [
+      {
+        "number": "noun 1",
+        "text": "The quality or state of being necessary, unavoidable, or absolutely requisite. (e.g., \"I bought a new table out of necessity. My old one was ruined.\")"
+      },
+      {
+        "number": "noun 2",
+        "text": "The condition of being needy; desperate need; lack"
+      },
+      {
+        "number": "noun 3",
+        "text": "Something necessary; a requisite; something indispensable. (e.g., \"A tent is a necessity if you plan on camping.\")"
+      },
+      {
+        "number": "noun 4",
+        "text": "Something which makes an act or an event unavoidable; an irresistible force; overruling power"
+      },
+      {
+        "number": "noun 5",
+        "text": "The negation of freedom in voluntary action; the subjection of all phenomena, whether material or spiritual, to inevitable causation; necessitarianism."
+      },
+      {
+        "number": "noun 6",
+        "text": "Greater utilitarian good; used in justification of a criminal act. (e.g., \"doctrine of necessity\")"
+      },
+      {
+        "number": "noun 7",
+        "text": "(in the plural) Indispensable requirements (of life)."
+      }
+    ],
+    "totalVerses": 7,
+    "phonetic": "/nɪˈsɛsəti/",
+    "etymology": "",
+    "audioUrl": "https://api.dictionaryapi.dev/media/pronunciations/en/necessity-us.mp3",
+    "firstLetter": "N",
+    "timestamp": 1773186154218
+  }
+}

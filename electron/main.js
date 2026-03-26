@@ -103,9 +103,9 @@ function createTray() {
     },
     { type: 'separator' },
     {
-      label: 'Copy Bible Control URL',
+      label: 'Copy Reference Control URL',
       click: () => {
-        clipboard.writeText(`${BASE_URL}/bible-control.html`);
+        clipboard.writeText(`${BASE_URL}/reference-control.html`);
       }
     },
     {

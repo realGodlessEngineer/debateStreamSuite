@@ -11,6 +11,12 @@
   <!-- Title Bar -->
   <div class="title-bar">
     <h1><span class="status-dot" id="statusDot"></span> Soundboard</h1>
+    <!-- Now Playing (in title bar) -->
+    <div class="now-playing" id="nowPlaying">
+      <span class="now-playing-emoji" id="nowPlayingEmoji"></span>
+      <span class="now-playing-name" id="nowPlayingName"></span>
+      <button class="btn-stop-sound" id="stopSoundBtn">&#9632; Stop</button>
+    </div>
     <div class="title-bar-actions">
       <button class="btn-info" id="showManageBtn">
         <span>&#9998;</span> Manage
@@ -133,15 +139,6 @@
       <button class="page-btn" id="nextPageBtn" disabled>&#9654;</button>
     </div>
 
-    <!-- Now Playing -->
-    <div class="now-playing" id="nowPlaying">
-      <div class="now-playing-label">Now Playing</div>
-      <div class="now-playing-info">
-        <span class="now-playing-emoji" id="nowPlayingEmoji"></span>
-        <span class="now-playing-name" id="nowPlayingName"></span>
-      </div>
-      <button class="dock-btn btn-stop-sound" id="stopSoundBtn">&#9632; Stop</button>
-    </div>
   </div>
 
   <!-- Hidden audio element -->

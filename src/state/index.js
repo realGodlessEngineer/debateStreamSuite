@@ -27,6 +27,7 @@ const createVerseState = () => Object.freeze({
   totalVerses: 0,
   currentPage: 0,
   versesPerPage: DISPLAY.VERSES_PER_PAGE,
+  source: '',
 });
 
 /**

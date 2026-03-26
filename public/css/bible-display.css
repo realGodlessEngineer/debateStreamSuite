@@ -163,6 +163,67 @@ body {
   font-style: italic;
 }
 
+/* ============================================
+ * Quran Display Mode
+ * ============================================ */
+
+/* Quran mode - green accent */
+.container.quran-mode .verse-box {
+  background: linear-gradient(135deg, #0d0d0d 0%, #0a1a0d 100%);
+  border-color: rgba(34, 197, 94, 0.4);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.7),
+    0 0 20px rgba(34, 197, 94, 0.15);
+}
+
+.container.quran-mode .reference {
+  color: #22c55e;
+}
+
+.container.quran-mode .page-indicator {
+  background: rgba(34, 197, 94, 0.2);
+}
+
+.container.quran-mode .verse-number {
+  color: #22c55e;
+}
+
+.container.quran-mode .version {
+  color: rgba(34, 197, 94, 0.6);
+}
+
+/* ============================================
+ * Dictionary Display Mode
+ * ============================================ */
+
+/* Dictionary mode - orange accent */
+.container.dictionary-mode .verse-box {
+  background: linear-gradient(135deg, #0d0d0d 0%, #1a140a 100%);
+  border-color: rgba(245, 158, 11, 0.4);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.7),
+    0 0 20px rgba(245, 158, 11, 0.15);
+}
+
+.container.dictionary-mode .reference {
+  color: #f59e0b;
+}
+
+.container.dictionary-mode .page-indicator {
+  background: rgba(245, 158, 11, 0.2);
+}
+
+.container.dictionary-mode .verse-number {
+  color: #f59e0b;
+  font-style: italic;
+  font-size: 0.7em;
+  vertical-align: baseline;
+}
+
+.container.dictionary-mode .version {
+  color: rgba(245, 158, 11, 0.6);
+}
+
 /* Responsive Adjustments */
 @media (max-width: 800px) {
   .verse-text {

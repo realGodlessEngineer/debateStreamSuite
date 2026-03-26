@@ -72,6 +72,10 @@ function validateVerseData(data) {
       }))
     : [];
 
+  const VALID_SOURCES = ['bible', 'quran', 'dictionary', ''];
+  const rawSource = sanitizeString(data.source, '', 10);
+  const source = VALID_SOURCES.includes(rawSource) ? rawSource : '';
+
   return {
     reference: sanitizeString(data.reference, '', 100),
     version: sanitizeString(data.version, '', 20),
@@ -81,6 +85,7 @@ function validateVerseData(data) {
     totalVerses: verses.length,
     currentPage: 0,
     versesPerPage: DISPLAY.VERSES_PER_PAGE,
+    source,
   };
 }
 
