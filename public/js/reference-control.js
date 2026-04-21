@@ -62,6 +62,12 @@
       totalVerses: 0,
       versesPerPage: 3,
     },
+    // Interlinear state
+    lastFetchedInterlinear: null,
+    cachedInterlinear: {},
+    selectedInterlinearKey: null,
+    selectedWord: null,
+    selectedLexicon: null,
     // Fallacy state
     allFallacies: [],
     selectedFallacySlug: null,
@@ -126,6 +132,14 @@
     displayUrl: document.getElementById('displayUrl'),
     controlUrl: document.getElementById('controlUrl'),
 
+    // Interlinear elements
+    interlinearReference: document.getElementById('interlinearReference'),
+    fetchInterlinearBtn: document.getElementById('fetchInterlinearBtn'),
+    clearInterlinearBtn: document.getElementById('clearInterlinearBtn'),
+    interlinearResults: document.getElementById('interlinearResults'),
+    interlinearHeader: document.getElementById('interlinearHeader'),
+    interlinearGrid: document.getElementById('interlinearGrid'),
+
     // Fallacy elements
     fallacySearch: document.getElementById('fallacySearch'),
     fallacyList: document.getElementById('fallacyList'),
@@ -162,6 +176,8 @@
       elements.quranReference.focus();
     } else if (tabName === 'dictionary') {
       elements.dictionaryWord.focus();
+    } else if (tabName === 'interlinear') {
+      elements.interlinearReference.focus();
     } else if (tabName === 'fallacies') {
       elements.fallacySearch.focus();
     }
@@ -210,6 +226,17 @@
     }
   }
 
+  async function loadInterlinearCached() {
+    try {
+      const response = await fetch('/api/cached-interlinear');
+      if (!response.ok) throw new Error(`Server returned ${response.status}`);
+      state.cachedInterlinear = await response.json();
+      updateCacheCount();
+    } catch (error) {
+      console.error('Error loading interlinear cache:', error);
+    }
+  }
+
   function updateCacheCount() {
     const bibleCount = Object.values(state.cachedVerses)
       .reduce((sum, arr) => sum + arr.length, 0);
@@ -217,7 +244,9 @@
       .reduce((sum, arr) => sum + arr.length, 0);
     const dictCount = Object.values(state.cachedDefinitions)
       .reduce((sum, arr) => sum + arr.length, 0);
-    const total = bibleCount + quranCount + dictCount;
+    const interlinearCount = Object.values(state.cachedInterlinear)
+      .reduce((sum, arr) => sum + arr.length, 0);
+    const total = bibleCount + quranCount + dictCount + interlinearCount;
     elements.cacheCount.textContent = total || '';
   }
 
@@ -226,6 +255,8 @@
       renderQuranCacheList(filter);
     } else if (state.activeTab === 'dictionary') {
       renderDictionaryCacheList(filter);
+    } else if (state.activeTab === 'interlinear') {
+      renderInterlinearCacheList(filter);
     } else {
       renderBibleCacheList(filter);
     }
@@ -412,6 +443,30 @@
 
   async function selectCachedVerse(encodedKey, source) {
     const key = decodeURIComponent(encodedKey);
+
+    // Handle interlinear cache selection separately
+    if (source === 'interlinear') {
+      state.selectedInterlinearKey = key;
+      document.querySelectorAll('.cached-verse').forEach((el) => {
+        const elKey = decodeURIComponent(el.dataset.key);
+        el.classList.toggle('selected', elKey === key && el.dataset.source === source);
+      });
+
+      try {
+        const response = await fetch('/api/cached-interlinear/' + encodeURIComponent(key));
+        if (response.ok) {
+          const data = await response.json();
+          state.lastFetchedInterlinear = data;
+          elements.interlinearReference.value = data.reference;
+          renderInterlinearGrid(data);
+          displayInterlinearOnOBS();
+        }
+      } catch (error) {
+        console.error('Error loading cached interlinear:', error);
+      }
+      return;
+    }
+
     const cacheMap = {
       quran: state.cachedQuranVerses,
       dictionary: state.cachedDefinitions,
@@ -460,6 +515,7 @@
     const endpointMap = {
       quran: '/api/cached-quran-verse/',
       dictionary: '/api/cached-definition/',
+      interlinear: '/api/cached-interlinear/',
     };
     const endpoint = endpointMap[source] || '/api/cached-verse/';
 
@@ -472,25 +528,29 @@
       } else if (source === 'dictionary') {
         if (state.selectedDictCacheKey === key) state.selectedDictCacheKey = null;
         await loadDictionaryCachedWords();
+      } else if (source === 'interlinear') {
+        if (state.selectedInterlinearKey === key) state.selectedInterlinearKey = null;
+        await loadInterlinearCached();
       } else {
         if (state.selectedCacheKey === key) state.selectedCacheKey = null;
         await loadBibleCachedVerses();
       }
       renderCacheList();
-      status.success('Verse removed from cache');
+      status.success('Entry removed from cache');
     } catch (error) {
-      status.error('Error deleting verse');
+      status.error('Error deleting entry');
     }
   }
 
   async function clearAllCache() {
-    const labelMap = { quran: 'Quran', dictionary: 'Dictionary' };
+    const labelMap = { quran: 'Quran', dictionary: 'Dictionary', interlinear: 'Interlinear' };
     const label = labelMap[state.activeTab] || 'Bible';
     if (!confirm(`Clear ALL cached ${label} entries? This cannot be undone.`)) return;
 
     const endpointMap = {
       quran: '/api/cached-quran-verses',
       dictionary: '/api/cached-definitions',
+      interlinear: '/api/cached-interlinear',
     };
     const endpoint = endpointMap[state.activeTab] || '/api/cached-verses';
 
@@ -500,6 +560,8 @@
         await loadQuranCachedVerses();
       } else if (state.activeTab === 'dictionary') {
         await loadDictionaryCachedWords();
+      } else if (state.activeTab === 'interlinear') {
+        await loadInterlinearCached();
       } else {
         await loadBibleCachedVerses();
       }
@@ -653,6 +715,379 @@
   }
 
   // ============================================
+  // Interlinear Functions
+  // ============================================
+
+  async function fetchInterlinear() {
+    const reference = elements.interlinearReference.value.trim();
+
+    if (!reference) {
+      status.error('Please enter a Bible reference');
+      return null;
+    }
+
+    status.loading('Fetching interlinear data...');
+
+    try {
+      const response = await fetch('/api/fetch-interlinear', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reference }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to fetch interlinear data');
+      }
+
+      if (!data.words || data.words.length === 0) {
+        throw new Error('No interlinear data found. Check the reference.');
+      }
+
+      state.lastFetchedInterlinear = data;
+      renderInterlinearGrid(data);
+      displayInterlinearOnOBS();
+
+      const cacheStatus = data.fromCache ? ' (from cache)' : ' (fetched & cached)';
+      const lang = data.language === 'hebrew' ? 'Hebrew' : 'Greek';
+      const langLabel = lang === 'Hebrew' ? 'Hebrew (WLC)' : 'Greek (Tischendorf)';
+      const verseNums = [...new Set(data.words.map((w) => w.verseNum))];
+      showPreview({
+        reference: data.reference,
+        text: `${data.words.length} words across ${verseNums.length} verse(s)`,
+        version: langLabel,
+        versionName: langLabel,
+        fromCache: data.fromCache,
+      }, 'interlinear');
+      status.success(`${lang} interlinear loaded${cacheStatus} - ${data.words.length} words`);
+
+      if (!data.fromCache) await loadInterlinearCached();
+
+      return data;
+    } catch (error) {
+      status.error(error.message);
+      return null;
+    }
+  }
+
+  function renderInterlinearGrid(data) {
+    const isHebrew = data.language === 'hebrew';
+    const langClass = isHebrew ? 'hebrew' : 'greek';
+    const langLabel = isHebrew ? 'Hebrew (WLC)' : 'Greek (Tischendorf)';
+
+    elements.interlinearHeader.textContent = `${data.reference} — ${langLabel} — ${data.words.length} words`;
+    elements.interlinearResults.style.display = 'block';
+    elements.interlinearGrid.classList.toggle('rtl', isHebrew);
+
+    let html = '';
+    let currentVerse = null;
+
+    for (let i = 0; i < data.words.length; i++) {
+      const w = data.words[i];
+
+      if (w.verseNum !== currentVerse) {
+        currentVerse = w.verseNum;
+        html += `<div class="interlinear-verse-marker">v. ${currentVerse}</div>`;
+      }
+
+      const morphTitle = w.morph ? decodeMorph(w.morph) : '';
+      html += `
+        <div class="interlinear-word ${langClass}" data-index="${i}" data-strongs="${escapeHtml(w.strongs || '')}"${morphTitle ? ` title="${escapeHtml(w.morph + ': ' + morphTitle)}"` : ''}>
+          <span class="word-original">${escapeHtml(w.original)}</span>
+          <span class="word-translit">${escapeHtml(w.transliteration || '')}</span>
+          <span class="word-strongs">${escapeHtml(w.strongs || '')}</span>
+          <span class="word-gloss">${escapeHtml(w.gloss || '')}</span>
+        </div>
+      `;
+    }
+
+    elements.interlinearGrid.innerHTML = html;
+
+    // Attach click handlers
+    elements.interlinearGrid.querySelectorAll('.interlinear-word').forEach((el) => {
+      el.addEventListener('click', () => {
+        const index = parseInt(el.dataset.index, 10);
+        const word = data.words[index];
+        selectInterlinearWord(word, el);
+      });
+    });
+  }
+
+  async function selectInterlinearWord(word, el) {
+    // Toggle off if clicking the already-selected word — revert to verse display
+    if (el.classList.contains('selected')) {
+      el.classList.remove('selected');
+      state.selectedWord = null;
+      state.selectedLexicon = null;
+      displayInterlinearOnOBS();
+      // Restore verse preview
+      const data = state.lastFetchedInterlinear;
+      if (data) {
+        const lang = data.language === 'hebrew' ? 'Hebrew' : 'Greek';
+        const langLabel = lang === 'Hebrew' ? 'Hebrew (WLC)' : 'Greek (Tischendorf)';
+        const verseNums = [...new Set(data.words.map((w) => w.verseNum))];
+        showPreview({
+          reference: data.reference,
+          text: `${data.words.length} words across ${verseNums.length} verse(s)`,
+          version: langLabel,
+          versionName: langLabel,
+        }, 'interlinear');
+      }
+      status.success('Reverted to verse display');
+      return;
+    }
+
+    // Update visual selection
+    elements.interlinearGrid.querySelectorAll('.interlinear-word').forEach((w) => w.classList.remove('selected'));
+    el.classList.add('selected');
+
+    state.selectedWord = word;
+
+    if (!word.strongs) {
+      status.error('No Strong\'s number for this word');
+      return;
+    }
+
+    status.loading('Fetching lexicon entry...');
+
+    try {
+      const response = await fetch('/api/fetch-lexicon', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ strongsNumber: word.strongs }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to fetch lexicon entry');
+      }
+
+      state.selectedLexicon = data;
+      showLexiconPreview(word, data);
+      displayLexiconOnOBS();
+      status.success(`Lexicon entry displayed for ${word.strongs}`);
+    } catch (error) {
+      status.error(error.message);
+    }
+  }
+
+  function displayInterlinearOnOBS() {
+    const data = state.lastFetchedInterlinear;
+    if (!data) return;
+
+    // Group words by verse number
+    const verseGroups = {};
+    for (const w of data.words) {
+      const v = w.verseNum || 1;
+      if (!verseGroups[v]) verseGroups[v] = [];
+      verseGroups[v].push(w);
+    }
+
+    // Build one verse object per verse group
+    const realVerses = Object.entries(verseGroups).map(([num, words]) => ({
+      number: String(num),
+      text: words.map((w) => `${w.original} (${w.gloss || w.strongs || ''})`).join('  '),
+      words: words.map((w) => ({
+        original: w.original,
+        transliteration: w.transliteration || '',
+        strongs: w.strongs || '',
+        gloss: w.gloss || '',
+      })),
+    }));
+
+    // Pad to 1 verse per page: server uses versesPerPage (3), so create
+    // versesPerPage placeholders per real verse. Only the first of each group
+    // carries the word data; the display renders 1 interlinear verse per page.
+    const vpp = state.paging.versesPerPage;
+    const paddedVerses = [];
+    for (const verse of realVerses) {
+      paddedVerses.push(verse);
+      for (let i = 1; i < vpp; i++) {
+        paddedVerses.push({ number: '', text: '' });
+      }
+    }
+
+    const langLabel = data.language === 'hebrew' ? 'Hebrew Interlinear (WLC)' : 'Greek Interlinear (Tischendorf)';
+
+    connection.emit('displayVerse', {
+      reference: data.reference,
+      version: langLabel,
+      versionName: langLabel,
+      text: realVerses.map((v) => v.text).join(' '),
+      verses: paddedVerses,
+      totalVerses: paddedVerses.length,
+      source: 'interlinear',
+      language: data.language,
+      lexicon: null,
+    });
+    status.success('Interlinear sent to display');
+  }
+
+  /**
+   * Parses definitions from a raw lexicon definition string
+   * Handles both Greek (numbered: "1. ...", "a. ...") and Hebrew (dash-separated) formats
+   * @param {string} raw - Raw definition text
+   * @returns {string[]} Array of definition strings
+   */
+  function parseLexiconDefinitions(raw) {
+    if (!raw) return [];
+
+    // Strip metadata sections that may follow definitions inline
+    const cleaned = raw.replace(/\s*-\s*Origin:[\s\S]*$/i, '')
+      .replace(/\s*-\s*TDNT[\s\S]*$/i, '')
+      .replace(/\s*-\s*Part\(s\)[\s\S]*$/i, '')
+      .replace(/\s*-\s*Strongs:[\s\S]*$/i, '');
+
+    // Try numbered format first (Greek-style): "1. ...", "2. ...", "a. ..."
+    const numbered = [];
+    const numLines = cleaned.split(/[\n]/).map((l) => l.trim()).filter(Boolean);
+    for (const line of numLines) {
+      const segments = line.split(/\s+(?=\d+\.\s|[a-z]\.\s)/);
+      for (const seg of segments) {
+        const match = seg.trim().match(/^(\d+|[a-z])\.\s+(.+)/);
+        if (match) numbered.push(match[0].trim());
+      }
+    }
+    if (numbered.length > 0) return numbered;
+
+    // Fallback: Hebrew BDB format — extract between "Definition:" and "Origin:"
+    const defMatch = raw.match(/Definition[:\s]*[-\s]*([\s\S]*?)(?:\n\s*Origin:|\n\s*TWOT|\n\s*Part)/i);
+    if (!defMatch) return [];
+
+    const items = defMatch[1]
+      .split(/\s*-\s*/)
+      .map((s) => s.trim().replace(/\n/g, ' ').replace(/\s+/g, ' '))
+      .filter(Boolean);
+
+    return items;
+  }
+
+  /**
+   * Parses metadata fields (origin, part of speech, etc.) from a raw lexicon definition
+   * @param {string} raw - Raw definition text
+   * @returns {Object} Extracted metadata fields
+   */
+  function parseLexiconMetadata(raw) {
+    if (!raw) return {};
+    const meta = {};
+
+    const originMatch = raw.match(/Origin:\s*(.+?)(?:\n|$)/i);
+    if (originMatch) meta.origin = originMatch[1].trim().replace(/\s+/g, ' ');
+
+    const posMatch = raw.match(/Part\(s\) of speech:\s*(.+?)(?:\n|$)/i);
+    if (posMatch) meta.partOfSpeech = posMatch[1].trim();
+
+    const tdntMatch = raw.match(/TDNT entry:\s*(.+?)(?:\n|$)/i);
+    if (tdntMatch) meta.tdnt = tdntMatch[1].trim();
+
+    const twotMatch = raw.match(/TWOT entry:\s*(.+?)(?:\n|$)/i);
+    if (twotMatch) meta.twot = twotMatch[1].trim();
+
+    return meta;
+  }
+
+  function displayLexiconOnOBS() {
+    const word = state.selectedWord;
+    const lexicon = state.selectedLexicon;
+    if (!word || !lexicon) return;
+
+    const isHebrew = (word.strongs || '').startsWith('H');
+    const langLabel = isHebrew ? 'Hebrew Lexicon (BDB)' : "Greek Lexicon (Thayer's)";
+    const definitions = parseLexiconDefinitions(lexicon.definition);
+    const metadata = parseLexiconMetadata(lexicon.definition);
+
+    // Build placeholder verses so the server paging system calculates the correct page count.
+    // Server uses versesPerPage (3), so we create 3 placeholders per definition page.
+    const DEFS_PER_PAGE = 8;
+    const defPageCount = Math.max(1, Math.ceil(definitions.length / DEFS_PER_PAGE));
+    const placeholderCount = defPageCount * state.paging.versesPerPage;
+    const defPages = Array.from({ length: placeholderCount }, () => ({ number: '', text: '' }));
+
+    connection.emit('displayVerse', {
+      reference: `${word.strongs}: ${word.gloss || word.original}`,
+      version: langLabel,
+      versionName: langLabel,
+      text: lexicon.definition || '',
+      verses: defPages,
+      totalVerses: defPageCount,
+      source: 'interlinear',
+      language: isHebrew ? 'hebrew' : 'greek',
+      lexicon: {
+        lemma: lexicon.lemma || word.original,
+        transliteration: lexicon.transliteration || '',
+        pronunciation: lexicon.pronunciation || '',
+        morph: word.morph || '',
+        origin: metadata.origin || '',
+        partOfSpeech: metadata.partOfSpeech || '',
+        tdnt: metadata.tdnt || '',
+        twot: metadata.twot || '',
+        definitions,
+      },
+    });
+    status.success('Lexicon entry sent to display');
+  }
+
+  function renderInterlinearCacheList(filter = '') {
+    const searchTerm = filter.toLowerCase();
+    const books = Object.keys(state.cachedInterlinear);
+
+    if (books.length === 0) {
+      elements.cacheList.innerHTML =
+        '<div class="cache-empty">No cached interlinear passages yet.<br>Fetch a passage to add it to the cache.</div>';
+      return;
+    }
+
+    let html = '';
+
+    for (const book of books) {
+      const passages = state.cachedInterlinear[book].filter((p) => {
+        if (!searchTerm) return true;
+        return p.reference.toLowerCase().includes(searchTerm) || p.language.toLowerCase().includes(searchTerm);
+      });
+
+      if (passages.length === 0) continue;
+
+      html += `
+        <div class="book-group">
+          <div class="book-header" data-book="${escapeHtml(book)}">
+            <span>${escapeHtml(book)} (${passages.length})</span>
+            <span class="toggle">▼</span>
+          </div>
+          <div class="book-verses">
+      `;
+
+      for (const passage of passages) {
+        const isSelected = state.selectedInterlinearKey === passage.key;
+        const encodedKey = encodeURIComponent(passage.key);
+        const langLabel = passage.language === 'hebrew' ? 'Hebrew' : 'Greek';
+        html += `
+          <div class="cached-verse ${isSelected ? 'selected' : ''}" data-key="${encodedKey}" data-source="interlinear">
+            <div class="cached-verse-content" data-action="select">
+              <div class="cached-verse-ref">${escapeHtml(passage.reference)}</div>
+              <div class="cached-verse-version">${escapeHtml(langLabel)}</div>
+            </div>
+            <button class="btn-delete" data-action="delete" title="Delete from cache">×</button>
+          </div>
+        `;
+      }
+
+      html += '</div></div>';
+    }
+
+    elements.cacheList.innerHTML = html || '<div class="cache-empty">No passages match your search.</div>';
+  }
+
+  async function handleInterlinearKeyboard(event) {
+    if (event.key === 'Enter') {
+      await fetchInterlinear();
+    } else if (event.key === 'Escape') {
+      clearDisplay();
+    }
+  }
+
+  // ============================================
   // Shared Display Functions
   // ============================================
 
@@ -698,6 +1133,96 @@
       ${etymology}
       ${verseCount}
     `;
+  }
+
+  /**
+   * Shows a lexicon info grid with definitions in the preview card
+   * @param {Object} word - Selected word data
+   * @param {Object} lexicon - Lexicon entry data
+   */
+  function showLexiconPreview(word, lexicon) {
+    const isHebrew = (word.strongs || '').startsWith('H');
+
+    let html = `<div class="preview-reference">${escapeHtml(word.strongs)}: ${escapeHtml(word.gloss || word.original)}</div>`;
+    html += '<div class="preview-info-grid">';
+
+    html += `
+      <div class="preview-info-item">
+        <div class="preview-info-label">Original</div>
+        <div class="preview-info-value ${isHebrew ? 'preview-script-hebrew' : 'preview-script-greek'}">${escapeHtml(lexicon.lemma || word.original)}</div>
+      </div>
+      <div class="preview-info-item">
+        <div class="preview-info-label">Transliteration</div>
+        <div class="preview-info-value">${escapeHtml(lexicon.transliteration || '')}</div>
+      </div>
+    `;
+
+    if (lexicon.pronunciation) {
+      html += `
+        <div class="preview-info-item">
+          <div class="preview-info-label">Pronunciation</div>
+          <div class="preview-info-value">${escapeHtml(lexicon.pronunciation)}</div>
+        </div>
+      `;
+    }
+
+    if (word.morph) {
+      html += `
+        <div class="preview-info-item">
+          <div class="preview-info-label">Morphology</div>
+          <div class="preview-info-value" title="${escapeHtml(word.morph)}">${escapeHtml(decodeMorph(word.morph))}</div>
+        </div>
+      `;
+    }
+
+    const metadata = parseLexiconMetadata(lexicon.definition);
+    if (metadata.partOfSpeech) {
+      html += `
+        <div class="preview-info-item">
+          <div class="preview-info-label">Part of Speech</div>
+          <div class="preview-info-value">${escapeHtml(metadata.partOfSpeech)}</div>
+        </div>
+      `;
+    }
+
+    if (metadata.origin) {
+      html += `
+        <div class="preview-info-item">
+          <div class="preview-info-label">Origin</div>
+          <div class="preview-info-value preview-info-small">${escapeHtml(metadata.origin)}</div>
+        </div>
+      `;
+    }
+
+    html += '</div>';
+
+    // Definition list
+    const definitions = parseLexiconDefinitions(lexicon.definition);
+    if (definitions.length > 0) {
+      const hasNumbered = definitions.some((d) => /^\d+\.\s/.test(d));
+      html += '<div class="preview-def-list">';
+      for (const def of definitions) {
+        if (hasNumbered) {
+          const subMatch = def.match(/^[a-z]\.\s+(.+)/);
+          const mainMatch = def.match(/^\d+\.\s+(.+)/);
+          if (subMatch) {
+            html += `<div class="preview-def-sub">${escapeHtml(subMatch[1])}</div>`;
+          } else if (mainMatch) {
+            html += `<div class="preview-def-main">${escapeHtml(mainMatch[1])}</div>`;
+          } else {
+            html += `<div class="preview-def-main">${escapeHtml(def)}</div>`;
+          }
+        } else {
+          html += `<div class="preview-def-main">${escapeHtml(def)}</div>`;
+        }
+      }
+      html += '</div>';
+    }
+
+    const langLabel = isHebrew ? 'Hebrew Lexicon (BDB)' : "Greek Lexicon (Thayer's)";
+    html += `<div class="preview-version">${escapeHtml(langLabel)}</div>`;
+
+    elements.previewContent.innerHTML = html;
   }
 
   // ============================================
@@ -802,7 +1327,8 @@
         elements.pagingControls.classList.add('visible');
         elements.currentPage.textContent = currentPage + 1;
         elements.totalPages.textContent = totalPages;
-        elements.verseRange.textContent = ` (verses ${startVerse}-${endVerse} of ${totalVerses})`;
+        const isInterlinear = data.source === 'interlinear';
+        elements.verseRange.textContent = isInterlinear ? '' : ` (verses ${startVerse}-${endVerse} of ${totalVerses})`;
         elements.prevPageBtn.disabled = currentPage === 0;
         elements.nextPageBtn.disabled = currentPage >= totalPages - 1;
       } else {
@@ -892,6 +1418,7 @@
     const titleMap = {
       quran: '📖 Cached Quran Verses',
       dictionary: '📖 Cached Definitions',
+      interlinear: '📖 Cached Interlinear Passages',
     };
     elements.cacheModalTitle.textContent = titleMap[state.activeTab] || '📚 Cached Bible Verses';
     renderCacheList();
@@ -951,6 +1478,16 @@
     elements.fetchDictOnlyBtn.addEventListener('click', fetchDictionaryWord);
     elements.clearDictBtn.addEventListener('click', clearDisplay);
 
+    // Interlinear buttons
+    elements.fetchInterlinearBtn.addEventListener('click', fetchInterlinear);
+    elements.clearInterlinearBtn.addEventListener('click', () => {
+      clearDisplay();
+      elements.interlinearResults.style.display = 'none';
+      state.lastFetchedInterlinear = null;
+      state.selectedWord = null;
+      state.selectedLexicon = null;
+    });
+
     // Fallacy
     elements.clearFallacyBtn.addEventListener('click', clearDisplay);
     elements.fallacyList.addEventListener('click', (event) => {
@@ -980,6 +1517,7 @@
       const loaderMap = {
         quran: loadQuranCachedVerses,
         dictionary: loadDictionaryCachedWords,
+        interlinear: loadInterlinearCached,
       };
       const loader = loaderMap[state.activeTab] || loadBibleCachedVerses;
       loader().then(() => renderCacheList());
@@ -997,6 +1535,7 @@
     elements.reference.addEventListener('keydown', handleBibleKeyboard);
     elements.quranReference.addEventListener('keydown', handleQuranKeyboard);
     elements.dictionaryWord.addEventListener('keydown', handleDictionaryKeyboard);
+    elements.interlinearReference.addEventListener('keydown', handleInterlinearKeyboard);
 
     // Global escape
     document.addEventListener('keydown', (e) => {
@@ -1022,6 +1561,7 @@
       loadBibleCachedVerses();
       loadQuranCachedVerses();
       loadDictionaryCachedWords();
+      loadInterlinearCached();
       loadFallacies();
     });
   }

@@ -27,21 +27,7 @@ const MAX_STRING_LENGTH = 200;
  */
 function sanitizeString(value, fallback = '', maxLen = MAX_STRING_LENGTH) {
   if (typeof value !== 'string') return fallback;
-  return escapeHtml(value.slice(0, maxLen).trim());
-}
-
-/**
- * Escapes HTML special characters to prevent XSS
- * @param {string} str - String to escape
- * @returns {string} Escaped string
- */
-function escapeHtml(str) {
-  return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
+  return value.slice(0, maxLen).trim();
 }
 
 /**
@@ -65,20 +51,36 @@ function validateCallerData(data) {
 function validateVerseData(data) {
   if (!data || typeof data !== 'object') return null;
 
+  const VALID_SOURCES = ['bible', 'quran', 'dictionary', 'interlinear', ''];
+  const rawSource = sanitizeString(data.source, '', 20);
+  const source = VALID_SOURCES.includes(rawSource) ? rawSource : '';
+  const isInterlinear = source === 'interlinear';
+
   const verses = Array.isArray(data.verses)
-    ? data.verses.map(v => ({
-        number: sanitizeString(String(v.number || ''), '', 10),
-        text: sanitizeString(v.text, '', 5000),
-      }))
+    ? data.verses.map(v => {
+        const verse = {
+          number: sanitizeString(String(v.number || ''), '', 10),
+          text: sanitizeString(v.text, '', 5000),
+        };
+        // Preserve word objects for interlinear display
+        if (isInterlinear && Array.isArray(v.words)) {
+          verse.words = v.words.map(w => ({
+            original: sanitizeString(w.original, '', 200),
+            transliteration: sanitizeString(w.transliteration, '', 200),
+            strongs: sanitizeString(w.strongs, '', 20),
+            gloss: sanitizeString(w.gloss, '', 200),
+          }));
+        }
+        return verse;
+      })
     : [];
 
-  const VALID_SOURCES = ['bible', 'quran', 'dictionary', ''];
-  const rawSource = sanitizeString(data.source, '', 10);
-  const source = VALID_SOURCES.includes(rawSource) ? rawSource : '';
+  const VALID_LANGUAGES = ['hebrew', 'greek'];
+  const rawLang = sanitizeString(data.language, '', 10);
 
-  return {
+  const result = {
     reference: sanitizeString(data.reference, '', 100),
-    version: sanitizeString(data.version, '', 20),
+    version: sanitizeString(data.version, '', 100),
     versionName: sanitizeString(data.versionName, '', 100),
     text: sanitizeString(data.text, '', 50000),
     verses,
@@ -87,6 +89,31 @@ function validateVerseData(data) {
     versesPerPage: DISPLAY.VERSES_PER_PAGE,
     source,
   };
+
+  if (isInterlinear && VALID_LANGUAGES.includes(rawLang)) {
+    result.language = rawLang;
+  }
+
+  // Preserve structured lexicon data for display rendering, or clear it
+  if (isInterlinear && data.lexicon && typeof data.lexicon === 'object') {
+    result.lexicon = {
+      lemma: sanitizeString(data.lexicon.lemma, '', 200),
+      transliteration: sanitizeString(data.lexicon.transliteration, '', 200),
+      pronunciation: sanitizeString(data.lexicon.pronunciation, '', 200),
+      morph: sanitizeString(data.lexicon.morph, '', 100),
+      origin: sanitizeString(data.lexicon.origin, '', 500),
+      partOfSpeech: sanitizeString(data.lexicon.partOfSpeech, '', 100),
+      tdnt: sanitizeString(data.lexicon.tdnt, '', 50),
+      twot: sanitizeString(data.lexicon.twot, '', 50),
+      definitions: Array.isArray(data.lexicon.definitions)
+        ? data.lexicon.definitions.slice(0, 50).map(d => sanitizeString(d, '', 500))
+        : [],
+    };
+  } else {
+    result.lexicon = null;
+  }
+
+  return result;
 }
 
 /**

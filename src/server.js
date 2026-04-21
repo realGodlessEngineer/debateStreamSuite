@@ -25,6 +25,7 @@ const FallacyService = require('./services/fallacy.service');
 const HostsService = require('./services/hosts.service');
 const SoundboardService = require('./services/soundboard.service');
 const ShowConfigService = require('./services/show-config.service');
+const InterlinearCacheService = require('./services/interlinear-cache.service');
 
 // Routes
 const apiRoutes = require('./routes/api.routes');
@@ -84,6 +85,7 @@ const services = [
   { name: 'QuranCache', fn: () => QuranCacheService.load() },
   { name: 'DictionaryCache', fn: () => DictionaryCacheService.load() },
   { name: 'Fallacies', fn: () => FallacyService.load() },
+  { name: 'InterlinearCache', fn: () => InterlinearCacheService.load() },
   { name: 'Soundboard', fn: () => SoundboardService.load() },
   { name: 'ShowConfig', fn: () => ShowConfigService.load() },
 ];

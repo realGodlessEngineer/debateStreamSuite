@@ -12,12 +12,56 @@ const QuranCacheService = require('../services/quran-cache.service');
 const DictionaryService = require('../services/dictionary.service');
 const DictionaryCacheService = require('../services/dictionary-cache.service');
 const FallacyService = require('../services/fallacy.service');
+const InterlinearService = require('../services/interlinear.service');
+const LexiconService = require('../services/lexicon.service');
+const InterlinearCacheService = require('../services/interlinear-cache.service');
 const { DISPLAY, SOUNDBOARD, BIBLE_BOOK_ORDER, QURAN_SURAH_ORDER, QURAN_EDITIONS } = require('../config/constants');
 const createLogger = require('../utils/logger');
 
 const log = createLogger('API');
 
 const router = express.Router();
+
+/**
+ * Extracts a concise gloss from a full lexicon definition string
+ * Parses both Hebrew BDB format and Greek numbered format
+ * @param {Object} entry - Lexicon entry with definition and shortDefinition
+ * @returns {string} Best available gloss
+ */
+function extractGloss(entry) {
+  if (!entry) return '';
+
+  // Prefer AI-generated gloss when available
+  if (entry.aiGloss) return entry.aiGloss;
+
+  const def = entry.definition || '';
+
+  const MAX_GLOSS = 40;
+
+  // Hebrew BDB: grab entries between 'Definition:' and 'Origin:/TWOT/Part'
+  const bdbMatch = def.match(/(?:BDB )?Definition[:\s]*-\s*([\s\S]+?)(?:\n\s*(?:Origin|TWOT|Part))/i);
+  if (bdbMatch) {
+    const entries = bdbMatch[1].split(/\s*-\s*/).map(s => s.trim().replace(/\n/g, ' ')).filter(Boolean);
+    for (const item of entries) {
+      const cleaned = item.replace(/\(.*?\)/g, '').trim();
+      if (!cleaned) continue;
+      const gloss = cleaned.split(/,\s*/).filter(Boolean).slice(0, 3).join(', ');
+      return gloss.length > MAX_GLOSS ? gloss.slice(0, MAX_GLOSS).replace(/,?\s*\S*$/, '') : gloss;
+    }
+  }
+
+  // Greek numbered: '1. ...'
+  const numMatch = def.match(/1\.\s+(.+?)(?:\s{2,}|\n|$)/);
+  if (numMatch) {
+    const cleaned = numMatch[1].trim()
+      .replace(/,?\s*whether\b.*$/, '')
+      .replace(/\(.*?\)/g, '').trim();
+    const gloss = cleaned.split(/,\s*/).filter(Boolean).slice(0, 3).join(', ');
+    return gloss.length > MAX_GLOSS ? gloss.slice(0, MAX_GLOSS).replace(/,?\s*\S*$/, '') : gloss;
+  }
+
+  return entry.shortDefinition || '';
+}
 
 /**
  * POST /api/fetch-verse
@@ -379,6 +423,205 @@ router.get('/fallacy/:slug', (req, res) => {
   } else {
     res.status(404).json({ error: 'Fallacy not found' });
   }
+});
+
+// ============================================
+// Interlinear Endpoints
+// ============================================
+
+/**
+ * POST /api/fetch-interlinear
+ * Fetches interlinear word data for a Bible reference
+ */
+router.post('/fetch-interlinear', async (req, res) => {
+  const { reference } = req.body;
+
+  if (!reference || typeof reference !== 'string') {
+    return res.status(400).json({ error: 'Reference is required' });
+  }
+
+  if (reference.length > 200) {
+    return res.status(400).json({ error: 'Reference is too long (max 200 characters)' });
+  }
+
+  const parsed = InterlinearService.parseReference(reference);
+  if (!parsed) {
+    return res.status(400).json({ error: 'Invalid Bible reference. Use format: Book Chapter:Verse (e.g., Genesis 1:1)' });
+  }
+
+  const language = parsed.testament === 'OT' ? 'hebrew' : 'greek';
+
+  // Check cache first
+  const cached = InterlinearCacheService.getPassage(reference, language);
+  if (cached) {
+    log.debug('Interlinear cache hit:', reference);
+    // Enrich words with lexicon data
+    cached.words = cached.words.map((w) => {
+      const entry = InterlinearCacheService.getLexicon(w.strongs);
+      return {
+        ...w,
+        gloss: w.gloss || extractGloss(entry),
+        transliteration: w.transliteration || (entry ? entry.transliteration : ''),
+      };
+    });
+    return res.json({ ...cached, fromCache: true });
+  }
+
+  try {
+    const data = await InterlinearService.fetch(reference);
+
+    if (!InterlinearService.hasContent(data)) {
+      return res.status(404).json({ error: 'No interlinear data found. Check the reference.' });
+    }
+
+    const cachedData = InterlinearCacheService.addPassage(data);
+
+    // Fetch lexicon entries for all unique Strong's numbers and cache them
+    const uncachedStrongs = data.words
+      .map((w) => w.strongs)
+      .filter(Boolean)
+      .filter((s) => !InterlinearCacheService.getLexicon(s));
+
+    if (uncachedStrongs.length > 0) {
+      const lexiconEntries = await LexiconService.fetchBatch([...new Set(uncachedStrongs)]);
+      InterlinearCacheService.addLexiconBatch(lexiconEntries);
+
+      // Enrich words with definitions from fetched lexicon
+      cachedData.words = cachedData.words.map((w) => {
+        const entry = lexiconEntries[w.strongs] || InterlinearCacheService.getLexicon(w.strongs);
+        return {
+          ...w,
+          gloss: extractGloss(entry),
+          transliteration: entry ? entry.transliteration : '',
+        };
+      });
+    } else {
+      // All entries already cached, enrich from cache
+      cachedData.words = cachedData.words.map((w) => {
+        const entry = InterlinearCacheService.getLexicon(w.strongs);
+        return {
+          ...w,
+          gloss: extractGloss(entry),
+          transliteration: entry ? entry.transliteration : '',
+        };
+      });
+    }
+
+    res.json({ ...cachedData, fromCache: false });
+  } catch (error) {
+    log.error('Error fetching interlinear data:', error.message);
+    const isUserError = error.message.includes('Invalid') || error.message.includes('not found');
+    res.status(isUserError ? 400 : 500)
+      .json({ error: isUserError ? error.message : 'Failed to fetch interlinear data. Please try again.' });
+  }
+});
+
+/**
+ * POST /api/fetch-lexicon
+ * Fetches a lexicon entry for a Strong's number
+ */
+router.post('/fetch-lexicon', async (req, res) => {
+  const { strongsNumber } = req.body;
+
+  if (!strongsNumber || typeof strongsNumber !== 'string') {
+    return res.status(400).json({ error: "Strong's number is required" });
+  }
+
+  if (!/^[HG]\d{1,5}$/i.test(strongsNumber.trim())) {
+    return res.status(400).json({ error: "Invalid Strong's number format. Use H#### or G####." });
+  }
+
+  // Check cache first
+  const cached = InterlinearCacheService.getLexicon(strongsNumber.trim().toUpperCase());
+  if (cached) {
+    log.debug('Lexicon cache hit:', strongsNumber);
+    return res.json({ ...cached, fromCache: true });
+  }
+
+  try {
+    const entry = await LexiconService.fetch(strongsNumber);
+
+    if (!LexiconService.hasContent(entry)) {
+      return res.status(404).json({ error: 'No lexicon entry found.' });
+    }
+
+    const cachedEntry = InterlinearCacheService.addLexicon(entry);
+    res.json({ ...cachedEntry, fromCache: false });
+  } catch (error) {
+    log.error('Error fetching lexicon entry:', error.message);
+    res.status(500).json({ error: 'Failed to fetch lexicon entry. Please try again.' });
+  }
+});
+
+/**
+ * GET /api/cached-interlinear
+ * Returns all cached interlinear passages grouped by book
+ */
+router.get('/cached-interlinear', (req, res) => {
+  res.json(InterlinearCacheService.getAllByBook());
+});
+
+/**
+ * GET /api/cached-interlinear/:key
+ * Gets a specific cached interlinear passage
+ */
+router.get('/cached-interlinear/:key', (req, res) => {
+  const key = decodeURIComponent(req.params.key);
+  const passage = InterlinearCacheService.getPassageByKey(key);
+  if (passage) {
+    // Enrich words with lexicon data
+    passage.words = passage.words.map((w) => {
+      const entry = InterlinearCacheService.getLexicon(w.strongs);
+      return {
+        ...w,
+        gloss: w.gloss || extractGloss(entry),
+        transliteration: w.transliteration || (entry ? entry.transliteration : ''),
+      };
+    });
+    res.json(passage);
+  } else {
+    res.status(404).json({ error: 'Passage not found in cache' });
+  }
+});
+
+/**
+ * DELETE /api/cached-interlinear/:key
+ * Deletes a cached interlinear passage
+ */
+router.delete('/cached-interlinear/:key', (req, res) => {
+  const key = decodeURIComponent(req.params.key);
+  const removed = InterlinearCacheService.removePassage(key);
+  if (removed) {
+    res.json({ success: true });
+  } else {
+    res.status(404).json({ error: 'Passage not found in cache' });
+  }
+});
+
+/**
+ * DELETE /api/cached-interlinear
+ * Clears all cached interlinear passages
+ */
+router.delete('/cached-interlinear', (req, res) => {
+  InterlinearCacheService.clearPassages();
+  res.json({ success: true });
+});
+
+/**
+ * GET /api/interlinear-cache-stats
+ * Returns interlinear cache statistics
+ */
+router.get('/interlinear-cache-stats', (req, res) => {
+  res.json(InterlinearCacheService.getPassageStats());
+});
+
+// ============================================
+// Version
+// ============================================
+
+router.get('/version', (req, res) => {
+  const { version, name } = require('../../package.json');
+  res.json({ name, version });
 });
 
 module.exports = router;

@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="css/shared.css">
   <link rel="stylesheet" href="css/bible-control.css">
   <link rel="stylesheet" href="css/reference-control.css">
+  <link rel="stylesheet" href="css/interlinear.css">
 </head>
 <body>
   <div class="title-bar">
@@ -27,6 +28,7 @@
     <button class="tab active" data-tab="bible">Bible</button>
     <button class="tab" data-tab="quran">Quran</button>
     <button class="tab" data-tab="dictionary">Dictionary</button>
+    <button class="tab" data-tab="interlinear">Text Analysis</button>
     <button class="tab tab-fallacy" data-tab="fallacies">Fallacies <span id="fallacyCount" class="fallacy-count"></span></button>
   </div>
 
@@ -204,6 +206,28 @@
         </div>
       </div>
 
+      <!-- Interlinear Text Analysis Tab Content -->
+      <div class="tab-content" id="tab-interlinear">
+        <div class="panel">
+          <div class="form-group">
+            <label for="interlinearReference">Bible Reference (Original Language)</label>
+            <input type="text" id="interlinearReference" placeholder="e.g., Genesis 1:1 or John 1:1-5" autocomplete="off">
+          </div>
+
+          <div class="button-row">
+            <button class="btn-primary btn-interlinear" id="fetchInterlinearBtn">Fetch &amp; Display</button>
+            <button class="btn-danger" id="clearInterlinearBtn">Clear Display</button>
+          </div>
+
+          <!-- Interlinear results grid -->
+          <div class="interlinear-results" id="interlinearResults" style="display:none;">
+            <div class="interlinear-header" id="interlinearHeader"></div>
+            <div class="interlinear-grid" id="interlinearGrid"></div>
+          </div>
+
+        </div>
+      </div>
+
       <!-- Fallacies Tab Content -->
       <div class="tab-content" id="tab-fallacies">
         <div class="panel">
@@ -232,19 +256,18 @@
             Enter a reference and click "Fetch" to preview
           </p>
         </div>
-      </div>
-
-      <div class="paging-controls" id="pagingControls">
-        <div class="paging-buttons">
-          <button class="btn-page" id="prevPageBtn" disabled>← Previous</button>
-        </div>
-        <div class="paging-info">
-          Page <span class="page-num" id="currentPage">1</span> of
-          <span class="page-num" id="totalPages">1</span>
-          <span id="verseRange"></span>
-        </div>
-        <div class="paging-buttons">
-          <button class="btn-page" id="nextPageBtn" disabled>Next →</button>
+        <div class="paging-controls" id="pagingControls">
+          <div class="paging-buttons">
+            <button class="btn-page" id="prevPageBtn" disabled>← Previous</button>
+          </div>
+          <div class="paging-info">
+            Page <span class="page-num" id="currentPage">1</span> of
+            <span class="page-num" id="totalPages">1</span>
+            <span id="verseRange"></span>
+          </div>
+          <div class="paging-buttons">
+            <button class="btn-page" id="nextPageBtn" disabled>Next →</button>
+          </div>
         </div>
       </div>
 
@@ -265,6 +288,7 @@
   <script src="js/settings-modal.js"></script>
   <script src="js/socket-connection.js"></script>
   <script src="js/status-message.js"></script>
+  <script src="js/morph-decode.js"></script>
   <script src="js/reference-control.js"></script>
   <script>
     document.getElementById('showSettingsBtn').addEventListener('click', () => {

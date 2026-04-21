@@ -73,6 +73,43 @@ const createTables = () => {
     CREATE INDEX IF NOT EXISTS idx_dict_letter ON dictionary_entries(first_letter);
     CREATE INDEX IF NOT EXISTS idx_dict_reference ON dictionary_entries(reference);
     CREATE INDEX IF NOT EXISTS idx_fallacy_name ON fallacies(name);
+
+    CREATE TABLE IF NOT EXISTS interlinear_passages (
+      key TEXT PRIMARY KEY,
+      reference TEXT NOT NULL,
+      language TEXT NOT NULL,
+      book TEXT,
+      words_json TEXT,
+      total_words INTEGER,
+      timestamp INTEGER NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS lexicon_entries (
+      strongs_number TEXT PRIMARY KEY,
+      definition TEXT,
+      short_definition TEXT,
+      transliteration TEXT,
+      pronunciation TEXT,
+      lemma TEXT,
+      response_json TEXT,
+      ai_gloss TEXT DEFAULT NULL,
+      timestamp INTEGER NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS hebrew_words (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      book TEXT NOT NULL,
+      chapter INTEGER NOT NULL,
+      verse INTEGER NOT NULL,
+      position INTEGER NOT NULL,
+      hebrew TEXT NOT NULL,
+      strongs TEXT NOT NULL,
+      morph TEXT NOT NULL
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_interlinear_book ON interlinear_passages(book);
+    CREATE INDEX IF NOT EXISTS idx_interlinear_reference ON interlinear_passages(reference);
+    CREATE INDEX IF NOT EXISTS idx_hebrew_words_bcv ON hebrew_words(book, chapter, verse);
   `);
 };
 

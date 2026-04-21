@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DebateStreamSuite</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/themes/godless-engineer.css">
+  <link rel="stylesheet" href="css/shared.css">
+  <style>
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: var(--spacing-xl);
+    }
+
+    .landing-header {
+      text-align: center;
+      margin: 40px 0 48px;
+    }
+
+    .landing-header h1 {
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .landing-header .subtitle {
+      font-size: 14px;
+      color: var(--color-text-muted);
+    }
+
+    .landing-header .version {
+      display: inline-block;
+      font-size: 11px;
+      color: var(--color-text-dim);
+      background: var(--color-bg-hover);
+      padding: 2px 8px;
+      border-radius: var(--radius-pill);
+      margin-top: var(--spacing-sm);
+    }
+
+    .tool-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: var(--spacing-xl);
+      max-width: 1000px;
+      width: 100%;
+    }
+
+    .tool-card {
+      background: var(--color-bg-card);
+      border: 1px solid var(--color-primary-border);
+      border-radius: var(--radius-lg);
+      padding: var(--spacing-2xl);
+      transition: border-color var(--transition-normal), box-shadow var(--transition-normal);
+    }
+
+    .tool-card:hover {
+      border-color: var(--color-primary);
+      box-shadow: var(--shadow-glow);
+    }
+
+    .tool-card-header {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .tool-card-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-md);
+      background: var(--color-primary-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .tool-card-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+
+    .tool-card-desc {
+      font-size: 13px;
+      color: var(--color-text-muted);
+      margin-bottom: var(--spacing-lg);
+      line-height: 1.6;
+    }
+
+    .tool-links {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-sm);
+    }
+
+    .tool-link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--spacing-md) var(--spacing-lg);
+      border-radius: var(--radius-md);
+      background: var(--color-bg-hover);
+      color: var(--color-text-secondary);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: background var(--transition-normal), color var(--transition-normal);
+    }
+
+    .tool-link:hover {
+      background: var(--color-primary-subtle);
+      color: var(--color-text-primary);
+    }
+
+    .tool-link-label {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+    }
+
+    .tool-link-badge {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 2px 6px;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+    }
+
+    .badge-control {
+      background: var(--color-primary-subtle);
+      color: var(--color-primary-light);
+    }
+
+    .badge-obs {
+      background: var(--color-success-bg);
+      color: var(--color-success);
+    }
+
+    .tool-link-arrow {
+      color: var(--color-text-dim);
+      transition: transform var(--transition-normal);
+    }
+
+    .tool-link:hover .tool-link-arrow {
+      transform: translateX(3px);
+      color: var(--color-primary);
+    }
+
+    .landing-footer {
+      margin-top: 48px;
+      padding: var(--spacing-lg) 0;
+      text-align: center;
+      font-size: 12px;
+      color: var(--color-text-dimmer);
+    }
+
+    .connection-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--color-text-dim);
+      margin-top: var(--spacing-lg);
+    }
+
+    .connection-indicator .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--color-disconnected);
+    }
+
+    .connection-indicator .dot.connected {
+      background: var(--color-connected);
+      box-shadow: 0 0 6px var(--color-connected-glow);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="landing-header">
+    <h1>DebateStreamSuite</h1>
+    <div class="subtitle">Real-time streaming toolkit for debate livestreams</div>
+    <span class="version" id="version"></span>
+    <div class="connection-indicator">
+      <span class="dot" id="statusDot"></span>
+      <span id="statusText">Connecting...</span>
+    </div>
+  </div>
+
+  <div class="tool-grid">
+
+    <!-- Caller Info -->
+    <div class="tool-card">
+      <div class="tool-card-header">
+        <div class="tool-card-icon">&#128222;</div>
+        <div class="tool-card-title">Caller Info</div>
+      </div>
+      <div class="tool-card-desc">
+        Display caller name, location, pronouns, and topic in your OBS overlay during live calls.
+      </div>
+      <div class="tool-links">
+        <a href="/dock.html" class="tool-link">
+          <span class="tool-link-label">
+            Control Panel
+            <span class="tool-link-badge badge-control">Control</span>
+          </span>
+          <span class="tool-link-arrow">&#8594;</span>
+        </a>
+        <a href="/display.html" class="tool-link">
+          <span class="tool-link-label">
+            Horizontal Display
+            <span class="tool-link-badge badge-obs">OBS</span>
+          </span>
+          <span class="tool-link-arrow">&#8594;</span>
+        </a>
+        <a href="/vertical-display.html" class="tool-link">
+          <span class="tool-link-label">
+            Vertical Display
+            <span class="tool-link-badge badge-obs">OBS</span>
+          </span>
+          <span class="tool-link-arrow">&#8594;</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Reference Repository -->
+    <div class="tool-card">
+      <div class="tool-card-header">
+        <div class="tool-card-icon">&#128214;</div>
+        <div class="tool-card-title">Reference Repository</div>
+      </div>
+      <div class="tool-card-desc">
+        Look up and display Bible verses, Quran verses, and dictionary definitions with caching.
+      </div>
+      <div class="tool-links">
+        <a href="/reference-control.html" class="tool-link">
+          <span class="tool-link-label">
+            Control Panel
+            <span class="tool-link-badge badge-control">Control</span>
+          </span>
+          <span class="tool-link-arrow">&#8594;</span>
+        </a>
+        <a href="/bible-display.html" class="tool-link">
+          <span class="tool-link-label">
+            Reference Display
+            <span class="tool-link-badge badge-obs">OBS</span>
+          </span>
+          <span class="tool-link-arrow">&#8594;</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Soundboard -->
+    <div class="tool-card">
+      <div class="tool-card-header">
+        <div class="tool-card-icon">&#127925;</div>
+        <div class="tool-card-title">Soundboard</div>
+      </div>
+      <div class="tool-card-desc">
+        Upload, organize, and trigger sound effects during your stream with hotkey support.
+      </div>
+      <div class="tool-links">
+        <a href="/soundboard.html" class="tool-link">
+          <span class="tool-link-label">
+            Soundboard
+            <span class="tool-link-badge badge-control">Control</span>
+          </span>
+          <span class="tool-link-arrow">&#8594;</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="landing-footer">
+    DebateStreamSuite &mdash; Built for livestream debates
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    const dot = document.getElementById('statusDot');
+    const statusText = document.getElementById('statusText');
+    const versionEl = document.getElementById('version');
+
+    socket.on('connect', () => {
+      dot.classList.add('connected');
+      statusText.textContent = 'Connected';
+    });
+
+    socket.on('disconnect', () => {
+      dot.classList.remove('connected');
+      statusText.textContent = 'Disconnected';
+    });
+
+    // Fetch version from package.json exposed via API or hardcode from server
+    fetch('/api/version')
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (data && data.version) {
+          versionEl.textContent = 'v' + data.version;
+        }
+      })
+      .catch(() => {});
+  </script>
+</body>
+</html>

@@ -39,12 +39,39 @@
 
   /**
    * Creates a verse element
-   * @param {Object} verse - Verse data { number, text }
+   * @param {Object} verse - Verse data { number, text, words? }
+   * @param {Object} options - Rendering options { interlinear, language }
    * @returns {HTMLElement} Verse DOM element
    */
-  function createVerseElement(verse) {
+  function createVerseElement(verse, options = {}) {
     const verseEl = document.createElement('div');
     verseEl.className = 'verse';
+
+    // Interlinear mode: render word grid instead of plain text
+    if (options.interlinear && verse.words && verse.words.length > 0) {
+      const langClass = options.language === 'hebrew' ? 'hebrew' : 'greek';
+      let html = '';
+
+      if (verse.number) {
+        html += `<span class="verse-number">${escapeHtml(verse.number)}</span>`;
+      }
+
+      html += `<div class="interlinear-word-grid ${langClass}">`;
+      for (const w of verse.words) {
+        html += `
+          <div class="il-word">
+            <span class="il-original">${escapeHtml(w.original)}</span>
+            <span class="il-translit">${escapeHtml(w.transliteration)}</span>
+            <span class="il-strongs">${escapeHtml(w.strongs)}</span>
+            <span class="il-gloss">${escapeHtml(w.gloss)}</span>
+          </div>
+        `;
+      }
+      html += '</div>';
+
+      verseEl.innerHTML = html;
+      return verseEl;
+    }
 
     if (verse.number) {
       verseEl.innerHTML = `
@@ -91,6 +118,171 @@
     });
   }
 
+  // Lexicon paging state
+  const DEFS_PER_PAGE = 8;
+  let lexiconState = null;
+
+  /**
+   * Builds the info grid HTML for a lexicon entry
+   * @param {Object} lexicon - Lexicon data
+   * @param {string} scriptClass - 'hebrew' or 'greek'
+   * @returns {string} HTML string
+   */
+  function buildLexiconInfoGrid(lexicon, scriptClass) {
+    let html = '<div class="lexicon-info-grid">';
+    html += `
+      <div class="lexicon-info-item">
+        <div class="lexicon-info-label">Original</div>
+        <div class="lexicon-info-value lexicon-script-${scriptClass}">${escapeHtml(lexicon.lemma)}</div>
+      </div>
+      <div class="lexicon-info-item">
+        <div class="lexicon-info-label">Transliteration</div>
+        <div class="lexicon-info-value">${escapeHtml(lexicon.transliteration)}</div>
+      </div>
+    `;
+    if (lexicon.pronunciation) {
+      html += `
+        <div class="lexicon-info-item">
+          <div class="lexicon-info-label">Pronunciation</div>
+          <div class="lexicon-info-value">${escapeHtml(lexicon.pronunciation)}</div>
+        </div>
+      `;
+    }
+    if (lexicon.morph) {
+      html += `
+        <div class="lexicon-info-item">
+          <div class="lexicon-info-label">Morphology</div>
+          <div class="lexicon-info-value">${escapeHtml(lexicon.morph)}</div>
+          <div class="lexicon-info-decoded">${escapeHtml(decodeMorph(lexicon.morph))}</div>
+        </div>
+      `;
+    }
+    if (lexicon.partOfSpeech) {
+      html += `
+        <div class="lexicon-info-item">
+          <div class="lexicon-info-label">Part of Speech</div>
+          <div class="lexicon-info-value">${escapeHtml(lexicon.partOfSpeech)}</div>
+        </div>
+      `;
+    }
+    if (lexicon.origin) {
+      html += `
+        <div class="lexicon-info-item">
+          <div class="lexicon-info-label">Origin</div>
+          <div class="lexicon-info-value lexicon-info-small">${escapeHtml(lexicon.origin)}</div>
+        </div>
+      `;
+    }
+    html += '</div>';
+    return html;
+  }
+
+  /**
+   * Builds the definition list HTML for a page of definitions
+   * @param {string[]} defs - Definitions for current page
+   * @param {boolean} hasNumbered - Whether definitions use numbered format
+   * @param {number} startIndex - 0-based index of first definition on this page
+   * @returns {string} HTML string
+   */
+  function buildLexiconDefList(defs, hasNumbered, startIndex) {
+    if (!defs || defs.length === 0) return '';
+    let html = `<ol class="lexicon-def-list" style="counter-reset: def-counter ${startIndex};">`;
+    for (const def of defs) {
+      if (hasNumbered) {
+        const subMatch = def.match(/^[a-z]\.\s+(.+)/);
+        const mainMatch = def.match(/^\d+\.\s+(.+)/);
+        if (subMatch) {
+          html += `<li class="lexicon-def-sub">${escapeHtml(subMatch[1])}</li>`;
+        } else if (mainMatch) {
+          html += `<li class="lexicon-def-main">${escapeHtml(mainMatch[1])}</li>`;
+        } else {
+          html += `<li class="lexicon-def-main">${escapeHtml(def)}</li>`;
+        }
+      } else {
+        html += `<li class="lexicon-def-main">${escapeHtml(def)}</li>`;
+      }
+    }
+    html += '</ol>';
+    return html;
+  }
+
+  /**
+   * Builds the full lexicon card with info grid and a definition container
+   */
+  function renderLexiconCard() {
+    if (!lexiconState) return;
+    const { lexicon, scriptClass } = lexiconState;
+
+    let html = '<div class="lexicon-display">';
+    html += buildLexiconInfoGrid(lexicon, scriptClass);
+    html += '<div id="lexiconDefContainer"></div>';
+    html += '</div>';
+
+    elements.versesContainer.innerHTML = '';
+    const el = document.createElement('div');
+    el.className = 'verse';
+    el.innerHTML = html;
+    elements.versesContainer.appendChild(el);
+
+    showContainer();
+  }
+
+  /**
+   * Swaps only the definition list for the given page
+   * @param {number} page - Page index (0-based)
+   */
+  function renderLexiconPage(page) {
+    if (!lexiconState) return;
+    const { totalPages, hasNumbered, lexicon } = lexiconState;
+    const defs = lexicon.definitions || [];
+
+    const currentPage = Math.max(0, Math.min(page, totalPages - 1));
+    lexiconState.currentPage = currentPage;
+
+    // Page indicator
+    if (totalPages > 1) {
+      elements.pageIndicator.textContent = `${currentPage + 1} / ${totalPages}`;
+      elements.pageIndicator.style.display = 'block';
+    } else {
+      elements.pageIndicator.style.display = 'none';
+    }
+
+    // Swap only the definitions
+    const startIdx = currentPage * DEFS_PER_PAGE;
+    const pageDefs = defs.slice(startIdx, startIdx + DEFS_PER_PAGE);
+    const container = document.getElementById('lexiconDefContainer');
+    if (container) {
+      container.innerHTML = buildLexiconDefList(pageDefs, hasNumbered, startIdx);
+    }
+
+    adjustForContentHeight();
+  }
+
+  /**
+   * Renders a structured lexicon entry on the display
+   * @param {Object} data - Verse data with lexicon object
+   */
+  function renderLexiconEntry(data) {
+    const { reference, version, versionName, lexicon, language } = data;
+    const isHebrew = language === 'hebrew';
+    const scriptClass = isHebrew ? 'hebrew' : 'greek';
+    const defs = lexicon.definitions || [];
+    const totalPages = Math.max(1, Math.ceil(defs.length / DEFS_PER_PAGE));
+    const hasNumbered = defs.some((d) => /^\d+\.\s/.test(d));
+
+    elements.reference.textContent = reference;
+    elements.version.textContent = versionName || version;
+
+    // Store state for paging — only rebuild the card if it's a different lexicon entry
+    const isNewEntry = !lexiconState || lexiconState.reference !== reference;
+    lexiconState = { lexicon, scriptClass, totalPages, hasNumbered, reference };
+
+    if (isNewEntry) {
+      renderLexiconCard();
+    }
+    renderLexiconPage(data.currentPage || 0);
+  }
+
   /**
    * Renders paginated verses
    * @param {Object} data - Verse data with pagination info
@@ -98,6 +290,7 @@
   function renderPaginatedVerses(data) {
     const { verses, versesPerPage = 3, currentPage = 0, reference, version, versionName } = data;
     const totalPages = Math.ceil(verses.length / versesPerPage);
+    const isInterlinear = data.source === 'interlinear';
 
     // Update header
     elements.reference.textContent = reference;
@@ -116,10 +309,16 @@
     const endIndex = Math.min(startIndex + versesPerPage, verses.length);
     const pageVerses = verses.slice(startIndex, endIndex);
 
-    // Clear and render verses
+    // Build render options
+    const options = isInterlinear
+      ? { interlinear: true, language: data.language || 'hebrew' }
+      : {};
+
+    // Clear and render verses (skip empty placeholders for interlinear)
     elements.versesContainer.innerHTML = '';
     pageVerses.forEach((verse) => {
-      elements.versesContainer.appendChild(createVerseElement(verse));
+      if (isInterlinear && !verse.words && !verse.text) return;
+      elements.versesContainer.appendChild(createVerseElement(verse, options));
     });
 
     showContainer();
@@ -152,6 +351,15 @@
    */
   function handleVerseUpdate(data) {
     console.log('Received verseUpdate:', data);
+
+    // Check for structured lexicon entry
+    if (data.lexicon && data.reference) {
+      renderLexiconEntry(data);
+      return;
+    }
+
+    // Clear lexicon paging state when showing non-lexicon content
+    lexiconState = null;
 
     // Check for paginated verses
     if (data.verses && data.verses.length > 0 && data.reference) {
@@ -239,12 +447,14 @@
   // ============================================
 
   socket.on('verseUpdate', (data) => {
-    elements.container.classList.remove('fallacy-mode', 'quran-mode', 'dictionary-mode');
+    elements.container.classList.remove('fallacy-mode', 'quran-mode', 'dictionary-mode', 'interlinear-mode');
 
     if (data.source === 'quran') {
       elements.container.classList.add('quran-mode');
     } else if (data.source === 'dictionary') {
       elements.container.classList.add('dictionary-mode');
+    } else if (data.source === 'interlinear') {
+      elements.container.classList.add('interlinear-mode');
     }
 
     handleVerseUpdate(data);
