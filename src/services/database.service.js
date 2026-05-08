@@ -74,6 +74,24 @@ const createTables = () => {
     CREATE INDEX IF NOT EXISTS idx_dict_reference ON dictionary_entries(reference);
     CREATE INDEX IF NOT EXISTS idx_fallacy_name ON fallacies(name);
 
+    CREATE TABLE IF NOT EXISTS hadiths (
+      key TEXT PRIMARY KEY,
+      reference TEXT NOT NULL,
+      collection TEXT NOT NULL,
+      collection_name TEXT NOT NULL,
+      hadith_number TEXT NOT NULL,
+      text TEXT NOT NULL,
+      arabic_number TEXT,
+      grades_json TEXT,
+      book_number INTEGER,
+      book_name TEXT,
+      hadith_in_book INTEGER,
+      timestamp INTEGER NOT NULL
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_hadith_collection ON hadiths(collection);
+    CREATE INDEX IF NOT EXISTS idx_hadith_reference ON hadiths(reference);
+
     CREATE TABLE IF NOT EXISTS interlinear_passages (
       key TEXT PRIMARY KEY,
       reference TEXT NOT NULL,

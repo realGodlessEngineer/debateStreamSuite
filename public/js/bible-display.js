@@ -447,10 +447,14 @@
   // ============================================
 
   socket.on('verseUpdate', (data) => {
-    elements.container.classList.remove('fallacy-mode', 'quran-mode', 'dictionary-mode', 'interlinear-mode');
+    elements.container.classList.remove('fallacy-mode', 'quran-mode', 'hadith-mode', 'dictionary-mode', 'interlinear-mode');
 
     if (data.source === 'quran') {
       elements.container.classList.add('quran-mode');
+    } else if (data.source === 'hadith') {
+      // Hadiths inherit Quran styling for now; the hadith-mode hook lets us
+      // diverge later without another display refactor.
+      elements.container.classList.add('quran-mode', 'hadith-mode');
     } else if (data.source === 'dictionary') {
       elements.container.classList.add('dictionary-mode');
     } else if (data.source === 'interlinear') {

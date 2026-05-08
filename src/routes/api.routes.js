@@ -9,6 +9,8 @@ const CacheService = require('../services/cache.service');
 const BibleGatewayService = require('../services/bible-gateway.service');
 const AlQuranService = require('../services/alquran.service');
 const QuranCacheService = require('../services/quran-cache.service');
+const HadithService = require('../services/hadith.service');
+const HadithCacheService = require('../services/hadith-cache.service');
 const DictionaryService = require('../services/dictionary.service');
 const DictionaryCacheService = require('../services/dictionary-cache.service');
 const FallacyService = require('../services/fallacy.service');
@@ -288,6 +290,119 @@ router.delete('/cached-quran-verses', async (req, res) => {
  */
 router.get('/quran-cache-stats', (req, res) => {
   res.json(QuranCacheService.getStats());
+});
+
+// ============================================
+// Hadith Endpoints
+// ============================================
+
+/**
+ * POST /api/fetch-hadith
+ * Fetches a hadith narration from cache or fawazahmed0/hadith-api
+ */
+router.post('/fetch-hadith', async (req, res) => {
+  const { reference } = req.body;
+
+  if (!reference || typeof reference !== 'string') {
+    return res.status(400).json({ error: 'Reference is required' });
+  }
+
+  if (reference.length > 100) {
+    return res.status(400).json({ error: 'Reference is too long (max 100 characters)' });
+  }
+
+  const parsed = HadithService.parseReference(reference);
+  if (!parsed) {
+    const collections = HadithService.listCollections().map((c) => c.name).join(', ');
+    return res.status(400).json({
+      error: `Invalid hadith reference. Use format: collection number (e.g., bukhari 3208, muslim 2662c). Supported: ${collections}.`,
+    });
+  }
+
+  const cached = HadithCacheService.get(parsed.collection, parsed.hadithNumber);
+  if (cached) {
+    log.debug('Hadith cache hit:', parsed.collection, parsed.hadithNumber);
+    return res.json({ ...cached, fromCache: true });
+  }
+
+  try {
+    const hadithData = await HadithService.fetch(reference);
+
+    if (!HadithService.hasContent(hadithData)) {
+      return res.status(404).json({ error: 'No hadith text found. Check the reference.' });
+    }
+
+    const cachedHadith = HadithCacheService.add(hadithData);
+    res.json({ ...cachedHadith, fromCache: false });
+  } catch (error) {
+    log.error('Error fetching hadith:', error.message);
+    const isUserError = error.message.includes('not found') || error.message.includes('Invalid');
+    res.status(isUserError ? 404 : 500)
+      .json({ error: isUserError ? error.message : 'Failed to fetch hadith. Please try again.' });
+  }
+});
+
+/**
+ * GET /api/cached-hadiths
+ * Returns all cached hadiths grouped by collection
+ */
+router.get('/cached-hadiths', (req, res) => {
+  res.json(HadithCacheService.getAllByCollection());
+});
+
+/**
+ * GET /api/cached-hadith/:key
+ * Gets a specific cached hadith by key
+ */
+router.get('/cached-hadith/:key', (req, res) => {
+  const key = decodeURIComponent(req.params.key);
+  const hadith = HadithCacheService.getByKey(key);
+
+  if (hadith) {
+    res.json(hadith);
+  } else {
+    res.status(404).json({ error: 'Hadith not found in cache' });
+  }
+});
+
+/**
+ * DELETE /api/cached-hadith/:key
+ * Deletes a specific cached hadith
+ */
+router.delete('/cached-hadith/:key', (req, res) => {
+  const key = decodeURIComponent(req.params.key);
+  const removed = HadithCacheService.remove(key);
+
+  if (removed) {
+    res.json({ success: true });
+  } else {
+    res.status(404).json({ error: 'Hadith not found in cache' });
+  }
+});
+
+/**
+ * DELETE /api/cached-hadiths
+ * Clears all cached hadiths
+ */
+router.delete('/cached-hadiths', (req, res) => {
+  HadithCacheService.clear();
+  res.json({ success: true });
+});
+
+/**
+ * GET /api/hadith-cache-stats
+ * Returns hadith cache statistics
+ */
+router.get('/hadith-cache-stats', (req, res) => {
+  res.json(HadithCacheService.getStats());
+});
+
+/**
+ * GET /api/hadith-collections
+ * Returns the supported hadith collection slugs and display names
+ */
+router.get('/hadith-collections', (req, res) => {
+  res.json(HadithService.listCollections());
 });
 
 // ============================================

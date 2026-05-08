@@ -169,11 +169,14 @@
       <div class="tab-content" id="tab-quran">
         <div class="panel">
           <div class="form-group">
-            <label for="quranReference">Quran Reference</label>
-            <input type="text" id="quranReference" placeholder="e.g., 2:255 or 1:1-7 or Al-Baqarah 2:255" autocomplete="off">
+            <label for="quranReference">Quran or Hadith Reference</label>
+            <input type="text" id="quranReference" placeholder="e.g., 2:255, Al-Baqarah 2:255, bukhari 3208, muslim 2662c" autocomplete="off">
+            <p class="form-hint" id="quranInputHint" style="margin: 6px 0 0; font-size: 0.85em; color: var(--color-text-dim);">
+              Hadith collections: bukhari, muslim, abudawud, tirmidhi, ibnmajah, nasai, malik, nawawi, qudsi
+            </p>
           </div>
 
-          <div class="form-group">
+          <div class="form-group" id="quranEditionGroup">
             <label for="quranEdition">Translation</label>
             <select id="quranEdition">
               <option value="en.sahih" selected>Sahih International</option>

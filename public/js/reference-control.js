@@ -22,6 +22,25 @@
     'Nahum', 'Habakkuk', 'Zephaniah', 'Haggai', 'Zechariah', 'Malachi',
   ];
 
+  // Populated from /api/hadith-collections so the client knows which words on
+  // the Quran tab indicate a hadith lookup vs. a Quran reference.
+  let HADITH_COLLECTION_SLUGS = new Set([
+    'bukhari', 'muslim', 'abudawud', 'tirmidhi',
+    'ibnmajah', 'nasai', 'malik', 'nawawi', 'qudsi',
+  ]);
+  const HADITH_ALIAS_TO_SLUG = {
+    'sahihbukhari': 'bukhari', 'sahihalbukhari': 'bukhari',
+    'sahihmuslim': 'muslim',
+    'abudaud': 'abudawud', 'abudawood': 'abudawud',
+    'sunanabidawud': 'abudawud', 'sunanabudawud': 'abudawud',
+    'tirmidi': 'tirmidhi', 'jamitirmidhi': 'tirmidhi', 'jamiattirmidhi': 'tirmidhi',
+    'ibnumajah': 'ibnmajah', 'sunanibnmajah': 'ibnmajah',
+    'annasai': 'nasai', 'sunannasai': 'nasai', 'sunanannasai': 'nasai',
+    'muwatta': 'malik', 'muwattamalik': 'malik',
+    'fortyhadith': 'nawawi', 'nawawi40': 'nawawi',
+    'qudsi40': 'qudsi',
+  };
+
   async function loadConfig() {
     try {
       const response = await fetch('/api/config');
@@ -35,6 +54,32 @@
     } catch (error) {
       console.error('Error loading config, using defaults:', error);
     }
+  }
+
+  async function loadHadithCollections() {
+    try {
+      const response = await fetch('/api/hadith-collections');
+      if (response.ok) {
+        const collections = await response.json();
+        HADITH_COLLECTION_SLUGS = new Set(collections.map((c) => c.slug));
+      }
+    } catch (error) {
+      console.error('Error loading hadith collections, using defaults:', error);
+    }
+  }
+
+  /**
+   * Detects whether a Quran-tab input string is a hadith reference.
+   * Returns the canonical collection slug if so, else null.
+   */
+  function detectHadithCollection(input) {
+    if (!input) return null;
+    const match = input.trim().match(/^([A-Za-z][A-Za-z'\s-]*?)\s*[:\s]\s*\d/);
+    if (!match) return null;
+    const normalized = match[1].toLowerCase().replace(/[^a-z0-9]/g, '');
+    if (HADITH_COLLECTION_SLUGS.has(normalized)) return normalized;
+    if (HADITH_ALIAS_TO_SLUG[normalized]) return HADITH_ALIAS_TO_SLUG[normalized];
+    return null;
   }
 
   // ============================================
@@ -51,6 +96,10 @@
     lastFetchedQuranVerse: null,
     cachedQuranVerses: {},
     selectedQuranCacheKey: null,
+    // Hadith state (lives on the Quran tab)
+    lastFetchedHadith: null,
+    cachedHadiths: {},
+    selectedHadithKey: null,
     // Dictionary state
     lastFetchedDefinition: null,
     cachedDefinitions: {},
@@ -92,6 +141,7 @@
     // Quran inputs
     quranReference: document.getElementById('quranReference'),
     quranEdition: document.getElementById('quranEdition'),
+    quranEditionGroup: document.getElementById('quranEditionGroup'),
     fetchQuranBtn: document.getElementById('fetchQuranBtn'),
     fetchQuranOnlyBtn: document.getElementById('fetchQuranOnlyBtn'),
     clearQuranBtn: document.getElementById('clearQuranBtn'),
@@ -215,6 +265,17 @@
     }
   }
 
+  async function loadHadithCached() {
+    try {
+      const response = await fetch('/api/cached-hadiths');
+      if (!response.ok) throw new Error(`Server returned ${response.status}`);
+      state.cachedHadiths = await response.json();
+      updateCacheCount();
+    } catch (error) {
+      console.error('Error loading hadith cache:', error);
+    }
+  }
+
   async function loadDictionaryCachedWords() {
     try {
       const response = await fetch('/api/cached-definitions');
@@ -242,11 +303,13 @@
       .reduce((sum, arr) => sum + arr.length, 0);
     const quranCount = Object.values(state.cachedQuranVerses)
       .reduce((sum, arr) => sum + arr.length, 0);
+    const hadithCount = Object.values(state.cachedHadiths)
+      .reduce((sum, arr) => sum + arr.length, 0);
     const dictCount = Object.values(state.cachedDefinitions)
       .reduce((sum, arr) => sum + arr.length, 0);
     const interlinearCount = Object.values(state.cachedInterlinear)
       .reduce((sum, arr) => sum + arr.length, 0);
-    const total = bibleCount + quranCount + dictCount + interlinearCount;
+    const total = bibleCount + quranCount + hadithCount + dictCount + interlinearCount;
     elements.cacheCount.textContent = total || '';
   }
 
@@ -334,10 +397,11 @@
   function renderQuranCacheList(filter = '') {
     const searchTerm = filter.toLowerCase();
     const surahs = Object.keys(state.cachedQuranVerses);
+    const collections = Object.keys(state.cachedHadiths);
 
-    if (surahs.length === 0) {
+    if (surahs.length === 0 && collections.length === 0) {
       elements.cacheList.innerHTML =
-        '<div class="cache-empty">No cached Quran verses yet.<br>Fetch a verse to add it to the cache.</div>';
+        '<div class="cache-empty">No cached Quran verses or hadiths yet.<br>Fetch one to add it to the cache.</div>';
       return;
     }
 
@@ -381,7 +445,60 @@
       html += '</div></div>';
     }
 
-    elements.cacheList.innerHTML = html || '<div class="cache-empty">No verses match your search.</div>';
+    if (collections.length > 0) {
+      const anyHadithVisible = collections.some((c) =>
+        state.cachedHadiths[c].some((h) =>
+          !searchTerm ||
+          h.reference.toLowerCase().includes(searchTerm) ||
+          (h.text || '').toLowerCase().includes(searchTerm) ||
+          (h.collectionName || '').toLowerCase().includes(searchTerm)
+        )
+      );
+
+      if (anyHadithVisible) {
+        html += '<div class="testament-divider">Hadith</div>';
+      }
+
+      for (const collection of collections) {
+        const hadiths = state.cachedHadiths[collection].filter((h) => {
+          if (!searchTerm) return true;
+          return (
+            h.reference.toLowerCase().includes(searchTerm) ||
+            (h.text || '').toLowerCase().includes(searchTerm) ||
+            (h.collectionName || '').toLowerCase().includes(searchTerm)
+          );
+        });
+
+        if (hadiths.length === 0) continue;
+
+        html += `
+          <div class="book-group">
+            <div class="book-header quran-header" data-book="${escapeHtml(collection)}">
+              <span>${escapeHtml(collection)} (${hadiths.length})</span>
+              <span class="toggle">▼</span>
+            </div>
+            <div class="book-verses">
+        `;
+
+        for (const hadith of hadiths) {
+          const isSelected = state.selectedHadithKey === hadith.key;
+          const encodedKey = encodeURIComponent(hadith.key);
+          html += `
+            <div class="cached-verse ${isSelected ? 'selected' : ''}" data-key="${encodedKey}" data-source="hadith">
+              <div class="cached-verse-content" data-action="select">
+                <div class="cached-verse-ref">${escapeHtml(hadith.reference)}</div>
+                <div class="cached-verse-version">${escapeHtml(hadith.versionName || hadith.collectionName || 'Hadith')}</div>
+              </div>
+              <button class="btn-delete" data-action="delete" title="Delete from cache">×</button>
+            </div>
+          `;
+        }
+
+        html += '</div></div>';
+      }
+    }
+
+    elements.cacheList.innerHTML = html || '<div class="cache-empty">No entries match your search.</div>';
   }
 
   function renderDictionaryCacheList(filter = '') {
@@ -469,6 +586,7 @@
 
     const cacheMap = {
       quran: state.cachedQuranVerses,
+      hadith: state.cachedHadiths,
       dictionary: state.cachedDefinitions,
     };
     const cache = cacheMap[source] || state.cachedVerses;
@@ -476,6 +594,8 @@
     // Update selection state
     if (source === 'quran') {
       state.selectedQuranCacheKey = key;
+    } else if (source === 'hadith') {
+      state.selectedHadithKey = key;
     } else if (source === 'dictionary') {
       state.selectedDictCacheKey = key;
     } else {
@@ -494,6 +614,11 @@
             state.lastFetchedQuranVerse = verse;
             elements.quranReference.value = verse.reference;
             elements.quranEdition.value = verse.version;
+            updateQuranEditionVisibility();
+          } else if (source === 'hadith') {
+            state.lastFetchedHadith = verse;
+            elements.quranReference.value = `${verse.collection} ${verse.hadithNumber}`;
+            updateQuranEditionVisibility();
           } else if (source === 'dictionary') {
             state.lastFetchedDefinition = verse;
             elements.dictionaryWord.value = verse.reference;
@@ -514,6 +639,7 @@
     const key = decodeURIComponent(encodedKey);
     const endpointMap = {
       quran: '/api/cached-quran-verse/',
+      hadith: '/api/cached-hadith/',
       dictionary: '/api/cached-definition/',
       interlinear: '/api/cached-interlinear/',
     };
@@ -525,6 +651,9 @@
       if (source === 'quran') {
         if (state.selectedQuranCacheKey === key) state.selectedQuranCacheKey = null;
         await loadQuranCachedVerses();
+      } else if (source === 'hadith') {
+        if (state.selectedHadithKey === key) state.selectedHadithKey = null;
+        await loadHadithCached();
       } else if (source === 'dictionary') {
         if (state.selectedDictCacheKey === key) state.selectedDictCacheKey = null;
         await loadDictionaryCachedWords();
@@ -543,26 +672,25 @@
   }
 
   async function clearAllCache() {
-    const labelMap = { quran: 'Quran', dictionary: 'Dictionary', interlinear: 'Interlinear' };
+    const labelMap = { quran: 'Quran & Hadith', dictionary: 'Dictionary', interlinear: 'Interlinear' };
     const label = labelMap[state.activeTab] || 'Bible';
     if (!confirm(`Clear ALL cached ${label} entries? This cannot be undone.`)) return;
 
-    const endpointMap = {
-      quran: '/api/cached-quran-verses',
-      dictionary: '/api/cached-definitions',
-      interlinear: '/api/cached-interlinear',
-    };
-    const endpoint = endpointMap[state.activeTab] || '/api/cached-verses';
-
     try {
-      await fetch(endpoint, { method: 'DELETE' });
       if (state.activeTab === 'quran') {
-        await loadQuranCachedVerses();
+        await Promise.all([
+          fetch('/api/cached-quran-verses', { method: 'DELETE' }),
+          fetch('/api/cached-hadiths', { method: 'DELETE' }),
+        ]);
+        await Promise.all([loadQuranCachedVerses(), loadHadithCached()]);
       } else if (state.activeTab === 'dictionary') {
+        await fetch('/api/cached-definitions', { method: 'DELETE' });
         await loadDictionaryCachedWords();
       } else if (state.activeTab === 'interlinear') {
+        await fetch('/api/cached-interlinear', { method: 'DELETE' });
         await loadInterlinearCached();
       } else {
+        await fetch('/api/cached-verses', { method: 'DELETE' });
         await loadBibleCachedVerses();
       }
       renderCacheList();
@@ -624,15 +752,29 @@
   // Quran Verse Functions
   // ============================================
 
+  /**
+   * Toggle the translation dropdown based on whether the current input is a
+   * hadith reference (English-only, no edition selector) or a Quran reference.
+   */
+  function updateQuranEditionVisibility() {
+    if (!elements.quranEditionGroup) return;
+    const isHadith = !!detectHadithCollection(elements.quranReference.value);
+    elements.quranEditionGroup.style.display = isHadith ? 'none' : '';
+  }
+
   async function fetchQuranVerse() {
     const reference = elements.quranReference.value.trim();
-    const edition = elements.quranEdition.value;
 
     if (!reference) {
-      status.error('Please enter a Quran reference');
+      status.error('Please enter a Quran or hadith reference');
       return null;
     }
 
+    if (detectHadithCollection(reference)) {
+      return fetchHadith(reference);
+    }
+
+    const edition = elements.quranEdition.value;
     status.loading('Fetching Quran verse...');
 
     try {
@@ -660,6 +802,43 @@
       status.success('Quran verse loaded' + cacheStatus + verseCount);
 
       if (!data.fromCache) await loadQuranCachedVerses();
+
+      return data;
+    } catch (error) {
+      status.error(error.message);
+      return null;
+    }
+  }
+
+  async function fetchHadith(reference) {
+    status.loading('Fetching hadith...');
+
+    try {
+      const response = await fetch('/api/fetch-hadith', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reference }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to fetch hadith');
+      }
+
+      if (!data.text) {
+        throw new Error('No hadith text found. Check the reference.');
+      }
+
+      // Tag the data so the shared display path treats it as a hadith
+      data._kind = 'hadith';
+      state.lastFetchedHadith = data;
+      showPreview(data, 'hadith');
+
+      const cacheStatus = data.fromCache ? ' (from cache)' : ' (fetched & cached)';
+      status.success(`Hadith loaded${cacheStatus}`);
+
+      if (!data.fromCache) await loadHadithCached();
 
       return data;
     } catch (error) {
@@ -1093,9 +1272,10 @@
 
   function displayVerse(data, source) {
     if (data) {
-      connection.emit('displayVerse', { ...data, source });
-      const labelMap = { quran: 'Quran verse', dictionary: 'Definition' };
-      status.success(`${labelMap[source] || 'Verse'} sent to display`);
+      const effectiveSource = data._kind === 'hadith' ? 'hadith' : source;
+      connection.emit('displayVerse', { ...data, source: effectiveSource });
+      const labelMap = { quran: 'Quran verse', hadith: 'Hadith', dictionary: 'Definition' };
+      status.success(`${labelMap[effectiveSource] || 'Verse'} sent to display`);
     }
   }
 
@@ -1111,7 +1291,7 @@
       ? '<span style="color: #51cf66;">(cached)</span>'
       : '';
 
-    const labelMap = { quran: 'ayah(s)', dictionary: 'definition(s)' };
+    const labelMap = { quran: 'ayah(s)', hadith: 'segment(s)', dictionary: 'definition(s)' };
     const label = labelMap[source] || 'verse(s)';
     const verseCount = data.verses
       ? `<div class="preview-stats">${data.verses.length} ${label} - will display 3 per page</div>`
@@ -1416,7 +1596,7 @@
 
   function openCacheModal() {
     const titleMap = {
-      quran: '📖 Cached Quran Verses',
+      quran: '📖 Cached Quran Verses & Hadiths',
       dictionary: '📖 Cached Definitions',
       interlinear: '📖 Cached Interlinear Passages',
     };
@@ -1462,13 +1642,14 @@
     elements.fetchBibleOnlyBtn.addEventListener('click', fetchBibleVerse);
     elements.clearBibleBtn.addEventListener('click', clearDisplay);
 
-    // Quran buttons
+    // Quran / Hadith buttons (the Quran tab handles both)
     elements.fetchQuranBtn.addEventListener('click', async () => {
       const data = await fetchQuranVerse();
       if (data) displayVerse(data, 'quran');
     });
     elements.fetchQuranOnlyBtn.addEventListener('click', fetchQuranVerse);
     elements.clearQuranBtn.addEventListener('click', clearDisplay);
+    elements.quranReference.addEventListener('input', updateQuranEditionVisibility);
 
     // Dictionary buttons
     elements.fetchDictBtn.addEventListener('click', async () => {
@@ -1514,13 +1695,17 @@
     elements.showCacheBtn.addEventListener('click', openCacheModal);
     elements.closeCacheBtn.addEventListener('click', closeCacheModal);
     elements.refreshCache.addEventListener('click', () => {
-      const loaderMap = {
-        quran: loadQuranCachedVerses,
-        dictionary: loadDictionaryCachedWords,
-        interlinear: loadInterlinearCached,
-      };
-      const loader = loaderMap[state.activeTab] || loadBibleCachedVerses;
-      loader().then(() => renderCacheList());
+      let promise;
+      if (state.activeTab === 'quran') {
+        promise = Promise.all([loadQuranCachedVerses(), loadHadithCached()]);
+      } else if (state.activeTab === 'dictionary') {
+        promise = loadDictionaryCachedWords();
+      } else if (state.activeTab === 'interlinear') {
+        promise = loadInterlinearCached();
+      } else {
+        promise = loadBibleCachedVerses();
+      }
+      promise.then(() => renderCacheList());
       status.success('Cache refreshed');
     });
     elements.clearCache.addEventListener('click', clearAllCache);
@@ -1557,9 +1742,10 @@
     elements.reference.focus();
 
     // Load data
-    loadConfig().then(() => {
+    Promise.all([loadConfig(), loadHadithCollections()]).then(() => {
       loadBibleCachedVerses();
       loadQuranCachedVerses();
+      loadHadithCached();
       loadDictionaryCachedWords();
       loadInterlinearCached();
       loadFallacies();

@@ -51,7 +51,7 @@ function validateCallerData(data) {
 function validateVerseData(data) {
   if (!data || typeof data !== 'object') return null;
 
-  const VALID_SOURCES = ['bible', 'quran', 'dictionary', 'interlinear', ''];
+  const VALID_SOURCES = ['bible', 'quran', 'hadith', 'dictionary', 'interlinear', ''];
   const rawSource = sanitizeString(data.source, '', 20);
   const source = VALID_SOURCES.includes(rawSource) ? rawSource : '';
   const isInterlinear = source === 'interlinear';
