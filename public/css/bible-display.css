@@ -224,6 +224,207 @@ body {
   color: rgba(245, 158, 11, 0.6);
 }
 
+/* ============================================
+ * Interlinear Display Mode
+ * ============================================ */
+
+/* Interlinear mode - teal/cyan accent */
+.container.interlinear-mode .verse-box {
+  background: linear-gradient(135deg, #0d0d0d 0%, #0a141a 100%);
+  border-color: rgba(56, 189, 248, 0.4);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.7),
+    0 0 20px rgba(56, 189, 248, 0.15);
+}
+
+.container.interlinear-mode .reference {
+  color: #38bdf8;
+}
+
+.container.interlinear-mode .page-indicator {
+  background: rgba(56, 189, 248, 0.2);
+}
+
+.container.interlinear-mode .verse-number {
+  color: #38bdf8;
+  font-size: 0.7em;
+  vertical-align: baseline;
+}
+
+.container.interlinear-mode .verse-text {
+  font-size: 1.8em;
+  line-height: 1.7;
+}
+
+/* Interlinear word grid for OBS display */
+.interlinear-word-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 20px;
+  padding: 4px 0;
+}
+
+.interlinear-word-grid.hebrew {
+  direction: rtl;
+}
+
+.il-word {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  min-width: 60px;
+}
+
+.il-original {
+  font-size: 2em;
+  font-weight: 600;
+  color: #ffffff;
+  line-height: 1.3;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.interlinear-word-grid.hebrew .il-original {
+  font-family: 'SBL Hebrew', 'Ezra SIL', 'Times New Roman', serif;
+  font-size: 2.2em;
+}
+
+.interlinear-word-grid.greek .il-original {
+  font-family: 'SBL Greek', 'Gentium Plus', 'Times New Roman', serif;
+  font-size: 2em;
+}
+
+.il-translit {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 0.85em;
+  color: rgba(255, 255, 255, 0.5);
+  font-style: italic;
+  margin-top: 2px;
+}
+
+.il-strongs {
+  font-family: 'Open Sans', monospace;
+  font-size: 0.7em;
+  color: #38bdf8;
+  margin-top: 1px;
+}
+
+.il-gloss {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 0.9em;
+  color: rgba(255, 255, 255, 0.8);
+  margin-top: 2px;
+}
+
+/* ============================================
+ * Lexicon Entry Display
+ * ============================================ */
+
+.lexicon-display {
+  padding: 4px 0;
+}
+
+/* Info grid: original, transliteration, pronunciation, morph */
+.lexicon-info-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px 32px;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(56, 189, 248, 0.15);
+}
+
+.lexicon-info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.lexicon-info-label {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 0.7em;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #38bdf8;
+}
+
+.lexicon-info-value {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 1.4em;
+  color: #ffffff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  overflow-wrap: break-word;
+}
+
+.lexicon-info-value.lexicon-info-small {
+  font-size: 1.1em;
+}
+
+.lexicon-info-decoded {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 0.8em;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 2px;
+}
+
+.lexicon-info-value.lexicon-script-hebrew {
+  direction: rtl;
+  font-family: 'SBL Hebrew', 'Ezra SIL', 'Times New Roman', serif;
+  font-size: 2em;
+}
+
+.lexicon-info-value.lexicon-script-greek {
+  font-family: 'SBL Greek', 'Gentium Plus', 'Times New Roman', serif;
+  font-size: 1.8em;
+}
+
+/* Definition list */
+.lexicon-def-list {
+  list-style: none;
+  counter-reset: def-counter;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.lexicon-def-main {
+  counter-increment: def-counter;
+  font-family: 'Merriweather', Georgia, serif;
+  font-size: 1.6em;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.5;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  padding-left: 1.5em;
+  position: relative;
+}
+
+.lexicon-def-main::before {
+  content: counter(def-counter) ".";
+  position: absolute;
+  left: 0;
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 600;
+  color: #38bdf8;
+  font-size: 0.75em;
+}
+
+.lexicon-def-sub {
+  font-family: 'Merriweather', Georgia, serif;
+  font-size: 1.3em;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.5;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  padding-left: 3em;
+  list-style: none;
+}
+
+.container.interlinear-mode .version {
+  color: rgba(56, 189, 248, 0.6);
+}
+
 /* Responsive Adjustments */
 @media (max-width: 800px) {
   .verse-text {

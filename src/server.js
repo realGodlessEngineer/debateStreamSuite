@@ -20,11 +20,13 @@ const { SERVER } = require('./config/constants');
 const DatabaseService = require('./services/database.service');
 const CacheService = require('./services/cache.service');
 const QuranCacheService = require('./services/quran-cache.service');
+const HadithCacheService = require('./services/hadith-cache.service');
 const DictionaryCacheService = require('./services/dictionary-cache.service');
 const FallacyService = require('./services/fallacy.service');
 const HostsService = require('./services/hosts.service');
 const SoundboardService = require('./services/soundboard.service');
 const ShowConfigService = require('./services/show-config.service');
+const InterlinearCacheService = require('./services/interlinear-cache.service');
 
 // Routes
 const apiRoutes = require('./routes/api.routes');
@@ -82,8 +84,10 @@ if (!DatabaseService.initialize()) {
 const services = [
   { name: 'Cache', fn: () => CacheService.load() },
   { name: 'QuranCache', fn: () => QuranCacheService.load() },
+  { name: 'HadithCache', fn: () => HadithCacheService.load() },
   { name: 'DictionaryCache', fn: () => DictionaryCacheService.load() },
   { name: 'Fallacies', fn: () => FallacyService.load() },
+  { name: 'InterlinearCache', fn: () => InterlinearCacheService.load() },
   { name: 'Soundboard', fn: () => SoundboardService.load() },
   { name: 'ShowConfig', fn: () => ShowConfigService.load() },
 ];
