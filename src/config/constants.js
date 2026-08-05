@@ -84,6 +84,14 @@ const SCOREBOARD = Object.freeze({
 });
 
 /**
+ * Claim / resolution banner settings — proposition + attribution length caps.
+ */
+const CLAIM = Object.freeze({
+  TEXT_MAX_LENGTH: 200,
+  SUBTEXT_MAX_LENGTH: 150,
+});
+
+/**
  * Soundboard settings
  */
 const SOUNDBOARD = Object.freeze({
@@ -253,6 +261,7 @@ module.exports = {
   STAGE,
   SCENE,
   SCOREBOARD,
+  CLAIM,
   SOUNDBOARD,
   BIBLE_BOOK_ORDER,
   QURAN_EDITIONS,

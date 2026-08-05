@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920, height=1080">
+  <title>Claim / Resolution Banner Overlay</title>
+  <link rel="stylesheet" href="css/display-claim.css">
+</head>
+<body>
+  <!-- Claim / resolution banner - names the proposition currently under
+       debate. Its own state channel and page (NOT the verse/fallacy display
+       mutex) so it can stay on screen while verses and fallacies come and go
+       beneath it. Positioned as a compact top band so a default drop-in
+       clears the topic stack (its own source, top-center, lower down) and
+       the caller lower-third (bottom of the caller overlay pages).
+       No theme stylesheet: colors are fixed, matching the stage-overlay
+       pattern - a theme's body gradient would make the source opaque. -->
+  <div id="claimBanner" class="claim-banner">
+    <div id="claimText" class="claim-text"></div>
+    <div id="claimSubtext" class="claim-subtext"></div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="js/socket-connection.js"></script>
+  <script src="js/display-claim.js"></script>
+</body>
+</html>

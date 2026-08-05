@@ -1,0 +1,106 @@
+/**
+ * Claim / Resolution Banner Overlay Styles
+ * For OBS Browser Source - Landscape (1920x1080)
+ *
+ * Its own page/source, independent of the verse/fallacy display mutex, so
+ * the proposition under debate can stay on screen the whole show. Docked as
+ * a compact band flush to the top edge so a default drop-in at 0,0 clears
+ * both the topic stack (which starts lower, at top:84px on
+ * display-topics.html, and lives in its own source) and the caller
+ * lower-third (pinned to the bottom of display.html/vertical-display.html).
+ * The operator can still reposition this source freely once it's in the scene.
+ *
+ * Local heavy-condensed-italic display face; overlays are OBS/CEF so
+ * -webkit-text-stroke + paint-order render as intended. No CDN assets.
+ */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: transparent;
+  color: #ffffff;
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+  position: relative;
+}
+
+@font-face {
+  font-family: 'Futura XBlkCnIt BT';
+  src: url('/fonts/futura-xblkcnit-bt.ttf') format('truetype');
+  font-display: swap;
+}
+
+/* Claim banner wrapper - a compact top band. Flex column so the optional
+   subtext pill sits directly under the proposition line, and the whole
+   stack stays vertically tight regardless of which lines are present. */
+.claim-banner {
+  position: absolute;
+  top: 26px;
+  left: 0;
+  right: 0;
+  z-index: 30;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  pointer-events: none;
+}
+
+.claim-banner.visible {
+  display: flex;
+}
+
+/* Proposition line - the main "RESOLVED: ..." text. A solid banner (not
+   bare stroked text like the topic list) because this line is the whole
+   point of the overlay and needs to read instantly over any background. */
+.claim-text {
+  max-width: 82%;
+  background: rgba(0, 0, 0, 0.82);
+  border-radius: 14px;
+  border-bottom: 4px solid #e63946;
+  padding: 18px 42px;
+  text-align: center;
+  color: #ffffff;
+  font-family: 'Futura XBlkCnIt BT', Impact, sans-serif;
+  font-size: 52px;
+  line-height: 1.15;
+  -webkit-text-stroke: 3px #000;
+  paint-order: stroke fill;
+  text-transform: uppercase;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+}
+
+/* Attribution / qualifier pill - optional second line, smaller and quieter
+   than the proposition so it reads as a caption rather than competing text. */
+.claim-subtext {
+  display: none;
+  max-width: 68%;
+  background: rgba(0, 0, 0, 0.75);
+  border-radius: 999px;
+  padding: 8px 26px;
+  text-align: center;
+  color: #e63946;
+  font-family: 'Futura XBlkCnIt BT', Impact, sans-serif;
+  font-size: 26px;
+  line-height: 1.2;
+  -webkit-text-stroke: 2px #000;
+  paint-order: stroke fill;
+  text-transform: uppercase;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.claim-subtext.has-subtext {
+  display: block;
+}

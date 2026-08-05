@@ -84,6 +84,19 @@ const createShowConfigState = () => Object.freeze({
 });
 
 /**
+ * Creates initial claim (resolution banner) state
+ * @returns {Object} Fresh claim state
+ * `text` is the proposition under debate (e.g. "RESOLVED: ..."); `subtext`
+ * is an optional attribution/qualifier line; `visible` toggles the overlay.
+ * Independent of the verse/fallacy display mutex - this is its own channel.
+ */
+const createClaimState = () => Object.freeze({
+  text: '',
+  subtext: '',
+  visible: false,
+});
+
+/**
  * Creates initial fallacy state
  * @returns {Object} Fresh fallacy state
  */
@@ -150,6 +163,7 @@ let state = {
   scene: createSceneState(),
   segmentTimer: createSegmentTimerState(),
   scoreboard: createScoreboardState(),
+  claim: createClaimState(),
 };
 
 // Monotonic counter for queue item ids (stable across a server run)
@@ -700,6 +714,47 @@ const StateManager = {
       }),
     };
     return state.scoreboard;
+  },
+
+  // ========================================
+  // Claim (Resolution Banner) State
+  // ========================================
+
+  /**
+   * Get current claim state
+   * @returns {Object} Immutable claim state
+   */
+  getClaim() {
+    return state.claim;
+  },
+
+  /**
+   * Update claim state with new values
+   * @param {Object} updates - { text, subtext, visible }
+   * @returns {Object} New claim state
+   */
+  updateClaim({ text, subtext, visible }) {
+    state = {
+      ...state,
+      claim: Object.freeze({
+        text: typeof text === 'string' ? text : '',
+        subtext: typeof subtext === 'string' ? subtext : '',
+        visible: Boolean(visible),
+      }),
+    };
+    return state.claim;
+  },
+
+  /**
+   * Reset claim to initial (empty) state
+   * @returns {Object} Fresh claim state
+   */
+  clearClaim() {
+    state = {
+      ...state,
+      claim: createClaimState(),
+    };
+    return state.claim;
   },
 
   /**

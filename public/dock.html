@@ -279,6 +279,21 @@
       </div>
     </div>
 
+    <!-- Claim / Resolution Banner Section -->
+    <div class="dock-section">
+      <div class="section-label">Claim / Resolution</div>
+      <div class="form-compact">
+        <input type="text" id="claimTextInput" placeholder="e.g., RESOLVED: The Gospels are historically reliable" maxlength="200">
+      </div>
+      <div class="form-compact">
+        <input type="text" id="claimSubtextInput" placeholder="Attribution or qualifier (optional)" maxlength="150">
+      </div>
+      <div class="button-row">
+        <button type="button" id="updateClaimBtn" class="dock-btn btn-update">Update</button>
+        <button type="button" id="toggleClaimBtn" class="dock-btn">Show</button>
+      </div>
+    </div>
+
   </div>
 
   <script src="/socket.io/socket.io.js"></script>
@@ -290,6 +305,7 @@
   <script src="js/show-config-modal.js"></script>
   <script src="js/scene-control.js"></script>
   <script src="js/scoreboard-control.js"></script>
+  <script src="js/claim-control.js"></script>
   <script>
     // OBS Setup modal
     const modalOverlay = document.getElementById('modalOverlay');

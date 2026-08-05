@@ -5,7 +5,7 @@
  */
 
 const StateManager = require('../state');
-const { DISPLAY, CALLER, QUEUE, STAGE, SCENE, SCOREBOARD } = require('../config/constants');
+const { DISPLAY, CALLER, QUEUE, STAGE, SCENE, SCOREBOARD, CLAIM } = require('../config/constants');
 const SoundboardService = require('../services/soundboard.service');
 const ShowConfigService = require('../services/show-config.service');
 const createLogger = require('../utils/logger');
@@ -227,6 +227,20 @@ function validateSceneData(data) {
 }
 
 /**
+ * Validates and sanitizes claim (resolution banner) data
+ * @param {*} data - Raw socket data { text, subtext, visible }
+ * @returns {Object|null} Sanitized { text, subtext, visible } or null if invalid
+ */
+function validateClaimData(data) {
+  if (!data || typeof data !== 'object') return null;
+  return {
+    text: sanitizeString(data.text, '', CLAIM.TEXT_MAX_LENGTH),
+    subtext: sanitizeString(data.subtext, '', CLAIM.SUBTEXT_MAX_LENGTH),
+    visible: Boolean(data.visible),
+  };
+}
+
+/**
  * Validates a request to arm the segment countdown
  * @param {*} data - Raw socket data { label, durationMs }
  * @returns {Object|null} Sanitized { label, durationMs } or null if invalid
@@ -320,6 +334,10 @@ const createSocketHandlers = (io) => {
     io.emit('scoreboardUpdate', StateManager.getScoreboard());
   };
 
+  const broadcastClaim = () => {
+    io.emit('claimUpdate', StateManager.getClaim());
+  };
+
   /**
    * Handle new socket connections
    * @param {SocketIO.Socket} socket - Connected socket
@@ -342,6 +360,7 @@ const createSocketHandlers = (io) => {
     socket.emit('sceneUpdate', StateManager.getScene());
     socket.emit('segmentTimerUpdate', StateManager.getSegmentTimer());
     socket.emit('scoreboardUpdate', StateManager.getScoreboard());
+    socket.emit('claimUpdate', StateManager.getClaim());
 
     // ========================================
     // Caller Event Handlers
@@ -620,6 +639,25 @@ const createSocketHandlers = (io) => {
       const { visible } = StateManager.getScoreboard();
       StateManager.setScoreboardVisible(!visible);
       broadcastScoreboard();
+    });
+
+    // ========================================
+    // Claim (Resolution Banner) Event Handlers
+    // ========================================
+
+    socket.on('updateClaim', (data) => {
+      const validated = validateClaimData(data);
+      if (!validated) return;
+
+      StateManager.updateClaim(validated);
+      log.info('Claim updated:', validated.text, '- Visible:', validated.visible);
+      broadcastClaim();
+    });
+
+    socket.on('clearClaim', () => {
+      StateManager.clearClaim();
+      log.info('Claim cleared');
+      broadcastClaim();
     });
 
     // ========================================
