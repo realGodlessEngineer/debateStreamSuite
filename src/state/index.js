@@ -51,6 +51,15 @@ const createCallInState = () => Object.freeze({
 /**
  * Creates initial verse state
  * @returns {Object} Fresh verse state
+ * `compareVerses`/`compareVersion`/`compareVersionName` carry an optional
+ * second translation for side-by-side comparison (Bible source only — see
+ * validateVerseData). This is a sibling array to `verses[]`, not a merged
+ * per-verse shape, because translations don't always share a verse count
+ * (some editions omit/merge verses); index-aligning the two would silently
+ * shift every later row. Rows are matched by verse `number` at render time
+ * instead. `currentPage`/`versesPerPage` still page the primary translation
+ * only — there is one cursor, and the compare column renders whatever verse
+ * numbers fall in that same window.
  */
 const createVerseState = () => Object.freeze({
   reference: '',
@@ -62,6 +71,9 @@ const createVerseState = () => Object.freeze({
   currentPage: 0,
   versesPerPage: DISPLAY.VERSES_PER_PAGE,
   source: '',
+  compareVerses: [],
+  compareVersion: '',
+  compareVersionName: '',
 });
 
 /**

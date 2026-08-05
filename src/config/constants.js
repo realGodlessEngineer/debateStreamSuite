@@ -22,6 +22,9 @@ const SERVER = Object.freeze({
  */
 const DISPLAY = Object.freeze({
   VERSES_PER_PAGE: 3,
+  // Caps the verse-compare payload (see verse.compareVerses in state/index.js).
+  // Psalm 119 is the longest chapter at 176 verses; this leaves headroom.
+  MAX_COMPARE_VERSES: 200,
 });
 
 /**

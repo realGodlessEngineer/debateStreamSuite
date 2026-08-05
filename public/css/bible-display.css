@@ -125,6 +125,79 @@ body {
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
+/* ============================================
+ * Translation Compare Mode (two-column layout)
+ * Bible-only; the extra width only applies when .compare-mode is present,
+ * so single-translation and every other source (Quran/hadith/dictionary/
+ * interlinear) render exactly as before.
+ * ============================================ */
+
+.container.compare-mode {
+  max-width: 1700px;
+}
+
+.compare-columns {
+  display: flex;
+  gap: 32px;
+}
+
+.compare-column {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 26px;
+}
+
+/* Version label per column, via attr() rather than an extra DOM node so the
+ * .verse rows stay the direct/only children (keeps the :nth-child fade-in
+ * stagger below working the same as single-column mode). */
+.compare-column::before {
+  content: attr(data-label);
+  position: absolute;
+  top: 0;
+  left: 0;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 0.8em;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-primary, #e63946);
+  opacity: 0.8;
+}
+
+.compare-column:first-child {
+  border-right: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.compare-column .verse-number {
+  font-size: 1.4em;
+}
+
+.compare-column .verse-text {
+  font-size: 1.5em;
+}
+
+.verse-missing .verse-text {
+  color: rgba(255, 255, 255, 0.3);
+  font-style: italic;
+}
+
+@media (max-width: 900px) {
+  .compare-columns {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .compare-column:first-child {
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    padding-bottom: 16px;
+  }
+}
+
 /* Version Footer */
 .version {
   font-family: 'Open Sans', sans-serif;

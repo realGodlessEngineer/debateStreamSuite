@@ -137,6 +137,10 @@
     fetchBibleBtn: document.getElementById('fetchBibleBtn'),
     fetchBibleOnlyBtn: document.getElementById('fetchBibleOnlyBtn'),
     clearBibleBtn: document.getElementById('clearBibleBtn'),
+    compareEnabled: document.getElementById('compareEnabled'),
+    compareVersionGroup: document.getElementById('compareVersionGroup'),
+    compareVersion: document.getElementById('compareVersion'),
+    tabBible: document.getElementById('tab-bible'),
 
     // Quran inputs
     quranReference: document.getElementById('quranReference'),
@@ -704,48 +708,118 @@
   // Bible Verse Functions
   // ============================================
 
+  /**
+   * Fetches a single translation from the existing /api/fetch-verse endpoint.
+   * Shared by the primary fetch and the optional compare fetch below - two
+   * plain calls to the same endpoint, rather than growing the route with a
+   * second-version param, so the cache path and route stay untouched.
+   * @param {string} reference - Bible reference
+   * @param {string} version - Bible version code
+   * @returns {Promise<Object>} Verse data from the server
+   */
+  async function fetchVerseFromApi(reference, version) {
+    const response = await fetch('/api/fetch-verse', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ reference, version }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to fetch verse');
+    }
+
+    return data;
+  }
+
+  /**
+   * Populates the compare-translation dropdown by cloning the primary
+   * version select's own (trusted, server-rendered) markup rather than
+   * duplicating ~30 <option> tags a second time in the HTML.
+   */
+  function populateCompareVersionOptions() {
+    elements.compareVersion.innerHTML = '<option value="">— Select translation —</option>' + elements.version.innerHTML;
+    // KJV next to the NRSVUE default reads as an obviously different
+    // translation, so compare is useful the moment the box is checked.
+    const hasKjv = Array.from(elements.compareVersion.options).some((o) => o.value === 'KJV');
+    if (hasKjv) elements.compareVersion.value = 'KJV';
+  }
+
+  /**
+   * Reflects whether compare is armed on the Fetch button and tab panel, so
+   * it's obvious mid-show whether a second translation will be fetched.
+   */
+  function updateCompareArmedUI() {
+    const armed = elements.compareEnabled.checked && !!elements.compareVersion.value;
+    elements.fetchBibleBtn.textContent = armed
+      ? `Fetch & Display (+${elements.compareVersion.value})`
+      : 'Fetch & Display';
+    elements.tabBible.classList.toggle('compare-armed', armed);
+  }
+
+  function handleCompareToggleChange() {
+    elements.compareVersionGroup.style.display = elements.compareEnabled.checked ? '' : 'none';
+    updateCompareArmedUI();
+  }
+
   async function fetchBibleVerse() {
     const reference = elements.reference.value.trim();
     const version = elements.version.value;
+    const compareVersion = elements.compareEnabled.checked ? elements.compareVersion.value : '';
 
     if (!reference) {
       status.error('Please enter a Bible reference');
       return null;
     }
 
-    status.loading('Fetching verse...');
+    status.loading(compareVersion ? 'Fetching verse and comparison translation...' : 'Fetching verse...');
 
+    let primary;
     try {
-      const response = await fetch('/api/fetch-verse', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reference, version }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to fetch verse');
-      }
-
-      if (!data.text && (!data.verses || data.verses.length === 0)) {
-        throw new Error('No verse text found. Check the reference.');
-      }
-
-      state.lastFetchedVerse = data;
-      showPreview(data, 'bible');
-
-      const cacheStatus = data.fromCache ? ' (from cache)' : ' (fetched & cached)';
-      const verseCount = data.verses ? ` - ${data.verses.length} verses` : '';
-      status.success('Verse loaded' + cacheStatus + verseCount);
-
-      if (!data.fromCache) await loadBibleCachedVerses();
-
-      return data;
+      primary = await fetchVerseFromApi(reference, version);
     } catch (error) {
       status.error(error.message);
       return null;
     }
+
+    if (!primary.text && (!primary.verses || primary.verses.length === 0)) {
+      status.error('No verse text found. Check the reference.');
+      return null;
+    }
+
+    const data = { ...primary };
+    let compareNote = '';
+
+    // Compare translation is best-effort: a failure here (bad version code,
+    // network hiccup) must not take down the primary verse that already
+    // succeeded above.
+    if (compareVersion) {
+      try {
+        const compare = await fetchVerseFromApi(reference, compareVersion);
+        if (compare.verses && compare.verses.length > 0) {
+          data.compareVerses = compare.verses;
+          data.compareVersion = compare.version;
+          data.compareVersionName = compare.versionName || compare.version;
+          compareNote = ` + ${data.compareVersionName} comparison`;
+        } else {
+          compareNote = ' (comparison translation had no text)';
+        }
+      } catch (error) {
+        compareNote = ' (comparison translation failed to load)';
+      }
+    }
+
+    state.lastFetchedVerse = data;
+    showPreview(data, 'bible');
+
+    const cacheStatus = primary.fromCache ? ' (from cache)' : ' (fetched & cached)';
+    const verseCount = primary.verses ? ` - ${primary.verses.length} verses` : '';
+    status.success('Verse loaded' + cacheStatus + verseCount + compareNote);
+
+    if (!primary.fromCache) await loadBibleCachedVerses();
+
+    return data;
   }
 
   // ============================================
@@ -1305,6 +1379,10 @@
       ? `<div class="preview-etymology" style="color: var(--color-text-dim); font-size: 0.85em; margin-top: 4px;">Origin: ${escapeHtml(data.etymology)}</div>`
       : '';
 
+    const compareNote = source === 'bible' && data.compareVersionName
+      ? `<div class="preview-compare-note" style="color: #38bdf8; font-size: 0.85em; margin-top: 4px;">Comparing with ${escapeHtml(data.compareVersionName)}</div>`
+      : '';
+
     elements.previewContent.innerHTML = `
       <div class="preview-reference">${escapeHtml(data.reference)} ${fromCache}</div>
       ${phonetic}
@@ -1312,6 +1390,7 @@
       <div class="preview-version">${escapeHtml(data.versionName || data.version)}</div>
       ${etymology}
       ${verseCount}
+      ${compareNote}
     `;
   }
 
@@ -1641,6 +1720,8 @@
     });
     elements.fetchBibleOnlyBtn.addEventListener('click', fetchBibleVerse);
     elements.clearBibleBtn.addEventListener('click', clearDisplay);
+    elements.compareEnabled.addEventListener('change', handleCompareToggleChange);
+    elements.compareVersion.addEventListener('change', updateCompareArmedUI);
 
     // Quran / Hadith buttons (the Quran tab handles both)
     elements.fetchQuranBtn.addEventListener('click', async () => {
@@ -1737,6 +1818,10 @@
         }
       }
     });
+
+    // Compare-translation dropdown (off by default; see compareEnabled)
+    populateCompareVersionOptions();
+    updateCompareArmedUI();
 
     // Focus default input
     elements.reference.focus();

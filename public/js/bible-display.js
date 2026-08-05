@@ -86,6 +86,68 @@
   }
 
   /**
+   * Creates a compare-column verse row for a given primary-column verse
+   * number. Renders a muted placeholder when the compare translation has
+   * no verse at that number (a genuinely omitted/merged verse, not a bug -
+   * see renderCompareColumns).
+   * @param {Object|undefined} compareVerse - { number, text } or undefined
+   * @returns {HTMLElement} Verse DOM element
+   */
+  function createCompareVerseElement(compareVerse) {
+    if (!compareVerse) {
+      const verseEl = document.createElement('div');
+      verseEl.className = 'verse verse-missing';
+      verseEl.innerHTML = '<span class="verse-text">—</span>';
+      return verseEl;
+    }
+    return createVerseElement(compareVerse, {});
+  }
+
+  /**
+   * Renders the primary translation's current page alongside the compare
+   * translation, aligned by verse NUMBER rather than array index. Some
+   * translations omit or merge verses (Matthew 17:21, Acts 8:37, etc.), so
+   * index-alignment would silently show mismatched verses side by side once
+   * one column omits something the other has. The row set is always the
+   * primary page's verse numbers; a missing compare counterpart renders as
+   * a muted placeholder instead of shifting later rows.
+   * @param {Array} pageVerses - Primary translation's verses for this page
+   * @param {Object} data - Full verse payload (compareVerses/labels)
+   */
+  function renderCompareColumns(pageVerses, data) {
+    // First-wins: a passage spanning a chapter boundary repeats verse numbers
+    // (Romans 8:1-9:2 yields 1..39 then 1, 2), and Map's constructor lets a
+    // later entry overwrite an earlier one - which would pair the opening rows
+    // with the wrong chapter's text. Keeping the first occurrence means the
+    // rows most likely to be on screen stay correct.
+    const compareByNumber = new Map();
+    data.compareVerses.forEach((v) => {
+      if (!compareByNumber.has(v.number)) compareByNumber.set(v.number, v);
+    });
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'compare-columns';
+
+    const primaryColumn = document.createElement('div');
+    primaryColumn.className = 'compare-column';
+    primaryColumn.dataset.label = data.versionName || data.version;
+    pageVerses.forEach((verse) => {
+      primaryColumn.appendChild(createVerseElement(verse, {}));
+    });
+
+    const compareColumn = document.createElement('div');
+    compareColumn.className = 'compare-column';
+    compareColumn.dataset.label = data.compareVersionName || data.compareVersion;
+    pageVerses.forEach((verse) => {
+      compareColumn.appendChild(createCompareVerseElement(compareByNumber.get(verse.number)));
+    });
+
+    wrapper.appendChild(primaryColumn);
+    wrapper.appendChild(compareColumn);
+    elements.versesContainer.appendChild(wrapper);
+  }
+
+  /**
    * Shows the verse container with animation
    */
   function showContainer() {
@@ -291,6 +353,10 @@
     const { verses, versesPerPage = 3, currentPage = 0, reference, version, versionName } = data;
     const totalPages = Math.ceil(verses.length / versesPerPage);
     const isInterlinear = data.source === 'interlinear';
+    // Compare is Bible-only; a compare payload riding on any other source
+    // (or an empty one) is ignored, so Quran/hadith/dictionary/interlinear
+    // are unaffected even if compareVerses were somehow present.
+    const isCompare = data.source === 'bible' && Array.isArray(data.compareVerses) && data.compareVerses.length > 0;
 
     // Update header
     elements.reference.textContent = reference;
@@ -316,10 +382,16 @@
 
     // Clear and render verses (skip empty placeholders for interlinear)
     elements.versesContainer.innerHTML = '';
-    pageVerses.forEach((verse) => {
-      if (isInterlinear && !verse.words && !verse.text) return;
-      elements.versesContainer.appendChild(createVerseElement(verse, options));
-    });
+    elements.container.classList.toggle('compare-mode', isCompare);
+
+    if (isCompare) {
+      renderCompareColumns(pageVerses, data);
+    } else {
+      pageVerses.forEach((verse) => {
+        if (isInterlinear && !verse.words && !verse.text) return;
+        elements.versesContainer.appendChild(createVerseElement(verse, options));
+      });
+    }
 
     showContainer();
     adjustForContentHeight();
@@ -447,7 +519,7 @@
   // ============================================
 
   socket.on('verseUpdate', (data) => {
-    elements.container.classList.remove('fallacy-mode', 'quran-mode', 'hadith-mode', 'dictionary-mode', 'interlinear-mode');
+    elements.container.classList.remove('fallacy-mode', 'quran-mode', 'hadith-mode', 'dictionary-mode', 'interlinear-mode', 'compare-mode');
 
     if (data.source === 'quran') {
       elements.container.classList.add('quran-mode');

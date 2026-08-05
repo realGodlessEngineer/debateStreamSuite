@@ -148,10 +148,29 @@ function validateVerseData(data) {
     currentPage: 0,
     versesPerPage: DISPLAY.VERSES_PER_PAGE,
     source,
+    // Second-translation compare column, Bible-only. Always defaulted here
+    // (not just left undefined) so a compare column from a previous Bible
+    // display can never survive into a later non-compare or non-bible one.
+    compareVerses: [],
+    compareVersion: '',
+    compareVersionName: '',
   };
 
   if (isInterlinear && VALID_LANGUAGES.includes(rawLang)) {
     result.language = rawLang;
+  }
+
+  // Compare payload sanitized with the same discipline as `verses` above:
+  // Array.isArray guard, bounded string lengths, capped array size.
+  if (source === 'bible' && Array.isArray(data.compareVerses)) {
+    result.compareVerses = data.compareVerses
+      .slice(0, DISPLAY.MAX_COMPARE_VERSES)
+      .map(v => ({
+        number: sanitizeString(String(v.number || ''), '', 10),
+        text: sanitizeString(v.text, '', 5000),
+      }));
+    result.compareVersion = sanitizeString(data.compareVersion, '', 100);
+    result.compareVersionName = sanitizeString(data.compareVersionName, '', 100);
   }
 
   // Preserve structured lexicon data for display rendering, or clear it

@@ -157,6 +157,18 @@
             </select>
           </div>
 
+          <div class="form-group compare-toggle-group">
+            <label class="compare-toggle-label" for="compareEnabled">
+              <input type="checkbox" id="compareEnabled">
+              <span>Compare with a second translation</span>
+            </label>
+          </div>
+
+          <div class="form-group compare-version-group" id="compareVersionGroup" style="display:none;">
+            <label for="compareVersion">Compare Translation</label>
+            <select id="compareVersion"></select>
+          </div>
+
           <div class="button-row">
             <button class="btn-primary" id="fetchBibleBtn">Fetch & Display</button>
             <button class="btn-secondary" id="fetchBibleOnlyBtn">Fetch Only</button>
