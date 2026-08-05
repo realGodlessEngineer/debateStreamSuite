@@ -92,6 +92,16 @@ const CLAIM = Object.freeze({
 });
 
 /**
+ * Ticker overlay settings — bottom-of-screen scrolling crawl band (social
+ * handles, next-topic teaser, stream announcements). Mirrors STAGE's
+ * topics-list validation limits.
+ */
+const TICKER = Object.freeze({
+  MAX_ITEMS: 20,
+  ITEM_MAX_LENGTH: 120,
+});
+
+/**
  * Soundboard settings
  */
 const SOUNDBOARD = Object.freeze({
@@ -262,6 +272,7 @@ module.exports = {
   SCENE,
   SCOREBOARD,
   CLAIM,
+  TICKER,
   SOUNDBOARD,
   BIBLE_BOOK_ORDER,
   QURAN_EDITIONS,

@@ -1,0 +1,112 @@
+/**
+ * Ticker Overlay Styles (bottom-of-screen scrolling crawl band)
+ * For OBS Browser Source - Landscape (1920x1080)
+ *
+ * Its own page/source so the operator can position, scale, and toggle the
+ * crawl independently of every other overlay. Pinned flush to the true
+ * bottom edge of the 1920x1080 canvas at a fixed ~44px band height, which
+ * sits inside the 40px margin display.css reserves below the caller
+ * lower-third card (.caller-overlay { bottom: 40px }) - so with both
+ * overlays active at their default positions they do not collide.
+ *
+ * Local heavy-condensed-italic display face; overlays are OBS/CEF so
+ * -webkit-text-stroke + paint-order render as intended. No CDN assets.
+ */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: transparent;
+  color: #ffffff;
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+  position: relative;
+}
+
+@font-face {
+  font-family: 'Futura XBlkCnIt BT';
+  src: url('/fonts/futura-xblkcnit-bt.ttf') format('truetype');
+  font-display: swap;
+}
+
+/* Crawl band - flush against the bottom edge, full width. overflow:hidden
+   is what clips the horizontally-scrolling track to a single visible line. */
+.ticker-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 44px;
+  z-index: 20;
+  display: none;
+  align-items: center;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.ticker-bar.visible {
+  display: flex;
+}
+
+/* Track holds two identical copies of the item run, laid out side by side.
+   width: max-content lets it size to its actual content (both runs) rather
+   than the 1920px viewport, which is what makes a translateX(-50%) land
+   exactly on the boundary between the two copies - a seamless loop with no
+   snap, regardless of how many items are loaded. The animation itself is
+   assigned from JS (duration depends on rendered width), not declared here. */
+.ticker-track {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+}
+
+@keyframes ticker-crawl {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.ticker-run {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.ticker-item {
+  font-family: 'Futura XBlkCnIt BT', Impact, sans-serif;
+  font-size: 30px;
+  line-height: 1;
+  color: #ffffff;
+  -webkit-text-stroke: 4px #000;
+  paint-order: stroke fill;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* Delimiter glyph between items (and after the last item in a run, so the
+   wrap point between the two copies reads as continuous). Accent-colored so
+   distinct entries never run together visually. */
+.ticker-sep {
+  display: inline-block;
+  font-family: 'Futura XBlkCnIt BT', Impact, sans-serif;
+  font-size: 24px;
+  line-height: 1;
+  color: #e63946;
+  -webkit-text-stroke: 4px #000;
+  paint-order: stroke fill;
+  margin: 0 32px;
+}

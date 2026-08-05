@@ -150,6 +150,17 @@ const createScoreboardState = () => Object.freeze({
   visible: false,
 });
 
+/**
+ * Creates initial ticker state
+ * @returns {Object} Fresh ticker state
+ * `items` is the operator's bottom-of-screen crawl strings (social handles,
+ * next-topic teaser, announcements); `visible` toggles the overlay.
+ */
+const createTickerState = () => Object.freeze({
+  items: Object.freeze([]),
+  visible: false,
+});
+
 // Application state container
 let state = {
   caller: createCallerState(),
@@ -164,6 +175,7 @@ let state = {
   segmentTimer: createSegmentTimerState(),
   scoreboard: createScoreboardState(),
   claim: createClaimState(),
+  ticker: createTickerState(),
 };
 
 // Monotonic counter for queue item ids (stable across a server run)
@@ -755,6 +767,34 @@ const StateManager = {
       claim: createClaimState(),
     };
     return state.claim;
+  },
+
+  // ========================================
+  // Ticker State
+  // ========================================
+
+  /**
+   * Get current ticker state
+   * @returns {Object} Immutable ticker state
+   */
+  getTicker() {
+    return state.ticker;
+  },
+
+  /**
+   * Update ticker state with new values
+   * @param {Object} updates - { items, visible }
+   * @returns {Object} New ticker state
+   */
+  updateTicker({ items, visible }) {
+    state = {
+      ...state,
+      ticker: Object.freeze({
+        items: Object.freeze(Array.isArray(items) ? [...items] : []),
+        visible: Boolean(visible),
+      }),
+    };
+    return state.ticker;
   },
 
   /**

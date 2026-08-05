@@ -294,6 +294,19 @@
       </div>
     </div>
 
+    <!-- Ticker Section -->
+    <div class="dock-section">
+      <div class="section-label">Ticker</div>
+      <div class="form-compact">
+        <textarea id="tickerInput" placeholder="One item per line — handles, next topic, announcements" rows="4"></textarea>
+      </div>
+      <div class="button-row">
+        <button id="updateTickerBtn" class="dock-btn btn-update">Update</button>
+        <button id="clearTickerBtn" class="dock-btn btn-clear">Clear</button>
+        <button id="toggleTickerBtn" class="dock-btn">Show</button>
+      </div>
+    </div>
+
   </div>
 
   <script src="/socket.io/socket.io.js"></script>
@@ -306,6 +319,7 @@
   <script src="js/scene-control.js"></script>
   <script src="js/scoreboard-control.js"></script>
   <script src="js/claim-control.js"></script>
+  <script src="js/ticker-control.js"></script>
   <script>
     // OBS Setup modal
     const modalOverlay = document.getElementById('modalOverlay');

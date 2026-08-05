@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920, height=1080">
+  <title>Ticker Overlay</title>
+  <link rel="stylesheet" href="css/display-ticker.css">
+</head>
+<body>
+  <!-- Bottom-edge scrolling ticker band - social handles, next-topic teaser,
+       stream announcements. Own page/source, independent of the topic list
+       (top-center, display-topics.html) and the caller lower-third
+       (display.html / vertical-display.html), which sits with a 40px margin
+       above the true bottom edge - this band is pinned flush against that
+       edge so the two don't collide by default.
+       No theme stylesheet: colors are fixed, and a theme's body gradient
+       would make the OBS source opaque.
+       The track renders two identical copies of the item run side by side
+       and animates by exactly -50%, so the loop never visibly snaps. -->
+  <div id="tickerBar" class="ticker-bar">
+    <div class="ticker-track" id="tickerTrack">
+      <div class="ticker-run" id="tickerRunA"></div>
+      <div class="ticker-run" id="tickerRunB"></div>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="js/socket-connection.js"></script>
+  <script src="js/display-ticker.js"></script>
+</body>
+</html>

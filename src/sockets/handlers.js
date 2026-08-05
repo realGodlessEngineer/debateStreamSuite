@@ -5,7 +5,7 @@
  */
 
 const StateManager = require('../state');
-const { DISPLAY, CALLER, QUEUE, STAGE, SCENE, SCOREBOARD, CLAIM } = require('../config/constants');
+const { DISPLAY, CALLER, QUEUE, STAGE, SCENE, SCOREBOARD, CLAIM, TICKER } = require('../config/constants');
 const SoundboardService = require('../services/soundboard.service');
 const ShowConfigService = require('../services/show-config.service');
 const createLogger = require('../utils/logger');
@@ -285,6 +285,24 @@ function validateScoreAdjustment(data) {
 }
 
 /**
+ * Validates and sanitizes ticker data
+ * @param {*} payload - Raw socket data { items, visible }
+ * @returns {Object|null} Sanitized { items, visible } or null if invalid
+ */
+function validateTicker(payload) {
+  if (!payload || typeof payload !== 'object' || !Array.isArray(payload.items)) return null;
+  const items = payload.items
+    .map(item => String(item).trim())
+    .filter(Boolean)
+    .slice(0, TICKER.MAX_ITEMS)
+    .map(item => item.slice(0, TICKER.ITEM_MAX_LENGTH));
+  return {
+    items,
+    visible: Boolean(payload.visible),
+  };
+}
+
+/**
  * Creates socket event handlers
  * @param {SocketIO.Server} io - Socket.io server instance
  * @returns {Function} Connection handler
@@ -341,6 +359,10 @@ const createSocketHandlers = (io) => {
     io.emit('claimUpdate', StateManager.getClaim());
   };
 
+  const broadcastTicker = () => {
+    io.emit('tickerUpdate', StateManager.getTicker());
+  };
+
   /**
    * Handle new socket connections
    * @param {SocketIO.Socket} socket - Connected socket
@@ -364,6 +386,7 @@ const createSocketHandlers = (io) => {
     socket.emit('segmentTimerUpdate', StateManager.getSegmentTimer());
     socket.emit('scoreboardUpdate', StateManager.getScoreboard());
     socket.emit('claimUpdate', StateManager.getClaim());
+    socket.emit('tickerUpdate', StateManager.getTicker());
 
     // ========================================
     // Caller Event Handlers
@@ -661,6 +684,19 @@ const createSocketHandlers = (io) => {
       StateManager.clearClaim();
       log.info('Claim cleared');
       broadcastClaim();
+    });
+
+    // ========================================
+    // Ticker Event Handlers
+    // ========================================
+
+    socket.on('updateTicker', (data) => {
+      const validated = validateTicker(data);
+      if (!validated) return;
+
+      StateManager.updateTicker(validated);
+      log.info('Ticker updated:', validated.items.length, '- Visible:', validated.visible);
+      broadcastTicker();
     });
 
     // ========================================
