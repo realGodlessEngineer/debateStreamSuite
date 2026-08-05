@@ -107,6 +107,36 @@ function createTray() {
         clipboard.writeText(`${BASE_URL}/display-topics.html`);
       }
     },
+    {
+      label: 'Copy Scene Card URL',
+      click: () => {
+        clipboard.writeText(`${BASE_URL}/display-scene.html`);
+      }
+    },
+    {
+      label: 'Copy Segment Timer URL',
+      click: () => {
+        clipboard.writeText(`${BASE_URL}/display-segment.html`);
+      }
+    },
+    {
+      label: 'Copy Scoreboard URL',
+      click: () => {
+        clipboard.writeText(`${BASE_URL}/display-scoreboard.html`);
+      }
+    },
+    {
+      label: 'Copy Claim Banner URL',
+      click: () => {
+        clipboard.writeText(`${BASE_URL}/display-claim.html`);
+      }
+    },
+    {
+      label: 'Copy Ticker URL',
+      click: () => {
+        clipboard.writeText(`${BASE_URL}/display-ticker.html`);
+      }
+    },
     { type: 'separator' },
     {
       label: 'Copy Reference Control URL',

@@ -17,6 +17,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
     callerControl: `${BASE_URL}/dock.html`,
     callerDisplay: `${BASE_URL}/display.html`,
     topicsDisplay: `${BASE_URL}/display-topics.html`,
+    sceneDisplay: `${BASE_URL}/display-scene.html`,
+    segmentDisplay: `${BASE_URL}/display-segment.html`,
+    scoreboardDisplay: `${BASE_URL}/display-scoreboard.html`,
+    claimDisplay: `${BASE_URL}/display-claim.html`,
+    tickerDisplay: `${BASE_URL}/display-ticker.html`,
     bibleControl: `${BASE_URL}/reference-control.html`,
     bibleDisplay: `${BASE_URL}/bible-display.html`,
     soundboard: `${BASE_URL}/soundboard.html`

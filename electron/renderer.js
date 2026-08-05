@@ -19,6 +19,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('callerDisplayUrl').textContent = urls.callerDisplay;
   document.getElementById('topicsDisplayUrl').textContent = urls.topicsDisplay;
+  document.getElementById('sceneDisplayUrl').textContent = urls.sceneDisplay;
+  document.getElementById('segmentDisplayUrl').textContent = urls.segmentDisplay;
+  document.getElementById('scoreboardDisplayUrl').textContent = urls.scoreboardDisplay;
+  document.getElementById('claimDisplayUrl').textContent = urls.claimDisplay;
+  document.getElementById('tickerDisplayUrl').textContent = urls.tickerDisplay;
   document.getElementById('callerControlUrl').textContent = urls.callerControl;
   document.getElementById('bibleDisplayUrl').textContent = urls.bibleDisplay;
   document.getElementById('bibleControlUrl').textContent = urls.bibleControl;

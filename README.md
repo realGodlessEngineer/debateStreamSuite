@@ -108,6 +108,11 @@ debate-stream-suite/
 │   ├── dock.html                  # Caller info control panel
 │   ├── display.html               # Caller info OBS display
 │   ├── display-topics.html        # Topic list + call-in OBS display
+│   ├── display-scene.html         # Starting Soon / BRB / Ending card
+│   ├── display-segment.html       # Segment countdown OBS display
+│   ├── display-scoreboard.html    # Per-side tally OBS display
+│   ├── display-claim.html         # Claim / resolution banner
+│   ├── display-ticker.html        # Bottom-edge ticker crawl
 │   ├── bible-control.html         # Bible verse control panel
 │   ├── bible-display.html         # Bible verse OBS display
 │   ├── soundboard.html            # Soundboard control panel
@@ -177,6 +182,11 @@ The server starts at **http://localhost:3666** by default.
 | Caller Control | `/dock.html` | Manage caller name & pronouns |
 | Caller Display | `/display.html` | OBS overlay for caller info |
 | Topics Display | `/display-topics.html` | OBS overlay for the topic list & call-in |
+| Scene Card | `/display-scene.html` | Full-screen Starting Soon / BRB / Ending card |
+| Segment Timer | `/display-segment.html` | OBS overlay for the segment countdown |
+| Scoreboard | `/display-scoreboard.html` | OBS overlay for the per-side tally |
+| Claim Banner | `/display-claim.html` | OBS overlay naming the proposition under debate |
+| Ticker | `/display-ticker.html` | OBS overlay for the bottom-edge crawl |
 | Bible Control | `/bible-control.html` | Search & display Bible verses |
 | Bible Display | `/bible-display.html` | OBS overlay for verses |
 | Soundboard | `/soundboard.html` | Upload & trigger sounds |
@@ -187,10 +197,18 @@ The server starts at **http://localhost:3666** by default.
 2. Set the URL to one of the display pages:
    - `http://localhost:3666/display.html` — Caller info overlay
    - `http://localhost:3666/display-topics.html` — Topic list & call-in overlay
+   - `http://localhost:3666/display-scene.html` — Starting Soon / BRB / Ending card
+   - `http://localhost:3666/display-segment.html` — Segment countdown
+   - `http://localhost:3666/display-scoreboard.html` — Per-side scoreboard
+   - `http://localhost:3666/display-claim.html` — Claim / resolution banner
+   - `http://localhost:3666/display-ticker.html` — Ticker crawl
    - `http://localhost:3666/bible-display.html` — Bible verse overlay
 3. Set dimensions to **1920 x 1080**
 4. Optionally enable **Shutdown source when not visible**
-5. The background is transparent — overlays render on top of your scene
+5. The background is transparent — overlays render on top of your scene.
+   The one exception is `display-scene.html`, which is deliberately opaque:
+   it is a holding screen meant to replace the picture during a break, and a
+   see-through one would show whatever the last live source left behind.
 
 ### Hostname Mapping (Optional)
 

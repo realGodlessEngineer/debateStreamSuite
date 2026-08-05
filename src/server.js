@@ -126,6 +126,13 @@ server.listen(SERVER.PORT, () => {
 ║    OBS Display:   http://localhost:${SERVER.PORT}/display.html        ║
 ║    Topics OBS:    http://localhost:${SERVER.PORT}/display-topics.html ║
 ╠══════════════════════════════════════════════════════════════╣
+║  Stage Overlays (each its own OBS source):                   ║
+║    Scene Card:    http://localhost:${SERVER.PORT}/display-scene.html  ║
+║    Segment Timer: http://localhost:${SERVER.PORT}/display-segment.html ║
+║    Scoreboard:    http://localhost:${SERVER.PORT}/display-scoreboard.html ║
+║    Claim Banner:  http://localhost:${SERVER.PORT}/display-claim.html  ║
+║    Ticker:        http://localhost:${SERVER.PORT}/display-ticker.html ║
+╠══════════════════════════════════════════════════════════════╣
 ║  Reference Repository:                                       ║
 ║    Control Panel: http://localhost:${SERVER.PORT}/reference-control.html ║
 ║    OBS Display:   http://localhost:${SERVER.PORT}/bible-display.html  ║
