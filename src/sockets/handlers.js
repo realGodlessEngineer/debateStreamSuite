@@ -217,8 +217,11 @@ function validateShowConfigData(data) {
  */
 function validateSceneData(data) {
   if (!data || typeof data !== 'object') return null;
-  const rawKey = sanitizeString(data.key, '', 20);
-  const key = SCENE.KEYS.includes(rawKey) ? rawKey : '';
+  const key = sanitizeString(data.key, '', 20);
+  // Reject an unknown key rather than coercing it to '' — '' means "no scene",
+  // so coercing would let a malformed payload blank a live scene card. Clearing
+  // is what clearScene is for.
+  if (!SCENE.KEYS.includes(key)) return null;
   return {
     key,
     message: sanitizeString(data.message, '', SCENE.MESSAGE_MAX_LENGTH),
