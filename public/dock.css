@@ -905,3 +905,97 @@ input[type="text"]::placeholder {
 /* The countdown reuses .timer-display-compact and its .warn/.danger states
    from the call timer above. Note the polarity is reversed: those classes are
    applied here at LOW remaining time, not high elapsed time. */
+
+/* ========================================
+   Scoreboard (live per-side tally)
+   Reuses the [data-stance] --stance-color custom properties defined above
+   for the stance select/chips - each row below carries its own
+   data-stance attribute, so no new color rules are needed here.
+   ======================================== */
+
+.scoreboard-control-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.scoreboard-row-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: var(--color-bg-input-solid, #0a0a0a);
+  border-left: 3px solid var(--stance-color, #555);
+}
+
+.scoreboard-row-label {
+  flex: 1;
+  min-width: 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-text-secondary, #e5e5e5);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Sized for a live show - a thumb should never miss these. */
+.scoreboard-adj-btn {
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 6px;
+  background: #3a3a3a;
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.scoreboard-adj-btn:hover {
+  background: var(--color-primary, #dc2626);
+  transform: translateY(-1px);
+}
+
+.scoreboard-row-tally {
+  flex: 0 0 auto;
+  min-width: 2.4ch;
+  text-align: center;
+  font-family: var(--font-mono, 'Courier New', monospace);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-primary, #dc2626);
+}
+
+/* Show/Hide toggle - standalone from #toggleTopicsBtn/#toggleCallInBtn
+   above so this section stays self-contained; same neutral/active pattern. */
+.scoreboard-toggle-btn {
+  flex-shrink: 0;
+  padding: 4px 10px;
+  border: none;
+  border-radius: 4px;
+  background: #3a3a3a;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.scoreboard-toggle-btn:hover {
+  background: #2a2a2a;
+}
+
+.scoreboard-toggle-btn.active {
+  background: var(--color-primary, #dc2626);
+}
+
+.scoreboard-toggle-btn.active:hover {
+  background: var(--color-primary-dark, #b91c1c);
+}

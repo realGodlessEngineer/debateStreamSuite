@@ -1,0 +1,142 @@
+/**
+ * Scoreboard Overlay Styles (live per-side score tally)
+ * For OBS Browser Source - Landscape (1920x1080)
+ *
+ * Its own page/source so the operator can position, scale, and toggle the
+ * scoreboard independently of the caller lower-third and the stage topic
+ * stack (display-topics.html, top-center). It sits in the top-right corner
+ * with the same 40px inset the "Up Next" pill uses in the top-left
+ * (public/css/display.css .on-deck), so the two corners read as a pair.
+ *
+ * No theme stylesheet - colors are fixed here, same reasoning as
+ * display-topics.css: a theme's body gradient would make the OBS source
+ * opaque, and this card needs no theme accent beyond its own red/black.
+ * System font stack only; no CDN assets.
+ */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: transparent;
+  color: #ffffff;
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Per-stance accent color, reused verbatim from public/css/display.css so a
+   side's scoreboard row is visibly the same color as its stance chip on the
+   caller card / dock. Consumed via [data-stance] on each row below. */
+[data-stance="theist"]    { --stance-color: #a78bfa; }
+[data-stance="atheist"]   { --stance-color: #ef4444; }
+[data-stance="agnostic"]  { --stance-color: #9ca3af; }
+[data-stance="christian"] { --stance-color: #3b82f6; }
+[data-stance="muslim"]    { --stance-color: #22c55e; }
+[data-stance="jewish"]    { --stance-color: #38bdf8; }
+[data-stance="undecided"] { --stance-color: #eab308; }
+[data-stance="other"]     { --stance-color: #f97316; }
+
+/* Card - compact, top-right corner. display:none by default; only shown
+   once the server reports visible:true AND at least one side has a
+   nonzero score (see display-scoreboard.js), so a fresh 0-0 board never
+   renders a wall of zeroed-out sides. */
+.scoreboard-card {
+  position: absolute;
+  top: 40px;
+  right: 40px;
+  z-index: 15;
+  display: none;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 240px;
+  padding: 16px 22px;
+  background: linear-gradient(135deg, #0d0d0d 0%, #1a0808 100%);
+  border: 2px solid rgba(180, 30, 30, 0.4);
+  border-radius: 12px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.6);
+}
+
+.scoreboard-card.visible {
+  display: flex;
+}
+
+.scoreboard-title {
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #e63946;
+  text-align: center;
+}
+
+.scoreboard-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* One row per active side. The left accent bar is the same --stance-color
+   used everywhere else, so a viewer reads "theist" from the color alone. */
+.scoreboard-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  border-left: 4px solid var(--stance-color, #555);
+}
+
+.scoreboard-side {
+  font-size: 15px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+/* tabular-nums keeps the digit column steady as a score changes width
+   (e.g. "9" -> "10"), so the card doesn't jitter on every adjustment. */
+.scoreboard-score {
+  font-size: 30px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum';
+  min-width: 2ch;
+  text-align: right;
+}
+
+/* Brief flash on the row that just changed - the only cue a viewer gets
+   that a point landed. Runs once on insertion since rows are rebuilt from
+   scratch on every update (see display-scoreboard.js), so there's no need
+   to force a reflow to restart the animation on a reused element. */
+@keyframes scoreboardPulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 rgba(255, 255, 255, 0);
+  }
+  35% {
+    transform: scale(1.08);
+    box-shadow: 0 0 22px var(--stance-color, rgba(255, 255, 255, 0.6));
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 rgba(255, 255, 255, 0);
+  }
+}
+
+.scoreboard-row.pulse {
+  animation: scoreboardPulse 0.6s ease-out;
+}

@@ -5,7 +5,7 @@
  */
 
 const StateManager = require('../state');
-const { DISPLAY, CALLER, QUEUE, STAGE, SCENE } = require('../config/constants');
+const { DISPLAY, CALLER, QUEUE, STAGE, SCENE, SCOREBOARD } = require('../config/constants');
 const SoundboardService = require('../services/soundboard.service');
 const ShowConfigService = require('../services/show-config.service');
 const createLogger = require('../utils/logger');
@@ -244,6 +244,30 @@ function validateSegmentTimerStart(data) {
 }
 
 /**
+ * Validates a scoreboard adjustment. Only the message shape is checked here
+ * (side is a real stance key, delta is a small nonzero integer) - clamping
+ * the resulting score to SCOREBOARD.MIN_SCORE/MAX_SCORE happens once, in
+ * StateManager.adjustScore, since that's the only place that knows the
+ * current total.
+ * @param {*} data - Raw socket data { side, delta }
+ * @returns {{ side: string, delta: number }|null} Sanitized data or null if invalid
+ */
+function validateScoreAdjustment(data) {
+  if (!data || typeof data !== 'object') return null;
+
+  const side = sanitizeStance(data.side);
+  if (!side) return null;
+
+  const delta = Number(data.delta);
+  if (!Number.isInteger(delta) || delta === 0) return null;
+
+  return {
+    side,
+    delta: Math.max(-SCOREBOARD.MAX_DELTA, Math.min(SCOREBOARD.MAX_DELTA, delta)),
+  };
+}
+
+/**
  * Creates socket event handlers
  * @param {SocketIO.Server} io - Socket.io server instance
  * @returns {Function} Connection handler
@@ -292,6 +316,10 @@ const createSocketHandlers = (io) => {
     io.emit('segmentTimerUpdate', StateManager.getSegmentTimer());
   };
 
+  const broadcastScoreboard = () => {
+    io.emit('scoreboardUpdate', StateManager.getScoreboard());
+  };
+
   /**
    * Handle new socket connections
    * @param {SocketIO.Socket} socket - Connected socket
@@ -313,6 +341,7 @@ const createSocketHandlers = (io) => {
     socket.emit('showConfigUpdate', StateManager.getShowConfig());
     socket.emit('sceneUpdate', StateManager.getScene());
     socket.emit('segmentTimerUpdate', StateManager.getSegmentTimer());
+    socket.emit('scoreboardUpdate', StateManager.getScoreboard());
 
     // ========================================
     // Caller Event Handlers
@@ -566,6 +595,31 @@ const createSocketHandlers = (io) => {
       StateManager.resetSegmentTimer();
       log.info('Segment timer reset');
       broadcastSegmentTimer();
+    });
+
+    // ========================================
+    // Scoreboard Event Handlers
+    // ========================================
+
+    socket.on('scoreboardAdjust', (data) => {
+      const validated = validateScoreAdjustment(data);
+      if (!validated) return;
+
+      StateManager.adjustScore(validated.side, validated.delta);
+      log.info('Scoreboard adjusted:', validated.side, validated.delta > 0 ? `+${validated.delta}` : validated.delta);
+      broadcastScoreboard();
+    });
+
+    socket.on('scoreboardReset', () => {
+      StateManager.resetScoreboard();
+      log.info('Scoreboard reset');
+      broadcastScoreboard();
+    });
+
+    socket.on('scoreboardToggleVisibility', () => {
+      const { visible } = StateManager.getScoreboard();
+      StateManager.setScoreboardVisible(!visible);
+      broadcastScoreboard();
     });
 
     // ========================================

@@ -266,6 +266,19 @@
       </div>
     </div>
 
+    <!-- Scoreboard Section - live per-side tally, keyed off the same
+         CALLER.STANCES the caller/queue stance selects use. -->
+    <div class="dock-section">
+      <div class="section-header">
+        <div class="section-label">Scoreboard</div>
+        <button id="toggleScoreboardBtn" class="scoreboard-toggle-btn" title="Show/Hide Scoreboard Overlay">Show</button>
+      </div>
+      <div class="scoreboard-control-rows" id="scoreboardControlRows"></div>
+      <div class="button-row" style="margin-top: 10px;">
+        <button id="resetScoreboardBtn" class="dock-btn btn-clear">Reset All</button>
+      </div>
+    </div>
+
   </div>
 
   <script src="/socket.io/socket.io.js"></script>
@@ -276,6 +289,7 @@
   <script src="js/caller-control.js"></script>
   <script src="js/show-config-modal.js"></script>
   <script src="js/scene-control.js"></script>
+  <script src="js/scoreboard-control.js"></script>
   <script>
     // OBS Setup modal
     const modalOverlay = document.getElementById('modalOverlay');
@@ -315,6 +329,9 @@
 
     // Initialize show config modal with shared socket
     ShowConfigModal.init(CallerControl.socket);
+
+    // Initialize scoreboard control with shared socket
+    ScoreboardControl.init(CallerControl.socket);
   </script>
 </body>
 </html>

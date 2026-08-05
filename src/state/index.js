@@ -3,7 +3,7 @@
  * @module state
  */
 
-const { DISPLAY, SOUNDBOARD, QUEUE } = require('../config/constants');
+const { DISPLAY, SOUNDBOARD, QUEUE, CALLER, SCOREBOARD } = require('../config/constants');
 
 /**
  * Creates initial caller state
@@ -120,6 +120,23 @@ const createSegmentTimerState = () => Object.freeze({
   running: false,
 });
 
+/**
+ * Creates initial scoreboard state
+ * @returns {Object} Fresh scoreboard state
+ * `scores` is keyed by debate-stance (see CALLER.STANCES), one int per side,
+ * so a side's tally reuses the exact key/color already used for its stance
+ * chip elsewhere in the app rather than a parallel side vocabulary.
+ */
+const createScoreboardState = () => Object.freeze({
+  scores: Object.freeze(
+    CALLER.STANCES.reduce((scores, key) => {
+      scores[key] = 0;
+      return scores;
+    }, {})
+  ),
+  visible: false,
+});
+
 // Application state container
 let state = {
   caller: createCallerState(),
@@ -132,6 +149,7 @@ let state = {
   showConfig: createShowConfigState(),
   scene: createSceneState(),
   segmentTimer: createSegmentTimerState(),
+  scoreboard: createScoreboardState(),
 };
 
 // Monotonic counter for queue item ids (stable across a server run)
@@ -615,6 +633,73 @@ const StateManager = {
       segmentTimer: createSegmentTimerState(),
     };
     return state.segmentTimer;
+  },
+
+  // ========================================
+  // Scoreboard State
+  // ========================================
+
+  /**
+   * Get current scoreboard state
+   * @returns {Object} Immutable scoreboard state
+   */
+  getScoreboard() {
+    return state.scoreboard;
+  },
+
+  /**
+   * Adjust one side's score by a signed delta, clamped to
+   * SCOREBOARD.MIN_SCORE/MAX_SCORE so a stuck key can't run the display off
+   * the edge. Unknown sides are ignored (caller validates against
+   * CALLER.STANCES before this is reached).
+   * @param {string} side - A CALLER.STANCES key
+   * @param {number} delta - Signed integer adjustment
+   * @returns {Object} New scoreboard state
+   */
+  adjustScore(side, delta) {
+    if (!Object.prototype.hasOwnProperty.call(state.scoreboard.scores, side)) return state.scoreboard;
+
+    const current = state.scoreboard.scores[side];
+    const next = Math.max(SCOREBOARD.MIN_SCORE, Math.min(SCOREBOARD.MAX_SCORE, current + delta));
+    state = {
+      ...state,
+      scoreboard: Object.freeze({
+        ...state.scoreboard,
+        scores: Object.freeze({ ...state.scoreboard.scores, [side]: next }),
+      }),
+    };
+    return state.scoreboard;
+  },
+
+  /**
+   * Zero every side's score (visibility is left untouched)
+   * @returns {Object} New scoreboard state
+   */
+  resetScoreboard() {
+    state = {
+      ...state,
+      scoreboard: Object.freeze({
+        ...state.scoreboard,
+        scores: createScoreboardState().scores,
+      }),
+    };
+    return state.scoreboard;
+  },
+
+  /**
+   * Toggle the scoreboard overlay's visibility
+   * @param {boolean} visible
+   * @returns {Object} New scoreboard state
+   */
+  setScoreboardVisible(visible) {
+    state = {
+      ...state,
+      scoreboard: Object.freeze({
+        ...state.scoreboard,
+        visible: Boolean(visible),
+      }),
+    };
+    return state.scoreboard;
   },
 
   /**

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920, height=1080">
+  <title>Scoreboard Overlay</title>
+  <link rel="stylesheet" href="css/display-scoreboard.css">
+</head>
+<body>
+  <!-- Live per-side score tally. Its own OBS source (top-right corner,
+       compact) so it can be positioned/toggled independently and coexist
+       with the caller lower-third (bottom), the top-left "Up Next" pill,
+       and the top-center stage stack (display-topics.html). Only sides
+       with a nonzero score render a row, so an untouched 0-0 board stays
+       invisible instead of showing a wall of zeros. No theme stylesheet:
+       every color here is fixed, matching the display-topics.html precedent. -->
+  <div id="scoreboardCard" class="scoreboard-card">
+    <div class="scoreboard-title">Scoreboard</div>
+    <div id="scoreboardRows" class="scoreboard-rows"></div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="js/socket-connection.js"></script>
+  <script src="js/display-scoreboard.js"></script>
+</body>
+</html>

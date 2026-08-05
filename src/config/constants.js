@@ -72,6 +72,18 @@ const SCENE = Object.freeze({
 });
 
 /**
+ * Scoreboard settings — live per-side tally card. Sides are keyed off
+ * CALLER.STANCES (above), never a parallel vocabulary. MIN/MAX_SCORE clamp a
+ * single side's running total; MAX_DELTA bounds one adjustment so a
+ * malformed/hostile socket payload can't jump a side by an absurd amount.
+ */
+const SCOREBOARD = Object.freeze({
+  MIN_SCORE: -99,
+  MAX_SCORE: 99,
+  MAX_DELTA: 10,
+});
+
+/**
  * Soundboard settings
  */
 const SOUNDBOARD = Object.freeze({
@@ -240,6 +252,7 @@ module.exports = {
   QUEUE,
   STAGE,
   SCENE,
+  SCOREBOARD,
   SOUNDBOARD,
   BIBLE_BOOK_ORDER,
   QURAN_EDITIONS,
