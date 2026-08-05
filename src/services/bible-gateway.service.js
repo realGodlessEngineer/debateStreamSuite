@@ -102,6 +102,14 @@ const cleanPassageHtml = ($passage) => {
   ];
 
   elementsToRemove.forEach((selector) => $passage.find(selector).remove());
+
+  // At the start of a chapter Bible Gateway prints the chapter number in place
+  // of verse 1's number ("8 " for Romans 8:1), so the extracted text begins
+  // with a number that parseVerses reads as the verse number. That mislabels
+  // verse 1 and, in a passage long enough to reach the real verse 8, produces
+  // two verses numbered 8. Substitute the verse it actually stands for.
+  $passage.find('.chapternum').text('1 ');
+
   return $passage;
 };
 
@@ -134,10 +142,13 @@ const extractPassageText = ($, $passage) => {
 const parseHtml = (html, url = '') => {
   const $ = cheerio.load(html);
 
-  // Extract version name from dropdown
+  // Extract version name. .dropdown-display-text now holds the passage
+  // reference rather than the translation, so it is tried last: it is
+  // non-empty on every page and would otherwise shadow the correct value,
+  // labelling the verse card "Romans 8:1-3" instead of "King James Version".
   const versionName =
-    $('.dropdown-display-text').first().text().trim() ||
     $('meta[property="og:title"]').attr('content')?.split(' - ').pop()?.trim() ||
+    $('.dropdown-display-text').first().text().trim() ||
     '';
 
   // Extract reference from header
