@@ -35,20 +35,54 @@
     </div>
   </div>
 
-  <!-- Caller Card - shown when caller is set -->
+  <!-- On-deck pill (top-left) - shown when the caller queue is non-empty -->
+  <div id="onDeck" class="on-deck">
+    <span class="on-deck-label">Up Next</span>
+    <span class="on-deck-name" id="onDeckName"></span>
+    <span class="on-deck-stance" id="onDeckStance" data-stance=""></span>
+  </div>
+
+  <!-- Caller Card - shown when caller is set.
+       Each card is a two-column lower third: identity (label + name + pronouns)
+       on the left, meta cluster (stance chip + call timer) on the right. The
+       card carries its own data-stance so the accent edge picks up the color. -->
   <div id="callerDisplay" class="caller-overlay">
     <!-- 2-host caller card (full width) -->
-    <div class="caller-card two-host" id="callerCardTwoHost">
-      <div class="caller-name" id="callerNameTwoHost"></div>
-      <div class="caller-pronouns" id="callerPronounsTwoHost"></div>
+    <div class="caller-card two-host" id="callerCardTwoHost" data-stance="">
+      <span class="caller-accent"></span>
+      <div class="caller-identity">
+        <div class="caller-label">Caller</div>
+        <div class="caller-name-row">
+          <span class="caller-name" id="callerNameTwoHost"></span>
+          <span class="caller-pronouns" id="callerPronounsTwoHost"></span>
+        </div>
+      </div>
+      <div class="caller-meta">
+        <div class="caller-stance" id="callerStanceTwoHost" data-stance=""></div>
+        <div class="caller-timer" id="callerTimerTwoHost"></div>
+      </div>
     </div>
 
     <!-- 1-host caller card (right-aligned compact) -->
-    <div class="caller-card one-host" id="callerCardOneHost">
-      <div class="caller-name" id="callerNameOneHost"></div>
-      <div class="caller-pronouns" id="callerPronounsOneHost"></div>
+    <div class="caller-card one-host" id="callerCardOneHost" data-stance="">
+      <span class="caller-accent"></span>
+      <div class="caller-identity">
+        <div class="caller-label">Caller</div>
+        <div class="caller-name-row">
+          <span class="caller-name" id="callerNameOneHost"></span>
+          <span class="caller-pronouns" id="callerPronounsOneHost"></span>
+        </div>
+      </div>
+      <div class="caller-meta">
+        <div class="caller-stance" id="callerStanceOneHost" data-stance=""></div>
+        <div class="caller-timer" id="callerTimerOneHost"></div>
+      </div>
     </div>
   </div>
+
+  <!-- The topic list and call-in pill are their own OBS source: see
+       display-topics.html. Split out so they can be positioned and toggled
+       independently of this lower-third. -->
 
   <script src="/socket.io/socket.io.js"></script>
   <script src="js/sanitize.js"></script>

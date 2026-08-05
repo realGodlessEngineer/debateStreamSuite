@@ -167,64 +167,281 @@ body {
   animation: slideOut 0.4s ease-in forwards;
 }
 
-/* Caller cards */
+/* Caller cards.
+   Card chrome (gradient, radius, border, shadow) deliberately matches
+   .title-bar-card so the two overlays read as one system - only the interior
+   layout differs. Laid out as a two-column lower third: identity on the left,
+   meta cluster (stance chip + timer) on the right, both vertically centered.
+   overflow:hidden clips the stance accent edge to the rounded corners. */
 .caller-card {
+  position: relative;
+  overflow: hidden;
   background: linear-gradient(135deg, var(--color-bg-dark, #0d0d0d) 0%, var(--color-bg-tinted, #1a0808) 100%);
   border-radius: 16px;
   box-shadow:
     0 10px 40px rgba(0, 0, 0, 0.7),
     var(--shadow-glow, 0 0 30px rgba(180, 30, 30, 0.2));
   border: 2px solid var(--color-primary-border, rgba(180, 30, 30, 0.4));
-  text-align: center;
+  text-align: left;
   display: none;
+  align-items: center;
+  gap: 40px;
   max-width: 100%;
 }
 
 .caller-card.active {
-  display: block;
+  display: flex;
+}
+
+/* Stance accent edge. Reads --stance-color off the card's own data-stance
+   (set in caller-display.js); falls back to the theme primary when the
+   operator hasn't picked a stance.
+   A real element rather than ::before because the sandstone theme claims both
+   .caller-card::before and ::after for its grain/weathering layers at higher
+   specificity. z-index:2 keeps it above those layers. */
+.caller-accent {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 2;
+  width: 8px;
+  background: var(--stance-color, var(--color-primary, #e63946));
+  box-shadow: 0 0 18px var(--stance-color, var(--color-primary, #e63946));
 }
 
 /* 2-host caller card - full width lower third */
 .caller-card.two-host {
-  padding: 30px 50px;
+  padding: 26px 46px 26px 54px;
   width: 100%;
   flex-shrink: 0;
 }
 
 /* 1-host caller card - right-aligned, responsive */
 .caller-card.one-host {
-  padding: 24px 40px;
+  padding: 22px 38px 22px 46px;
   display: none;
-  text-align: center;
   flex-shrink: 1;
-  min-width: 500px;
+  min-width: 520px;
 }
 
 .caller-card.one-host.active {
-  display: inline-block;
+  display: flex;
 }
 
-/* Caller Name */
+/* Identity column - min-width:0 lets a long name wrap inside the flex row
+   instead of shoving the meta cluster off the card's right edge. */
+.caller-identity {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.caller-label {
+  font-size: 0.95em;
+  font-weight: 700;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--color-primary, #e63946);
+  margin-bottom: 6px;
+}
+
+/* Baseline alignment sits the pronoun pill on the name's baseline rather
+   than its box, so it optically hangs off the name at any name length. */
+.caller-name-row {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+}
+
+/* Caller Name. overflow-wrap:anywhere is insurance for an unbroken handle
+   (a long screen name with no spaces) - it breaks rather than spilling. */
 .caller-name {
   font-size: 3.2em;
   font-weight: 700;
   color: #ffffff;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-  line-height: 1.2;
+  line-height: 1.1;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
-/* Caller Pronouns */
+/* Caller Pronouns - muted pill trailing the name. :empty collapses it so a
+   caller with no pronouns set leaves no stray chip behind. */
 .caller-pronouns {
-  font-size: 1.6em;
-  font-weight: 500;
+  font-size: 1.15em;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: var(--color-text-muted, #b0b0b0);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  padding: 4px 14px;
+  white-space: nowrap;
+}
+
+.caller-pronouns:empty {
+  display: none;
+}
+
+/* Meta column - stance chip + call timer, never shrinks */
+.caller-meta {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+
+/* ========================================
+   Stance chip + call timer
+   ======================================== */
+
+/* Per-stance accent color (consumed by every [data-stance] chip below) */
+[data-stance="theist"]    { --stance-color: #a78bfa; }
+[data-stance="atheist"]   { --stance-color: #ef4444; }
+[data-stance="agnostic"]  { --stance-color: #9ca3af; }
+[data-stance="christian"] { --stance-color: #3b82f6; }
+[data-stance="muslim"]    { --stance-color: #22c55e; }
+[data-stance="jewish"]    { --stance-color: #38bdf8; }
+[data-stance="undecided"] { --stance-color: #eab308; }
+[data-stance="other"]     { --stance-color: #f97316; }
+
+.caller-stance {
+  display: none;
+  padding: 8px 24px;
+  border-radius: 999px;
+  font-size: 1.05em;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #ffffff;
+  background: var(--stance-color, #555);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+  white-space: nowrap;
+}
+
+.caller-stance.visible {
+  display: inline-block;
+}
+
+/* Call timer. Sits in-flow at the end of the meta cluster - it used to be
+   absolutely positioned in the card's top-right corner, where it collided
+   with long names on the compact card and floated ~1500px from the name on
+   the full-width one.
+   Font: inherits Inter (the old var(--font-mono, ...) resolved to Courier New,
+   since --font-mono is only defined in shared.css, which the display pages
+   don't load). tabular-nums plus a zero-padded MM keeps every digit the same
+   width, so the readout doesn't twitch as it ticks. */
+.caller-timer {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 18px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 1.5em;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+  color: var(--color-text-secondary, #e0e0e0);
+}
+
+.caller-timer.visible {
+  display: inline-flex;
+}
+
+/* Live dot - the only thing that pulses at danger. Blinking the whole
+   readout (the old behavior) made the digits hard to read on stream. */
+.caller-timer::before {
+  content: '';
+  flex: 0 0 auto;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.caller-timer.warn {
+  color: #fbbf24;
+  background: rgba(251, 191, 36, 0.12);
+  border-color: rgba(251, 191, 36, 0.4);
+}
+
+.caller-timer.danger {
+  color: #f87171;
+  background: rgba(248, 113, 113, 0.14);
+  border-color: rgba(248, 113, 113, 0.45);
+}
+
+.caller-timer.danger::before {
+  animation: timerPulse 1.2s ease-in-out infinite;
+}
+
+/* ========================================
+   On-deck (Up Next) pill
+   ======================================== */
+
+.on-deck {
+  position: absolute;
+  top: 40px;
+  left: 40px;
+  z-index: 15;
+  display: none;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 20px;
+  background: linear-gradient(135deg, var(--color-bg-dark, #0d0d0d) 0%, var(--color-bg-tinted, #1a0808) 100%);
+  border: 2px solid var(--color-primary-border, rgba(180, 30, 30, 0.4));
+  border-radius: 12px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.6);
+}
+
+.on-deck.visible {
+  display: inline-flex;
+}
+
+.on-deck-label {
+  font-size: 0.95em;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
   color: var(--color-primary, #e63946);
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-  margin-top: 4px;
+}
+
+.on-deck-name {
+  font-size: 1.5em;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.on-deck-stance {
+  display: none;
+  padding: 3px 14px;
+  border-radius: 999px;
+  font-size: 0.8em;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #ffffff;
+  background: var(--stance-color, #555);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.on-deck-stance.visible {
+  display: inline-block;
 }
 
 /* ========================================
    Animations
    ======================================== */
+
+@keyframes timerPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
 
 /* Bounce in from bottom */
 @keyframes bounceIn {

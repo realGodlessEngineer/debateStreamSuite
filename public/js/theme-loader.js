@@ -21,6 +21,11 @@
       name: 'The Bible Guy',
       description: 'Warm orange/gold theme with sky blue accents',
       file: 'css/themes/the-bible-guy.css'
+    },
+    'sandstone': {
+      name: 'Sandstone',
+      description: 'Weathered quarried-stone theme with warm ochre accents',
+      file: 'css/themes/sandstone.css'
     }
   };
 

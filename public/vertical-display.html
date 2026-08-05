@@ -25,13 +25,35 @@
     </div>
   </div>
 
-  <!-- Caller Card (bottom) - shown when caller is set -->
+  <!-- Caller Card (bottom) - shown when caller is set.
+       Same two-column lower third as the landscape overlay: identity on the
+       left, meta cluster (stance chip + call timer) on the right. The card
+       carries its own data-stance so the accent edge picks up the color. -->
   <div id="callerDisplay" class="caller-overlay">
-    <div class="caller-card">
-      <div class="caller-label">Caller</div>
-      <div class="caller-name" id="callerNameDisplay"></div>
-      <div class="caller-pronouns" id="callerPronounsDisplay"></div>
+    <div class="caller-card" id="callerCard" data-stance="">
+      <span class="caller-accent"></span>
+      <div class="caller-identity">
+        <div class="caller-label">Caller</div>
+        <div class="caller-name-row">
+          <span class="caller-name" id="callerNameDisplay"></span>
+          <span class="caller-pronouns" id="callerPronounsDisplay"></span>
+        </div>
+      </div>
+      <div class="caller-meta">
+        <div class="caller-stance" id="callerStanceDisplay" data-stance=""></div>
+        <div class="caller-timer" id="callerTimerDisplay"></div>
+      </div>
     </div>
+  </div>
+
+  <!-- Stage: topics list (mid-left) - shown via 'visible' class -->
+  <div id="stageTopics" class="stage-topics">
+    <div id="stageTopicsList"></div>
+  </div>
+
+  <!-- Stage: call-in pill (mid) - shown via 'visible' class -->
+  <div id="stageCallIn" class="stage-callin">
+    <span id="stageCallInText"></span>
   </div>
 
   <script src="/socket.io/socket.io.js"></script>

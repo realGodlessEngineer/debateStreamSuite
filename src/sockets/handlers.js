@@ -5,7 +5,7 @@
  */
 
 const StateManager = require('../state');
-const { DISPLAY } = require('../config/constants');
+const { DISPLAY, CALLER, QUEUE, STAGE } = require('../config/constants');
 const SoundboardService = require('../services/soundboard.service');
 const ShowConfigService = require('../services/show-config.service');
 const createLogger = require('../utils/logger');
@@ -31,6 +31,16 @@ function sanitizeString(value, fallback = '', maxLen = MAX_STRING_LENGTH) {
 }
 
 /**
+ * Validates a debate stance against the allowlist
+ * @param {*} value - Raw stance value
+ * @returns {string} A valid stance key, or '' if none/invalid
+ */
+function sanitizeStance(value) {
+  const raw = sanitizeString(value, '', 20).toLowerCase();
+  return CALLER.STANCES.includes(raw) ? raw : '';
+}
+
+/**
  * Validates and sanitizes caller data
  * @param {*} data - Raw socket data
  * @returns {Object|null} Sanitized data or null if invalid
@@ -40,6 +50,56 @@ function validateCallerData(data) {
   return {
     name: sanitizeString(data.name),
     pronouns: sanitizeString(data.pronouns, '', 50),
+    stance: sanitizeStance(data.stance),
+  };
+}
+
+/**
+ * Validates and sanitizes a caller-queue item
+ * @param {*} data - Raw socket data
+ * @returns {Object|null} Sanitized item or null if invalid (name is required)
+ */
+function validateQueueItem(data) {
+  if (!data || typeof data !== 'object') return null;
+  const name = sanitizeString(data.name);
+  if (!name) return null;
+  return {
+    name,
+    pronouns: sanitizeString(data.pronouns, '', 50),
+    stance: sanitizeStance(data.stance),
+    topic: sanitizeString(data.topic, '', 200),
+    platform: sanitizeString(data.platform, '', 50),
+  };
+}
+
+/**
+ * Validates and sanitizes stage-topics data
+ * @param {*} payload - Raw socket data { items, visible }
+ * @returns {Object|null} Sanitized { items, visible } or null if invalid
+ */
+function validateTopics(payload) {
+  if (!payload || typeof payload !== 'object' || !Array.isArray(payload.items)) return null;
+  const items = payload.items
+    .map(item => String(item).trim())
+    .filter(Boolean)
+    .slice(0, STAGE.MAX_TOPICS)
+    .map(item => item.slice(0, STAGE.TOPIC_MAX_LENGTH));
+  return {
+    items,
+    visible: Boolean(payload.visible),
+  };
+}
+
+/**
+ * Validates and sanitizes call-in data
+ * @param {*} payload - Raw socket data { text, visible }
+ * @returns {Object|null} Sanitized { text, visible } or null if invalid
+ */
+function validateCallIn(payload) {
+  if (!payload || typeof payload !== 'object') return null;
+  return {
+    text: String(payload.text || '').trim().slice(0, STAGE.CALLIN_MAX_LENGTH),
+    visible: Boolean(payload.visible),
   };
 }
 
@@ -160,6 +220,18 @@ const createSocketHandlers = (io) => {
     io.emit('callerUpdate', StateManager.getCaller());
   };
 
+  const broadcastQueue = () => {
+    io.emit('queueUpdate', StateManager.getQueue());
+  };
+
+  const broadcastTopics = () => {
+    io.emit('topicsUpdate', StateManager.getTopics());
+  };
+
+  const broadcastCallIn = () => {
+    io.emit('callInUpdate', StateManager.getCallIn());
+  };
+
   const broadcastVerse = () => {
     io.emit('verseUpdate', StateManager.getVerse());
   };
@@ -188,6 +260,9 @@ const createSocketHandlers = (io) => {
 
     // Send current state to newly connected client
     socket.emit('callerUpdate', StateManager.getCaller());
+    socket.emit('queueUpdate', StateManager.getQueue());
+    socket.emit('topicsUpdate', StateManager.getTopics());
+    socket.emit('callInUpdate', StateManager.getCallIn());
     socket.emit('verseUpdate', StateManager.getVerse());
     socket.emit('fallacyUpdate', StateManager.getFallacy());
     socket.emit('soundboardUpdate', {
@@ -204,7 +279,17 @@ const createSocketHandlers = (io) => {
       const validated = validateCallerData(data);
       if (!validated) return;
 
-      StateManager.updateCaller(validated);
+      // Auto-start (reset) the call timer whenever a new/different caller goes
+      // live; leave it untouched when only pronouns/stance of the same caller change.
+      const prev = StateManager.getCaller();
+      const updates = { ...validated };
+      if (validated.name && validated.name !== prev.name) {
+        updates.timerStartedAt = Date.now();
+      } else if (!validated.name) {
+        updates.timerStartedAt = null;
+      }
+
+      StateManager.updateCaller(updates);
       log.info('Caller updated:', validated.name);
       broadcastCaller();
     });
@@ -213,6 +298,91 @@ const createSocketHandlers = (io) => {
       StateManager.clearCaller();
       log.info('Caller cleared');
       broadcastCaller();
+    });
+
+    // Manual call-timer control (overrides the auto start/stop above)
+    socket.on('startCallerTimer', () => {
+      StateManager.updateCaller({ timerStartedAt: Date.now() });
+      broadcastCaller();
+    });
+
+    socket.on('stopCallerTimer', () => {
+      StateManager.updateCaller({ timerStartedAt: null });
+      broadcastCaller();
+    });
+
+    // ========================================
+    // Caller Queue Event Handlers
+    // ========================================
+
+    socket.on('queueAdd', (data) => {
+      const item = validateQueueItem(data);
+      if (!item) return;
+
+      StateManager.addToQueue(item);
+      log.info('Queued caller:', item.name);
+      broadcastQueue();
+    });
+
+    socket.on('queueRemove', (data) => {
+      if (!data || typeof data.id !== 'string') return;
+
+      StateManager.removeFromQueue(data.id);
+      broadcastQueue();
+    });
+
+    socket.on('queueReorder', (data) => {
+      if (!data || typeof data.id !== 'string') return;
+      const direction = ['up', 'down', 'top'].includes(data.direction) ? data.direction : null;
+      if (!direction) return;
+
+      StateManager.reorderQueue(data.id, direction);
+      broadcastQueue();
+    });
+
+    socket.on('queuePromote', (data) => {
+      if (!data || typeof data.id !== 'string') return;
+
+      const item = StateManager.promoteFromQueue(data.id);
+      if (!item) return;
+
+      StateManager.updateCaller({
+        name: item.name,
+        pronouns: item.pronouns,
+        stance: item.stance,
+        timerStartedAt: Date.now(),
+      });
+      log.info('Promoted queued caller to live:', item.name);
+      broadcastQueue();
+      broadcastCaller();
+    });
+
+    socket.on('queueClear', () => {
+      StateManager.clearQueue();
+      log.info('Queue cleared');
+      broadcastQueue();
+    });
+
+    // ========================================
+    // Stage Overlay Event Handlers
+    // ========================================
+
+    socket.on('updateTopics', (data) => {
+      const validated = validateTopics(data);
+      if (!validated) return;
+
+      StateManager.updateTopics(validated);
+      log.info('Topics updated:', validated.items.length, '- Visible:', validated.visible);
+      broadcastTopics();
+    });
+
+    socket.on('updateCallIn', (data) => {
+      const validated = validateCallIn(data);
+      if (!validated) return;
+
+      StateManager.updateCallIn(validated);
+      log.info('Call-in updated - Visible:', validated.visible);
+      broadcastCallIn();
     });
 
     // ========================================

@@ -101,6 +101,12 @@ function createTray() {
         clipboard.writeText(`${BASE_URL}/display.html`);
       }
     },
+    {
+      label: 'Copy Topics Display URL',
+      click: () => {
+        clipboard.writeText(`${BASE_URL}/display-topics.html`);
+      }
+    },
     { type: 'separator' },
     {
       label: 'Copy Reference Control URL',

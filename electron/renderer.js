@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   document.getElementById('callerDisplayUrl').textContent = urls.callerDisplay;
+  document.getElementById('topicsDisplayUrl').textContent = urls.topicsDisplay;
   document.getElementById('callerControlUrl').textContent = urls.callerControl;
   document.getElementById('bibleDisplayUrl').textContent = urls.bibleDisplay;
   document.getElementById('bibleControlUrl').textContent = urls.bibleControl;

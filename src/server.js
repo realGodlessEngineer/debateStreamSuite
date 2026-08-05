@@ -124,6 +124,7 @@ server.listen(SERVER.PORT, () => {
 ║  Caller Display:                                             ║
 ║    Control Panel: http://localhost:${SERVER.PORT}/dock.html           ║
 ║    OBS Display:   http://localhost:${SERVER.PORT}/display.html        ║
+║    Topics OBS:    http://localhost:${SERVER.PORT}/display-topics.html ║
 ╠══════════════════════════════════════════════════════════════╣
 ║  Reference Repository:                                       ║
 ║    Control Panel: http://localhost:${SERVER.PORT}/reference-control.html ║

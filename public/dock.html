@@ -115,6 +115,7 @@
       <div class="current-display">
         <div class="current-name" id="currentName">-</div>
         <div class="current-pronouns" id="currentPronouns">-</div>
+        <div class="current-stance" id="currentStance" data-stance=""></div>
       </div>
     </div>
 
@@ -125,14 +126,90 @@
         <div class="form-compact">
           <input type="text" id="name" name="name" placeholder="Caller name" required>
         </div>
-        <div class="form-compact">
+        <div class="form-row">
           <input type="text" id="pronouns" name="pronouns" placeholder="Pronouns (e.g., they/them)">
+          <select id="stance" name="stance" class="stance-select">
+            <option value="">— Stance —</option>
+            <option value="theist">Theist</option>
+            <option value="atheist">Atheist</option>
+            <option value="agnostic">Agnostic</option>
+            <option value="christian">Christian</option>
+            <option value="muslim">Muslim</option>
+            <option value="jewish">Jewish</option>
+            <option value="undecided">Undecided</option>
+            <option value="other">Other</option>
+          </select>
         </div>
         <div class="button-row">
           <button type="submit" class="dock-btn btn-update">Update</button>
           <button type="button" id="clearBtn" class="dock-btn btn-clear">Clear</button>
         </div>
       </form>
+    </div>
+
+    <!-- Caller Queue Section -->
+    <div class="dock-section">
+      <div class="section-header">
+        <div class="section-label">Caller Queue <span class="queue-count" id="queueCount">(0)</span></div>
+        <button class="dock-btn-mini" id="clearQueueBtn" title="Clear Queue">&#128465;</button>
+      </div>
+      <form id="queueForm">
+        <div class="form-compact">
+          <input type="text" id="queueName" placeholder="Caller name" required>
+        </div>
+        <div class="form-row">
+          <input type="text" id="queuePronouns" placeholder="Pronouns">
+          <select id="queueStance" class="stance-select">
+            <option value="">— Stance —</option>
+            <option value="theist">Theist</option>
+            <option value="atheist">Atheist</option>
+            <option value="agnostic">Agnostic</option>
+            <option value="christian">Christian</option>
+            <option value="muslim">Muslim</option>
+            <option value="jewish">Jewish</option>
+            <option value="undecided">Undecided</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="form-compact">
+          <input type="text" id="queueTopic" placeholder="Topic / position (optional)">
+        </div>
+        <div class="form-compact">
+          <input type="text" id="queuePlatform" placeholder="Platform — phone, Discord… (optional)">
+        </div>
+        <button type="submit" class="dock-btn btn-update" id="addQueueBtn">Add to Queue</button>
+      </form>
+      <div class="queue-list" id="queueList">
+        <div class="queue-empty">Queue is empty</div>
+      </div>
+    </div>
+
+    <!-- Stage Section -->
+    <div class="dock-section">
+      <div class="section-label">Stage</div>
+
+      <div class="stage-block">
+        <div class="stage-sublabel">Topics</div>
+        <div class="form-compact">
+          <textarea id="topicsInput" placeholder="One topic per line" rows="6"></textarea>
+        </div>
+        <div class="button-row">
+          <button id="updateTopicsBtn" class="dock-btn btn-update">Update</button>
+          <button id="clearTopicsBtn" class="dock-btn btn-clear">Clear</button>
+          <button id="toggleTopicsBtn" class="dock-btn">Show</button>
+        </div>
+      </div>
+
+      <div class="stage-block">
+        <div class="stage-sublabel">Call-In</div>
+        <div class="form-compact">
+          <input type="text" id="callInInput" placeholder="Call-in link or phone #">
+        </div>
+        <div class="button-row">
+          <button id="updateCallInBtn" class="dock-btn btn-update">Update</button>
+          <button id="toggleCallInBtn" class="dock-btn">Show</button>
+        </div>
+      </div>
     </div>
 
     <!-- Call Log Section -->

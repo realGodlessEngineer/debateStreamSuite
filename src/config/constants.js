@@ -25,6 +25,37 @@ const DISPLAY = Object.freeze({
 });
 
 /**
+ * Caller settings — debate stance allowlist + call-timer thresholds.
+ * Stance keys are the source of truth for socket validation; labels/colors
+ * for the overlay live client-side (dock <select> options + [data-stance] CSS).
+ */
+const CALLER = Object.freeze({
+  STANCES: Object.freeze([
+    'theist', 'atheist', 'agnostic',
+    'christian', 'muslim', 'jewish',
+    'undecided', 'other',
+  ]),
+  TIMER_WARN_SECONDS: 300,    // 5:00 — call timer turns amber
+  TIMER_DANGER_SECONDS: 600,  // 10:00 — call timer turns red
+});
+
+/**
+ * Caller queue settings
+ */
+const QUEUE = Object.freeze({
+  MAX_SIZE: 30,
+});
+
+/**
+ * Stage overlay settings — debate topics list + call-in pill validation limits.
+ */
+const STAGE = Object.freeze({
+  MAX_TOPICS: 8,
+  TOPIC_MAX_LENGTH: 120,
+  CALLIN_MAX_LENGTH: 200,
+});
+
+/**
  * Soundboard settings
  */
 const SOUNDBOARD = Object.freeze({
@@ -189,6 +220,9 @@ const QURAN_SURAH_ORDER = Object.freeze([
 module.exports = {
   SERVER,
   DISPLAY,
+  CALLER,
+  QUEUE,
+  STAGE,
   SOUNDBOARD,
   BIBLE_BOOK_ORDER,
   QURAN_EDITIONS,

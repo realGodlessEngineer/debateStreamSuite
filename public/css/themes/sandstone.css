@@ -1,0 +1,144 @@
+/**
+ * Sandstone Theme
+ * Weathered quarried-stone lower-thirds — warm tan/ochre with real grain.
+ *
+ * The palette variables feed the shared display/control CSS exactly like the
+ * other themes. The card *surface* (stone gradient + inline-noise grain +
+ * carved bevel) is layered on in the `body[data-theme="sandstone"]` block at
+ * the bottom, so the texture only touches this theme and needs no edits to
+ * display.css. Grain is an inline SVG turbulence data URI — no external asset,
+ * safe in an OBS browser source.
+ */
+
+:root {
+  /* Theme Metadata */
+  --theme-name: 'Sandstone';
+  --theme-description: 'Weathered quarried-stone theme with warm ochre accents';
+
+  /* Brand Colors - Ochre / warm sand */
+  --color-primary: #e6b271;
+  --color-primary-dark: #c78f4e;
+  --color-primary-light: #f3cd93;
+  --color-primary-glow: rgba(230, 178, 113, 0.4);
+  --color-primary-subtle: rgba(230, 178, 113, 0.2);
+  --color-primary-border: rgba(214, 189, 149, 0.32);
+
+  /* Accent - Dusty blue-stone (weathered patina, complementary) */
+  --color-accent: #7fa9b8;
+  --color-accent-dark: #5f8695;
+  --color-accent-glow: rgba(127, 169, 184, 0.3);
+
+  /* Background Colors - Warm dark stone */
+  --color-bg-primary: #201812;
+  --color-bg-secondary: #271d15;
+  --color-bg-tertiary: #33261a;
+  --color-bg-tinted: #2f2116;
+  --color-bg-card: rgba(230, 178, 113, 0.05);
+  --color-bg-card-solid: #33261a;
+  --color-bg-input: rgba(0, 0, 0, 0.4);
+  --color-bg-input-solid: #201812;
+  --color-bg-hover: rgba(230, 178, 113, 0.1);
+  --color-bg-dark: #201812;
+
+  /* Surface Colors */
+  --color-surface-border: #3d3024;
+  --color-surface-elevated: #33261a;
+
+  /* Text Colors - warm sand */
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #f1e7d6;
+  --color-text-muted: #d9c5a6;
+  --color-text-dim: #a8977e;
+  --color-text-dimmer: #786a58;
+
+  /* Status Colors */
+  --color-success: #8fbf6b;
+  --color-success-bg: rgba(143, 191, 107, 0.2);
+  --color-success-border: rgba(143, 191, 107, 0.5);
+  --color-error: #e07a5f;
+  --color-error-bg: rgba(224, 122, 95, 0.2);
+  --color-error-border: rgba(224, 122, 95, 0.5);
+  --color-warning: #e6b271;
+  --color-warning-bg: rgba(230, 178, 113, 0.2);
+  --color-warning-border: rgba(230, 178, 113, 0.5);
+
+  /* Connected Status - dusty blue-stone */
+  --color-connected: #7fa9b8;
+  --color-connected-glow: rgba(127, 169, 184, 0.5);
+  --color-disconnected: #8a6642;
+
+  /* Shadows - warm */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 20px rgba(230, 178, 113, 0.3);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.6);
+  --shadow-glow: 0 0 22px rgba(150, 100, 50, 0.25);
+
+  /* Scrollbar */
+  --scrollbar-track: transparent;
+  --scrollbar-thumb: var(--color-primary-border);
+  --scrollbar-thumb-hover: var(--color-primary);
+}
+
+/* Body background gradient - warm dark stone (control panels) */
+body {
+  background: linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-tinted) 100%);
+}
+
+/* ============================================================
+   Sandstone surface — OBS lower-third cards only
+   Scoped to this theme; higher specificity than display.css so it
+   wins regardless of stylesheet order. Adds the quarried-stone face,
+   grain, and carved bevel that the flat themes don't have.
+   ============================================================ */
+
+body[data-theme="sandstone"] .title-bar-card,
+body[data-theme="sandstone"] .caller-card {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(158deg, #5d4835 0%, #43301f 52%, #2f2116 100%);
+  border: 1px solid var(--color-primary-border);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 238, 214, 0.16),   /* top-edge sheen */
+    inset 0 -4px 10px rgba(0, 0, 0, 0.42),      /* carved base shadow */
+    0 16px 38px rgba(0, 0, 0, 0.5),             /* drop */
+    0 0 0 1px rgba(0, 0, 0, 0.28),              /* crisp edge */
+    var(--shadow-glow);                          /* warm ambient */
+}
+
+/* Fine sandstone grain — inline fractal-noise filter, no external asset */
+body[data-theme="sandstone"] .title-bar-card::before,
+body[data-theme="sandstone"] .caller-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 220px 220px;
+  mix-blend-mode: soft-light;
+  opacity: 0.5;
+}
+
+/* Weathering — warm mottle + faint sedimentary strata */
+body[data-theme="sandstone"] .title-bar-card::after,
+body[data-theme="sandstone"] .caller-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(60% 120% at 15% 0%, rgba(224, 180, 120, 0.13), transparent 60%),
+    radial-gradient(70% 120% at 100% 100%, rgba(0, 0, 0, 0.26), transparent 55%),
+    repeating-linear-gradient(97deg, rgba(255, 240, 220, 0.03) 0 3px, rgba(0, 0, 0, 0.03) 3px 9px);
+}
+
+/* Keep text (direct children) above the grain/weathering layers.
+   .caller-accent is excluded: it's the absolutely-positioned stance edge, and
+   this rule's `position: relative` would out-specify its own positioning and
+   drop it back into the flex flow as a visible 8px gap. */
+body[data-theme="sandstone"] .title-bar-card > *:not(.caller-accent),
+body[data-theme="sandstone"] .caller-card > *:not(.caller-accent) {
+  position: relative;
+  z-index: 1;
+}

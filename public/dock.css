@@ -540,3 +540,297 @@ input[type="text"]::placeholder {
   letter-spacing: 0;
   font-size: 10px;
 }
+
+/* ========================================
+   Stance select + chips
+   ======================================== */
+
+/* Per-stance accent color (consumed by [data-stance] chips below) */
+[data-stance="theist"]    { --stance-color: #a78bfa; }
+[data-stance="atheist"]   { --stance-color: #ef4444; }
+[data-stance="agnostic"]  { --stance-color: #9ca3af; }
+[data-stance="christian"] { --stance-color: #3b82f6; }
+[data-stance="muslim"]    { --stance-color: #22c55e; }
+[data-stance="jewish"]    { --stance-color: #38bdf8; }
+[data-stance="undecided"] { --stance-color: #eab308; }
+[data-stance="other"]     { --stance-color: #f97316; }
+
+.form-row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.form-row input[type="text"] {
+  flex: 1;
+  min-width: 0;
+}
+
+.stance-select {
+  flex: 0 0 auto;
+  max-width: 46%;
+  padding: 8px 10px;
+  border: 1px solid var(--color-surface-border, #2d2d2d);
+  border-radius: 6px;
+  font-size: 13px;
+  background: var(--color-bg-input-solid, #0a0a0a);
+  color: var(--color-text-secondary, #e5e5e5);
+  cursor: pointer;
+  transition: border-color 0.3s;
+}
+
+.stance-select:focus {
+  outline: none;
+  border-color: var(--color-primary, #dc2626);
+  box-shadow: 0 0 0 2px var(--color-primary-subtle, rgba(220, 38, 38, 0.1));
+}
+
+/* Current-caller stance chip */
+.current-stance {
+  display: none;
+  margin: 6px auto 0;
+  padding: 3px 12px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #ffffff;
+  background: var(--stance-color, #555);
+}
+
+.current-stance.visible {
+  display: inline-block;
+}
+
+/* Call-timer color states (mirror the overlay thresholds) */
+.timer-display-compact.warn {
+  color: #fbbf24;
+  text-shadow: 0 0 10px rgba(251, 191, 36, 0.4);
+}
+
+.timer-display-compact.danger {
+  color: #f87171;
+  text-shadow: 0 0 10px rgba(248, 113, 113, 0.5);
+  animation: pulse 1.2s infinite;
+}
+
+/* ========================================
+   Caller Queue
+   ======================================== */
+
+.queue-count {
+  color: var(--color-text-dim, #999);
+  font-weight: 600;
+}
+
+.queue-list {
+  margin-top: 10px;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.queue-empty {
+  text-align: center;
+  color: var(--color-text-dimmer, #666);
+  padding: 10px;
+  font-style: italic;
+  font-size: 11px;
+}
+
+.queue-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  margin-bottom: 6px;
+  border-radius: 6px;
+  background: var(--color-bg-input-solid, #0a0a0a);
+  border-left: 3px solid var(--color-surface-border, #2d2d2d);
+}
+
+.queue-item.on-deck {
+  border-left-color: var(--color-primary, #dc2626);
+  background: var(--color-primary-subtle, rgba(220, 38, 38, 0.08));
+}
+
+.queue-item-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.queue-item-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.queue-pos {
+  font-family: var(--font-mono, 'Courier New', monospace);
+  font-size: 11px;
+  color: var(--color-text-dim, #999);
+  min-width: 16px;
+}
+
+.queue-ondeck-label {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--color-primary, #dc2626);
+  background: var(--color-primary-subtle, rgba(220, 38, 38, 0.15));
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.queue-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text-secondary, #e5e5e5);
+}
+
+.queue-pronouns {
+  font-size: 11px;
+  color: var(--color-text-dim, #999);
+}
+
+.queue-stance {
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #ffffff;
+  background: var(--stance-color, #555);
+}
+
+.queue-meta {
+  font-size: 11px;
+  color: var(--color-text-dim, #999);
+  margin-top: 3px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.queue-item-actions {
+  display: flex;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+.queue-btn {
+  background: #3a3a3a;
+  border: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--color-text-secondary, #e5e5e5);
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.queue-btn:hover {
+  background: var(--color-primary, #dc2626);
+}
+
+.queue-go {
+  background: var(--color-primary, #dc2626);
+  color: #ffffff;
+}
+
+.queue-go:hover {
+  background: var(--color-primary-dark, #b91c1c);
+}
+
+.queue-remove:hover {
+  background: #7f1d1d;
+}
+
+/* Queue list scrollbar */
+.queue-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.queue-list::-webkit-scrollbar-track {
+  background: var(--color-surface-border, #2d2d2d);
+  border-radius: 3px;
+}
+
+.queue-list::-webkit-scrollbar-thumb {
+  background: var(--color-primary, #dc2626);
+  border-radius: 3px;
+}
+
+/* ========================================
+   Stage (topics + call-in)
+   ======================================== */
+
+.stage-block + .stage-block {
+  margin-top: 14px;
+}
+
+.stage-sublabel {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--color-text-dim, #999);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+#topicsInput {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--color-surface-border, #2d2d2d);
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: inherit;
+  line-height: 1.5;
+  background: var(--color-bg-input-solid, #0a0a0a);
+  color: var(--color-text-secondary, #e5e5e5);
+  transition: border-color 0.3s;
+  resize: vertical;
+  min-height: 90px;
+}
+
+#topicsInput:focus {
+  outline: none;
+  border-color: var(--color-primary, #dc2626);
+  box-shadow: 0 0 0 2px var(--color-primary-subtle, rgba(220, 38, 38, 0.1));
+}
+
+#topicsInput::placeholder {
+  color: var(--color-text-dimmer, #666);
+}
+
+/* Show/Hide toggle buttons — neutral by default, primary when "on" */
+#toggleTopicsBtn,
+#toggleCallInBtn {
+  flex: 1;
+  background: #3a3a3a;
+  color: white;
+}
+
+#toggleTopicsBtn:hover:not(:disabled),
+#toggleCallInBtn:hover:not(:disabled) {
+  background: #2a2a2a;
+  transform: translateY(-1px);
+}
+
+#toggleTopicsBtn.active,
+#toggleCallInBtn.active {
+  background: var(--color-primary, #dc2626);
+  color: #ffffff;
+}
+
+#toggleTopicsBtn.active:hover:not(:disabled),
+#toggleCallInBtn.active:hover:not(:disabled) {
+  background: var(--color-primary-dark, #b91c1c);
+}

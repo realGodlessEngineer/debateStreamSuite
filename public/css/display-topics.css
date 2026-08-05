@@ -1,0 +1,136 @@
+/**
+ * Stage Overlay Styles (topic list + call-in pill)
+ * For OBS Browser Source - Landscape (1920x1080)
+ *
+ * Its own page/source so the operator can position, scale, and toggle the
+ * topic list independently of the caller lower-third. The canvas keeps the
+ * full 1920x1080 footprint and the stack sits where it used to on
+ * display.html, so dropping this source in at 0,0 reproduces the old look
+ * exactly - then it can be moved anywhere in the scene.
+ *
+ * Local heavy-condensed-italic display face; overlays are OBS/CEF so
+ * -webkit-text-stroke + paint-order render as intended. No CDN assets.
+ */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: transparent;
+  color: #ffffff;
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+  position: relative;
+}
+
+@font-face {
+  font-family: 'Futura XBlkCnIt BT';
+  src: url('/fonts/futura-xblkcnit-bt.ttf') format('truetype');
+  font-display: swap;
+}
+
+/* Stage stack - topic list with the call-in pill directly beneath it,
+   centered across the top of the canvas. The wrapper is what makes the pill
+   sit just below a list whose height varies with the topic count. Both
+   children keep their own `visible` class, so hiding the topics simply lets
+   the pill rise to the top of the stack. */
+.stage-stack {
+  position: absolute;
+  top: 84px;  /* ~7.8% of the 1080px canvas */
+  left: 0;
+  right: 0;
+  z-index: 25;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 26px;
+  pointer-events: none;
+}
+
+/* Topic list. As a centered flex item its width is fit-content, so the block
+   hugs the topics and stays optically centered rather than sitting inside a
+   fixed column; max-width caps the line length on a long topic. The text
+   inside is left-aligned so the number column and the topic text each keep
+   one flush vertical edge. */
+.stage-topics {
+  max-width: 52%;
+  display: none;
+  text-align: left;
+  color: #ffffff;
+  font-family: 'Futura XBlkCnIt BT', Impact, sans-serif;
+  -webkit-text-stroke: 4px #000;
+  paint-order: stroke fill;
+  text-transform: uppercase;
+}
+
+.stage-topics.visible {
+  display: block;
+}
+
+/* One numbered topic per row, laid out as a two-column flex row. The "N."
+   prefix is normal stroked text (not an ::marker, which won't take the
+   stroke) sitting in a fixed-width column, so every number shares one left
+   edge and every topic shares one left edge. The text column being its own
+   flex item is what gives wrapped lines their hanging indent - continuation
+   lines align under the topic text, never under the number. */
+.stage-topic {
+  display: flex;
+  gap: 0.25em;
+  font-size: 48px;
+  line-height: 1.08;
+  margin-bottom: 20px;
+}
+
+.stage-topic:last-child {
+  margin-bottom: 0;
+}
+
+/* Fixed-width number column - wide enough for double digits. nowrap keeps
+   "10." on one line; wrapping it would knock the whole row out of alignment. */
+.stage-topic-num {
+  flex: 0 0 1.6em;
+  white-space: nowrap;
+}
+
+/* min-width: 0 lets a long unbroken topic shrink/wrap inside the flex row
+   instead of pushing past the block's right edge. */
+.stage-topic-text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Call-in pill - sits directly under the topic list in the stage stack.
+   Red stroked text on a black rounded pill with a soft blurred glow. */
+.stage-callin {
+  display: none;
+}
+
+.stage-callin.visible {
+  display: block;
+}
+
+.stage-callin span {
+  display: inline-block;
+  background: #000000;
+  border-radius: 999px;
+  padding: 14px 34px;
+  box-shadow:
+    0 0 34px rgba(230, 57, 70, 0.55),
+    0 8px 24px rgba(0, 0, 0, 0.6);
+  color: #e63946;
+  font-family: 'Futura XBlkCnIt BT', Impact, sans-serif;
+  font-size: 46px;
+  -webkit-text-stroke: 4px #000;
+  paint-order: stroke fill;
+  text-transform: uppercase;
+  white-space: nowrap;
+}

@@ -26,6 +26,8 @@ const createTables = () => {
       version_name TEXT,
       text TEXT,
       book TEXT,
+      verses_json TEXT,
+      total_verses INTEGER,
       timestamp INTEGER NOT NULL
     );
 
@@ -129,6 +131,23 @@ const createTables = () => {
     CREATE INDEX IF NOT EXISTS idx_interlinear_reference ON interlinear_passages(reference);
     CREATE INDEX IF NOT EXISTS idx_hebrew_words_bcv ON hebrew_words(book, chapter, verse);
   `);
+};
+
+/**
+ * Adds columns that were introduced after a database was first created.
+ * `CREATE TABLE IF NOT EXISTS` is idempotent for new tables but cannot retrofit
+ * columns onto an existing one.
+ */
+const migrateColumns = () => {
+  const bibleColumns = db.prepare('PRAGMA table_info(bible_verses)').all().map((c) => c.name);
+  if (!bibleColumns.includes('verses_json')) {
+    db.exec('ALTER TABLE bible_verses ADD COLUMN verses_json TEXT');
+    log.info('Added verses_json column to bible_verses');
+  }
+  if (!bibleColumns.includes('total_verses')) {
+    db.exec('ALTER TABLE bible_verses ADD COLUMN total_verses INTEGER');
+    log.info('Added total_verses column to bible_verses');
+  }
 };
 
 /**
@@ -262,6 +281,7 @@ const DatabaseService = {
       db.pragma('foreign_keys = ON');
 
       createTables();
+      migrateColumns();
 
       if (isNewDb) {
         log.info('New database created, migrating existing JSON data...');

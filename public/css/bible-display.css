@@ -112,11 +112,11 @@ body {
 .verse-number {
   display: inline;
   font-family: 'Open Sans', sans-serif;
-  font-size: 0.6em;
+  font-size: 2.2em;
   font-weight: 600;
   color: var(--color-primary, #e63946);
-  vertical-align: super;
-  margin-right: 3px;
+  vertical-align: baseline;
+  margin-right: 8px;
 }
 
 .verse-text {

@@ -16,6 +16,17 @@
   const ANIM_SLIDE_OUT = 400;  // ms - matches CSS slideOut
   const MAX_TRANSITION_RETRIES = 20;
 
+  // Call-timer color thresholds (mirror CALLER.TIMER_* in src/config/constants.js)
+  const TIMER_WARN_SECONDS = 300;    // 5:00 → amber
+  const TIMER_DANGER_SECONDS = 600;  // 10:00 → red
+
+  // Stance key → display label (keys validated server-side against CALLER.STANCES)
+  const STANCE_LABELS = {
+    theist: 'Theist', atheist: 'Atheist', agnostic: 'Agnostic',
+    christian: 'Christian', muslim: 'Muslim', jewish: 'Jewish',
+    undecided: 'Undecided', other: 'Other',
+  };
+
   // ============================================
   // DOM Elements
   // ============================================
@@ -42,6 +53,15 @@
     callerPronounsTwoHost: document.getElementById('callerPronounsTwoHost'),
     callerNameOneHost: document.getElementById('callerNameOneHost'),
     callerPronounsOneHost: document.getElementById('callerPronounsOneHost'),
+    callerStanceTwoHost: document.getElementById('callerStanceTwoHost'),
+    callerStanceOneHost: document.getElementById('callerStanceOneHost'),
+    callerTimerTwoHost: document.getElementById('callerTimerTwoHost'),
+    callerTimerOneHost: document.getElementById('callerTimerOneHost'),
+
+    // On-deck (up next) pill
+    onDeck: document.getElementById('onDeck'),
+    onDeckName: document.getElementById('onDeckName'),
+    onDeckStance: document.getElementById('onDeckStance'),
   };
 
   // ============================================
@@ -52,6 +72,7 @@
   let titleBarVisible = false;
   let callerVisible = false;
   let transitioning = false;
+  let currentTimerStartedAt = null;  // server-clock ms, or null when stopped
 
   // ============================================
   // Socket Connection
@@ -129,12 +150,103 @@
 
   function populateCaller(data) {
     const name = data.name || '';
-    const pronouns = data.pronouns ? '(' + data.pronouns + ')' : '';
+    // No parentheses - the pronouns render as their own pill beside the name
+    const pronouns = data.pronouns || '';
 
     elements.callerNameTwoHost.textContent = name;
     elements.callerPronounsTwoHost.textContent = pronouns;
     elements.callerNameOneHost.textContent = name;
     elements.callerPronounsOneHost.textContent = pronouns;
+
+    renderStance(elements.callerStanceTwoHost, data.stance);
+    renderStance(elements.callerStanceOneHost, data.stance);
+
+    // The card's own data-stance drives its accent edge color
+    elements.callerCardTwoHost.setAttribute('data-stance', data.stance || '');
+    elements.callerCardOneHost.setAttribute('data-stance', data.stance || '');
+
+    currentTimerStartedAt = typeof data.timerStartedAt === 'number' ? data.timerStartedAt : null;
+    renderTimer();
+  }
+
+  // ============================================
+  // Stance Chip + Call Timer Rendering
+  // ============================================
+
+  /**
+   * Render a stance chip: sets label, data-stance (drives CSS color), visibility
+   * @param {HTMLElement} el - Chip element
+   * @param {string} stance - Stance key or ''
+   */
+  function renderStance(el, stance) {
+    if (!el) return;
+    const key = stance || '';
+    const label = STANCE_LABELS[key] || '';
+    el.textContent = label;
+    el.setAttribute('data-stance', key);
+    el.classList.toggle('visible', !!label);
+  }
+
+  /**
+   * Format elapsed seconds as MM:SS, rolling over to H:MM:SS past an hour
+   * (the old MM:SS-only form showed a 65-minute call as "65:00"). Minutes
+   * are zero-padded so the readout keeps a constant width as it ticks.
+   * @param {number} totalSeconds
+   * @returns {string}
+   */
+  function formatElapsed(totalSeconds) {
+    const h = Math.floor(totalSeconds / 3600);
+    const m = Math.floor((totalSeconds % 3600) / 60);
+    const s = totalSeconds % 60;
+    const mm = (m < 10 ? '0' : '') + m;
+    const ss = (s < 10 ? '0' : '') + s;
+    return h > 0 ? h + ':' + mm + ':' + ss : mm + ':' + ss;
+  }
+
+  /**
+   * Repaint the call timer from currentTimerStartedAt. Called once per second
+   * and whenever caller state changes; amber past WARN, red past DANGER.
+   */
+  function renderTimer() {
+    const timers = [elements.callerTimerTwoHost, elements.callerTimerOneHost];
+
+    if (currentTimerStartedAt == null) {
+      timers.forEach(function (el) {
+        if (!el) return;
+        el.textContent = '';
+        el.classList.remove('visible', 'warn', 'danger');
+      });
+      return;
+    }
+
+    const elapsed = Math.max(0, Math.floor((Date.now() - currentTimerStartedAt) / 1000));
+    const text = formatElapsed(elapsed);
+    const danger = elapsed >= TIMER_DANGER_SECONDS;
+    const warn = !danger && elapsed >= TIMER_WARN_SECONDS;
+
+    timers.forEach(function (el) {
+      if (!el) return;
+      el.textContent = text;
+      el.classList.add('visible');
+      el.classList.toggle('warn', warn);
+      el.classList.toggle('danger', danger);
+    });
+  }
+
+  // ============================================
+  // On-Deck (Up Next) Rendering
+  // ============================================
+
+  function renderOnDeck(queue) {
+    const items = (queue && queue.items) || [];
+    if (!items.length) {
+      elements.onDeck.classList.remove('visible');
+      return;
+    }
+    const next = items[0];
+    elements.onDeckName.textContent = next.name || '';
+    renderStance(elements.onDeckStance, next.stance);
+    elements.onDeck.classList.add('visible');
   }
 
   // ============================================
@@ -281,6 +393,11 @@
   });
 
   /**
+   * Handle caller-queue update events (drives the on-deck pill)
+   */
+  socket.on('queueUpdate', renderOnDeck);
+
+  /**
    * Handle show config update events
    */
   socket.on('showConfigUpdate', function (config) {
@@ -308,6 +425,9 @@
   // ============================================
   // Initialization
   // ============================================
+
+  // Tick the call timer once per second (reads currentTimerStartedAt)
+  setInterval(renderTimer, 1000);
 
   console.log('Caller display initialized - waiting for data...');
 })();

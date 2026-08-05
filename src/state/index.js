@@ -3,15 +3,49 @@
  * @module state
  */
 
-const { DISPLAY, SOUNDBOARD } = require('../config/constants');
+const { DISPLAY, SOUNDBOARD, QUEUE } = require('../config/constants');
 
 /**
  * Creates initial caller state
  * @returns {Object} Fresh caller state
+ * `stance` is a debate-side key (see CALLER.STANCES); `timerStartedAt` is the
+ * server-clock ms timestamp the call went live (null = timer stopped), letting
+ * every client render the same elapsed call time.
  */
 const createCallerState = () => Object.freeze({
   name: '',
   pronouns: '',
+  stance: '',
+  timerStartedAt: null,
+});
+
+/**
+ * Creates initial caller-queue state
+ * @returns {Object} Fresh queue state
+ * Each item: { id, name, pronouns, stance, topic, platform }
+ */
+const createQueueState = () => Object.freeze({
+  items: Object.freeze([]),
+});
+
+/**
+ * Creates initial stage-topics state
+ * @returns {Object} Fresh topics state
+ * `items` is the operator's debate-topics list; `visible` toggles the overlay.
+ */
+const createTopicsState = () => Object.freeze({
+  items: Object.freeze([]),
+  visible: false,
+});
+
+/**
+ * Creates initial call-in state
+ * @returns {Object} Fresh call-in state
+ * `text` is the call-in pill line; `visible` toggles the overlay.
+ */
+const createCallInState = () => Object.freeze({
+  text: '',
+  visible: false,
 });
 
 /**
@@ -63,11 +97,17 @@ const createFallacyState = () => Object.freeze({
 // Application state container
 let state = {
   caller: createCallerState(),
+  queue: createQueueState(),
+  topics: createTopicsState(),
+  callIn: createCallInState(),
   verse: createVerseState(),
   fallacy: createFallacyState(),
   soundboard: createSoundboardState(),
   showConfig: createShowConfigState(),
 };
+
+// Monotonic counter for queue item ids (stable across a server run)
+let queueIdCounter = 0;
 
 /**
  * State accessor and mutator functions
@@ -108,6 +148,155 @@ const StateManager = {
       caller: createCallerState(),
     };
     return state.caller;
+  },
+
+  // ========================================
+  // Caller Queue State
+  // ========================================
+
+  /**
+   * Get current queue state
+   * @returns {Object} Immutable queue state
+   */
+  getQueue() {
+    return state.queue;
+  },
+
+  /**
+   * Replace the queue items (frozen) and return the new queue state
+   * @param {Array} items - New items array
+   * @returns {Object} New queue state
+   */
+  _setQueueItems(items) {
+    state = {
+      ...state,
+      queue: Object.freeze({ items: Object.freeze(items) }),
+    };
+    return state.queue;
+  },
+
+  /**
+   * Append a caller to the queue (assigns an id, enforces max size)
+   * @param {Object} item - { name, pronouns, stance, topic, platform }
+   * @returns {Object} New queue state
+   */
+  addToQueue(item) {
+    queueIdCounter += 1;
+    const entry = { id: `q${queueIdCounter}`, ...item };
+    return this._setQueueItems([...state.queue.items, entry].slice(0, QUEUE.MAX_SIZE));
+  },
+
+  /**
+   * Remove a queued caller by id
+   * @param {string} id - Queue item id
+   * @returns {Object} New queue state
+   */
+  removeFromQueue(id) {
+    return this._setQueueItems(state.queue.items.filter(i => i.id !== id));
+  },
+
+  /**
+   * Move a queued caller within the list
+   * @param {string} id - Queue item id
+   * @param {string} direction - 'up', 'down', or 'top'
+   * @returns {Object} New queue state
+   */
+  reorderQueue(id, direction) {
+    const items = [...state.queue.items];
+    const idx = items.findIndex(i => i.id === id);
+    if (idx === -1) return state.queue;
+
+    if (direction === 'top') {
+      const [moved] = items.splice(idx, 1);
+      items.unshift(moved);
+    } else if (direction === 'up' && idx > 0) {
+      [items[idx - 1], items[idx]] = [items[idx], items[idx - 1]];
+    } else if (direction === 'down' && idx < items.length - 1) {
+      [items[idx + 1], items[idx]] = [items[idx], items[idx + 1]];
+    } else {
+      return state.queue;
+    }
+    return this._setQueueItems(items);
+  },
+
+  /**
+   * Remove and return a queued caller (used when promoting to live)
+   * @param {string} id - Queue item id
+   * @returns {Object|null} The removed item, or null if not found
+   */
+  promoteFromQueue(id) {
+    const item = state.queue.items.find(i => i.id === id);
+    if (!item) return null;
+    this.removeFromQueue(id);
+    return item;
+  },
+
+  /**
+   * Empty the queue
+   * @returns {Object} Fresh queue state
+   */
+  clearQueue() {
+    state = {
+      ...state,
+      queue: createQueueState(),
+    };
+    return state.queue;
+  },
+
+  // ========================================
+  // Stage Topics State
+  // ========================================
+
+  /**
+   * Get current stage-topics state
+   * @returns {Object} Immutable topics state
+   */
+  getTopics() {
+    return state.topics;
+  },
+
+  /**
+   * Update stage-topics state with new values
+   * @param {Object} updates - { items, visible }
+   * @returns {Object} New topics state
+   */
+  updateTopics({ items, visible }) {
+    state = {
+      ...state,
+      topics: Object.freeze({
+        items: Object.freeze(Array.isArray(items) ? [...items] : []),
+        visible: Boolean(visible),
+      }),
+    };
+    return state.topics;
+  },
+
+  // ========================================
+  // Call-In State
+  // ========================================
+
+  /**
+   * Get current call-in state
+   * @returns {Object} Immutable call-in state
+   */
+  getCallIn() {
+    return state.callIn;
+  },
+
+  /**
+   * Update call-in state with new values
+   * @param {Object} updates - { text, visible }
+   * @returns {Object} New call-in state
+   */
+  updateCallIn({ text, visible }) {
+    state = {
+      ...state,
+      callIn: Object.freeze({
+        text: typeof text === 'string' ? text : '',
+        visible: Boolean(visible),
+      }),
+    };
+    return state.callIn;
   },
 
   /**

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920, height=1080">
+  <title>Stage Overlay - Topics &amp; Call-In</title>
+  <link rel="stylesheet" href="css/display-topics.css">
+</head>
+<body>
+  <!-- Stage overlays - topic list with the call-in pill directly beneath it,
+       centered across the top of the canvas. They share a column wrapper so
+       the pill tracks the bottom of a list whose height varies with the topic
+       count; each still toggles its own 'visible' class independently.
+       No theme stylesheet: every color here is fixed (white topics, red pill,
+       black stroke), and a theme's body gradient would make the source opaque. -->
+  <div class="stage-stack">
+    <!-- Topic list - shown via socket 'topicsUpdate' -->
+    <div id="stageTopics" class="stage-topics">
+      <div id="stageTopicsList"></div>
+    </div>
+
+    <!-- Call-in pill - shown via socket 'callInUpdate' -->
+    <div id="stageCallIn" class="stage-callin">
+      <span id="stageCallInText"></span>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="js/socket-connection.js"></script>
+  <script src="js/display-topics.js"></script>
+</body>
+</html>

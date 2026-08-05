@@ -42,14 +42,16 @@ Client emits socket event
 
 New connections receive full current state on connect. **Display mutex:** verse (Bible, Quran, hadith, or dictionary) and fallacy share the same display area — showing one clears the other. Interlinear data rides on the verse channel as an extra payload alongside Bible verses. Allowed `verse.source` values: `bible`, `quran`, `hadith`, `dictionary`, `interlinear`, `''` (cleared); the socket handler validates against this allowlist.
 
+**Verse breakdown & pagination:** fetched passages are parsed into an array of individual numbered verses (`verses[]`, `totalVerses`) rather than a single text blob. The OBS overlay renders `VERSES_PER_PAGE` (default 3) verses at a time; a `changePage` socket event (validated against `next`/`prev`/`first`/`last` or a numeric page) advances `currentPage`. Interlinear word objects (`original`, `transliteration`, `strongs`, `gloss`) ride inside each verse's `words[]`.
+
 ### Service Pattern
 
 Every domain has a singleton service in `src/services/` with a consistent API: `load()`, `get()`, `add()`, `remove()`, `clear()`. Services own their data and are the only layer that touches the database or external APIs.
 
-- **Database:** `database.service.js` — SQLite (references.db) with tables: `bible_verses`, `quran_verses`, `hadiths`, `dictionary_entries`, `fallacies`, `interlinear_passages`, `lexicon_entries`, `hebrew_words`
+- **Database:** `database.service.js` — SQLite (references.db) with tables: `bible_verses`, `quran_verses`, `hadiths`, `dictionary_entries`, `fallacies`, `interlinear_passages`, `lexicon_entries`, `hebrew_words`. Schema evolution happens in two passes during `initialize()`: `createTables()` (idempotent `CREATE TABLE IF NOT EXISTS`) then `migrateColumns()`, which `ALTER TABLE`s columns onto pre-existing tables that `CREATE TABLE` can't retrofit (e.g. `bible_verses.verses_json` / `total_verses`, which persist the per-verse breakdown).
 - **Fetch services:** `bible-gateway.service.js` (web scraping), `alquran.service.js` (AlQuran.Cloud API), `hadith.service.js` (fawazahmed0/hadith-api via jsDelivr — 9 English collections; sub-narration suffixes like "muslim 2662c" are accepted but the API has no separate sub-entries, so the base number is fetched), `dictionary.service.js` (Free Dictionary API), `interlinear.service.js` (Hebrew via local morphhb import; Greek via Bolls.life TISCH), `lexicon.service.js` (Strong's definitions via Bolls.life BDBT)
 - **Cache services:** `cache.service.js`, `quran-cache.service.js`, `hadith-cache.service.js`, `dictionary-cache.service.js`, `interlinear-cache.service.js` — read/write SQLite (interlinear-cache also stores lexicon entries with optional AI glosses)
-- **Other:** `fallacy.service.js`, `soundboard.service.js`, `show-config.service.js`, `hosts.service.js`
+- **Other:** `fallacy.service.js`, `soundboard.service.js`, `show-config.service.js`, `hosts.service.js` (on startup, maps the `getools` hostname to `127.0.0.1` in the OS hosts file so displays can be reached at `http://getools:3666/`; writing needs admin, and it warns gracefully without it — reads never do)
 
 ### Initialization Order (src/server.js)
 
@@ -57,7 +59,7 @@ DatabaseService must initialize before all cache services. The startup loop load
 
 ### State Management (src/state/index.js)
 
-Centralized ephemeral state for display data. Domains: `caller`, `verse`, `fallacy`, `soundboard`, `showConfig`. State resets on server restart; persistent data lives in services/SQLite. The `verse` state has a `source` field that distinguishes Bible, Quran, and dictionary references sharing the same display area.
+Centralized ephemeral state for display data. Domains: `caller`, `queue`, `verse`, `fallacy`, `soundboard`, `showConfig`, `topics`, `callIn`. State resets on server restart; persistent data lives in services/SQLite. The `verse` state carries a `source` field that distinguishes Bible/Quran/hadith/dictionary/interlinear references sharing the same display area, plus the per-verse breakdown (`verses[]`, `totalVerses`) and pagination cursor (`currentPage`, `versesPerPage`). The `caller` state carries `stance` (a debate-side key validated against `CALLER.STANCES` in constants) and `timerStartedAt` (a server-clock ms timestamp, `null` when stopped) so every client renders the same call-elapsed time. The `queue` state is a list of waiting callers (`items[]` of `{ id, name, pronouns, stance, topic, platform }`); `queuePromote` moves the front (or a given id) live and starts the timer. Socket events: `updateCaller`/`clearCaller` (updateCaller auto-starts the timer for a new caller name), `startCallerTimer`/`stopCallerTimer`, and `queueAdd`/`queueRemove`/`queueReorder`/`queuePromote`/`queueClear` (broadcast on `queueUpdate`). The `topics` state (`{ items[], visible }`) and `callIn` state (`{ text, visible }`) drive the two persistent **stage overlays** (a numbered topic list and a call-in link/phone pill) rendered onto both OBS display pages; they are updated via `updateTopics`/`updateCallIn` (validated against `STAGE.MAX_TOPICS`/`TOPIC_MAX_LENGTH`/`CALLIN_MAX_LENGTH`) and broadcast on `topicsUpdate`/`callInUpdate`.
 
 ### Routes
 
@@ -68,10 +70,10 @@ Routes are thin — validate input, call service, return result. Each reference 
 
 ### Frontend Pages
 
-- **Caller**: `dock.html` (control), `display.html` / `vertical-display.html` (OBS overlays)
+- **Caller**: `dock.html` (control — live-caller form with stance selector, caller queue with promote/reorder/remove, and a server-synced call timer), `display.html` / `vertical-display.html` (OBS overlays — caller card shows a colored stance chip + amber/red call timer; landscape also has a top-left "Up Next" on-deck pill fed by the queue). Stance colors live in each overlay/dock CSS keyed by `[data-stance="…"]`; the timer's amber/red thresholds mirror `CALLER.TIMER_*`. The dock also has a **Stage** section (topics `<textarea>` + call-in field, each with Update/Show-Hide) driving two persistent overlays: a numbered topic list and a black call-in pill, both set in the bundled `'Futura XBlkCnIt BT'` font (`public/fonts/futura-xblkcnit-bt.ttf`, Impact fallback) with a 4px black `-webkit-text-stroke` + `paint-order: stroke fill`. On **landscape these live on their own page**, `display-topics.html` (1920×1080, own CSS/JS, no theme stylesheet — its colors are fixed and a theme's body gradient would make the source opaque), so the operator can position and toggle them as a separate OBS source; the two share a `.stage-stack` flex column centered across the top, which is what keeps the pill directly beneath a list whose height varies with the topic count. The vertical overlay still carries its own copy inline (topics red/bottom-left, pill centered)
 - **References**: `reference-control.html` (unified Bible/Quran+Hadith/dictionary/interlinear control — the Quran tab accepts both Quran references like "2:255" and hadith references like "bukhari 3208" or "muslim 2662c"; the translation dropdown auto-hides when a hadith reference is detected), `bible-display.html` (OBS overlay for all reference types). `bible-control.html` is a legacy redirect to `reference-control.html`.
 - **Soundboard**: `soundboard.html` (control + playback)
-- **Themes**: OBS displays support swappable themes via `public/js/theme-loader.js` — current themes are `godless-engineer` (red/black) and `the-bible-guy` (orange/gold + sky blue). Theme files live in `public/css/themes/`. Selection persists in `localStorage`.
+- **Themes**: OBS displays support swappable themes via `public/js/theme-loader.js` — current themes are `godless-engineer` (red/black), `the-bible-guy` (orange/gold + sky blue), and `sandstone` (weathered quarried-stone with ochre accents; adds a grain/bevel surface to the caller & title-bar cards via a `body[data-theme="sandstone"]`-scoped block). Theme files live in `public/css/themes/`. Selection persists in `localStorage`.
 
 ## Development Philosophy (from PROJECT.md)
 
@@ -111,7 +113,7 @@ Routes are thin — validate input, call service, return result. Each reference 
 ## Key Files
 
 - `fallacies-db.json` — Pre-built fallacy database (checked in, 400+ entries; migrated into SQLite on first run)
-- `references.db` — SQLite database for all cached references and morphhb Hebrew word data (gitignored, auto-created with migration from legacy JSON files)
+- `references.db` — SQLite database for all cached references and morphhb Hebrew word data (gitignored, auto-created; migrates legacy JSON caches on first run and applies in-place column migrations on later startups)
 - `verse-cache.json`, `quran-cache.json`, `dictionary-cache.json` — Legacy JSON caches kept on disk for one-shot migration into SQLite; safe to delete after first successful run
 - `electron/main.js` — Electron shell that `require('../src/server')` then opens a window; context isolation enforced (preload at `electron/preload.js`)
 - `src/scripts/import-morphhb.js` — Imports Open Scriptures Hebrew Bible word/morphology data from the `morphhb` npm package into the `hebrew_words` table; invoked lazily by `interlinear.service.js` if the table is empty

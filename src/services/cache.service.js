@@ -59,19 +59,65 @@ const sortByChapterVerse = (a, b) => {
 };
 
 /**
+ * Safely parses JSON with a fallback for corrupt data
+ * @param {string} json - JSON string
+ * @param {*} fallback - Fallback value
+ * @returns {*} Parsed value or fallback
+ */
+const safeParse = (json, fallback = []) => {
+  try {
+    return JSON.parse(json || JSON.stringify(fallback));
+  } catch {
+    return fallback;
+  }
+};
+
+/**
+ * Sentence-chunks a passage when no per-verse breakdown was persisted.
+ * Used as a fallback for legacy cache rows; new entries always carry verses_json.
+ * @param {string} text - Passage text
+ * @returns {Array<{number: string, text: string}>} Verse-shaped chunks
+ */
+const chunkLegacyText = (text) => {
+  if (!text) return [];
+  const sentences = text.split(/(?<=[.!?])\s+(?=[A-Z"'(])/);
+  const TARGET = 280;
+  const chunks = [];
+  let buf = '';
+  for (const s of sentences) {
+    const candidate = buf ? `${buf} ${s}` : s;
+    if (candidate.length > TARGET && buf) {
+      chunks.push(buf);
+      buf = s;
+    } else {
+      buf = candidate;
+    }
+  }
+  if (buf) chunks.push(buf);
+  return chunks.map((t) => ({ number: '', text: t }));
+};
+
+/**
  * Converts a database row to a verse object
  * @param {Object} row - Database row
  * @returns {Object} Verse object
  */
-const rowToVerse = (row) => ({
-  key: row.key,
-  reference: row.reference,
-  version: row.version,
-  versionName: row.version_name,
-  text: row.text,
-  book: row.book,
-  timestamp: row.timestamp,
-});
+const rowToVerse = (row) => {
+  const verses = row.verses_json
+    ? safeParse(row.verses_json)
+    : chunkLegacyText(row.text);
+  return {
+    key: row.key,
+    reference: row.reference,
+    version: row.version,
+    versionName: row.version_name,
+    text: row.text,
+    book: row.book,
+    verses,
+    totalVerses: verses.length,
+    timestamp: row.timestamp,
+  };
+};
 
 /**
  * Cache Service API
@@ -138,11 +184,16 @@ const CacheService = {
     const key = createKey(verseData.reference, verseData.version);
     const book = extractBookName(verseData.reference);
     const timestamp = Date.now();
+    const versesJson = verseData.verses ? JSON.stringify(verseData.verses) : null;
+    const totalVerses = verseData.totalVerses || (verseData.verses ? verseData.verses.length : 0);
 
     db.prepare(`
-      INSERT OR REPLACE INTO bible_verses (key, reference, version, version_name, text, book, timestamp)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-    `).run(key, verseData.reference, verseData.version, verseData.versionName || '', verseData.text || '', book, timestamp);
+      INSERT OR REPLACE INTO bible_verses (key, reference, version, version_name, text, book, verses_json, total_verses, timestamp)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      key, verseData.reference, verseData.version, verseData.versionName || '',
+      verseData.text || '', book, versesJson, totalVerses, timestamp
+    );
 
     return { ...verseData, key, book, timestamp };
   },

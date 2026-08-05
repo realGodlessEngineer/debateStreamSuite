@@ -7,6 +7,13 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
+/* Stage overlay display face (topics + call-in) */
+@font-face {
+  font-family: 'Futura XBlkCnIt BT';
+  src: url('/fonts/futura-xblkcnit-bt.ttf') format('truetype');
+  font-display: swap;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -32,9 +39,16 @@ body {
    Show Info Overlay (Top)
    ======================================== */
 
+/* Removed from the vertical stage - the call-in pill occupies this slot above
+   the topic list instead. Kept in the DOM (rather than deleted from the HTML)
+   because vertical-display.js writes to the show-title/host-name/host-pronouns
+   nodes without null-guarding them. The .visible/.hiding rules below only set
+   `animation`, never `display`, so this stays hidden in every state.
+   The landscape overlay still shows its title bar - see display.css. */
 .show-info-overlay {
+  display: none;
   position: absolute;
-  top: 40px;
+  bottom: 987px;  /* ~51.4% of the 1920px canvas */
   left: 40px;
   right: 40px;
   z-index: 10;
@@ -146,41 +160,269 @@ body {
   animation: slideOutToBottom 0.4s ease-in forwards;
 }
 
-/* Caller Card */
+/* Caller Card - two-column lower third, matching the landscape overlay:
+   identity (label + name + pronouns) on the left, meta cluster (stance chip +
+   call timer) on the right, both vertically centered. overflow:hidden clips
+   the stance accent edge to the rounded corners. */
 .caller-card {
+  position: relative;
+  overflow: hidden;
   background: linear-gradient(135deg, var(--color-bg-dark, #0d0d0d) 0%, var(--color-bg-tinted, #1a0808) 100%);
   border-radius: 16px;
   box-shadow:
     0 10px 40px rgba(0, 0, 0, 0.7),
     var(--shadow-glow, 0 0 30px rgba(180, 30, 30, 0.2));
   border: 2px solid var(--color-primary-border, rgba(180, 30, 30, 0.4));
-  padding: 30px 40px;
-  text-align: center;
+  padding: 28px 42px 28px 50px;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+/* Stance accent edge. Reads --stance-color off the card's own data-stance
+   (set in vertical-display.js); falls back to the theme primary when the
+   operator hasn't picked a stance.
+   A real element rather than ::before because the sandstone theme claims both
+   .caller-card::before and ::after for its grain/weathering layers at higher
+   specificity. z-index:2 keeps it above those layers. */
+.caller-accent {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 2;
+  width: 8px;
+  background: var(--stance-color, var(--color-primary, #e63946));
+  box-shadow: 0 0 18px var(--stance-color, var(--color-primary, #e63946));
+}
+
+/* Identity column - min-width:0 lets a long name wrap inside the flex row
+   instead of shoving the meta cluster off the card's right edge. */
+.caller-identity {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .caller-label {
   font-size: 1em;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--color-primary, #e63946);
   text-transform: uppercase;
-  letter-spacing: 3px;
-  margin-bottom: 8px;
+  letter-spacing: 4px;
+  margin-bottom: 6px;
 }
 
+/* Baseline alignment sits the pronoun pill on the name's baseline rather
+   than its box, so it optically hangs off the name at any name length. */
+.caller-name-row {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+}
+
+/* overflow-wrap:anywhere is insurance for an unbroken handle (a long screen
+   name with no spaces) - it breaks rather than spilling. */
 .caller-name {
-  font-size: 3.5em;
+  font-size: 3.2em;
   font-weight: 700;
   color: #ffffff;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-  line-height: 1.2;
+  line-height: 1.1;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
+/* Muted pill trailing the name. :empty collapses it so a caller with no
+   pronouns set leaves no stray chip behind. */
 .caller-pronouns {
-  font-size: 1.6em;
-  font-weight: 500;
-  color: var(--color-primary, #e63946);
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-  margin-top: 4px;
+  font-size: 1.2em;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: var(--color-text-muted, #b0b0b0);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  padding: 4px 14px;
+  white-space: nowrap;
+}
+
+.caller-pronouns:empty {
+  display: none;
+}
+
+/* Meta column - stance chip + call timer, never shrinks */
+.caller-meta {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+/* ========================================
+   Stance chip + call timer
+   ======================================== */
+
+/* Per-stance accent color (consumed by the [data-stance] chip below) */
+[data-stance="theist"]    { --stance-color: #a78bfa; }
+[data-stance="atheist"]   { --stance-color: #ef4444; }
+[data-stance="agnostic"]  { --stance-color: #9ca3af; }
+[data-stance="christian"] { --stance-color: #3b82f6; }
+[data-stance="muslim"]    { --stance-color: #22c55e; }
+[data-stance="jewish"]    { --stance-color: #38bdf8; }
+[data-stance="undecided"] { --stance-color: #eab308; }
+[data-stance="other"]     { --stance-color: #f97316; }
+
+.caller-stance {
+  display: none;
+  padding: 8px 24px;
+  border-radius: 999px;
+  font-size: 1.1em;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #ffffff;
+  background: var(--stance-color, #555);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+  white-space: nowrap;
+}
+
+.caller-stance.visible {
+  display: inline-block;
+}
+
+/* Call timer. Sits in-flow at the end of the meta cluster - it used to be
+   absolutely positioned in the card's top-right corner, where it collided
+   with long caller names.
+   Font: inherits Inter (the old var(--font-mono, ...) resolved to Courier New,
+   since --font-mono is only defined in shared.css, which the display pages
+   don't load). tabular-nums plus a zero-padded MM keeps every digit the same
+   width, so the readout doesn't twitch as it ticks. */
+.caller-timer {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 18px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 1.5em;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+  color: var(--color-text-secondary, #e0e0e0);
+}
+
+.caller-timer.visible {
+  display: inline-flex;
+}
+
+/* Live dot - the only thing that pulses at danger. Blinking the whole
+   readout (the old behavior) made the digits hard to read on stream. */
+.caller-timer::before {
+  content: '';
+  flex: 0 0 auto;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.caller-timer.warn {
+  color: #fbbf24;
+  background: rgba(251, 191, 36, 0.12);
+  border-color: rgba(251, 191, 36, 0.4);
+}
+
+.caller-timer.danger {
+  color: #f87171;
+  background: rgba(248, 113, 113, 0.14);
+  border-color: rgba(248, 113, 113, 0.45);
+}
+
+.caller-timer.danger::before {
+  animation: timerPulse 1.2s ease-in-out infinite;
+}
+
+@keyframes timerPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+
+/* ========================================
+   Stage: Topics list (mid-left)
+   ======================================== */
+
+/* Positioned in px to sit centered on the message-board plaque in the
+   stage art (canvas is a fixed 1080x1920, so px and % scale identically). */
+.stage-topics {
+  display: none;
+  position: absolute;
+  left: 73px;  /* ~6.8% of the 1080px canvas */
+  top: 948px;  /* ~49.4% of the 1920px canvas */
+  width: 40%;
+  z-index: 40;
+  color: #ffffff;
+  font-family: 'Futura XBlkCnIt BT', Impact, sans-serif;
+  text-transform: uppercase;
+  text-align: left;
+  -webkit-text-stroke: 4px #000;
+  paint-order: stroke fill;
+}
+
+.stage-topics.visible {
+  display: block;
+}
+
+.stage-topic-row {
+  font-size: 52px;
+  line-height: 1.08;
+  margin-bottom: 22px;
+  /* Hanging indent: first line starts under the number, wrapped lines
+     align under the topic's first letter (not under the number). */
+  padding-left: 1.5em;
+  text-indent: -1.5em;
+}
+
+/* ========================================
+   Stage: Call-in pill (bottom)
+   ======================================== */
+
+/* Sits just above the topic list, in the slot the show-info card used to
+   occupy (now hidden): bottom edge at y = 1920 - 1037 = 883px, ~65px above the
+   list's top (948px). Spans the full canvas width and centers, so the
+   inline-block pill self-centers horizontally no matter how long the
+   operator's link or phone number is. */
+.stage-callin {
+  display: none;
+  position: absolute;
+  bottom: 1037px;  /* ~54.0% of the 1920px canvas */
+  left: 0;
+  right: 0;
+  z-index: 40;
+  text-align: center;
+}
+
+.stage-callin.visible {
+  display: block;
+}
+
+.stage-callin span {
+  display: inline-block;
+  background: #000;
+  border-radius: 999px;
+  padding: 18px 44px;
+  color: #e63946;
+  font-family: 'Futura XBlkCnIt BT', Impact, sans-serif;
+  font-size: 46px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  -webkit-text-stroke: 4px #000;
+  paint-order: stroke fill;
+  box-shadow: 0 0 40px 8px rgba(230, 57, 70, 0.45);
 }
 
 /* ========================================
