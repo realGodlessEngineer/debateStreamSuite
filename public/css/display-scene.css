@@ -1,0 +1,82 @@
+/**
+ * Scene Card Overlay Styles
+ * For OBS Browser Source - Landscape (1920x1080)
+ *
+ * Full-bleed and OPAQUE by design (see display-scene.html) - a
+ * "Starting Soon" / "BRB" / "Ending" card is meant to fully cover the
+ * picture during a break, not float translucently over whatever the last
+ * live source left behind. Hardcoded brand red/black, no theme stylesheet,
+ * so this page's look never shifts when the operator picks a different
+ * display theme.
+ *
+ * Headline uses the bundled heavy-condensed-italic display face at
+ * /fonts/futura-xblkcnit-bt.ttf, falling back to Impact if that asset isn't
+ * present. Body copy falls back to system sans-serif - no CDN font import
+ * (project rule: no external assets in overlays).
+ */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+  position: relative;
+  background: #0a0a0a;
+}
+
+@font-face {
+  font-family: 'Futura XBlkCnIt BT';
+  src: url('/fonts/futura-xblkcnit-bt.ttf') format('truetype');
+  font-display: swap;
+}
+
+.scene-card {
+  display: none;
+  position: absolute;
+  inset: 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 36px;
+  background: radial-gradient(circle at 50% 40%, #1a0808 0%, #0a0a0a 70%);
+}
+
+.scene-card.visible {
+  display: flex;
+}
+
+.scene-headline {
+  font-family: 'Futura XBlkCnIt BT', Impact, sans-serif;
+  font-size: 160px;
+  line-height: 1;
+  color: #ffffff;
+  -webkit-text-stroke: 6px #000;
+  paint-order: stroke fill;
+  text-transform: uppercase;
+  text-shadow: 0 0 60px rgba(230, 57, 70, 0.65);
+  text-align: center;
+}
+
+.scene-message {
+  display: none;
+  font-size: 42px;
+  font-weight: 600;
+  color: #e63946;
+  text-align: center;
+  max-width: 70%;
+}
+
+.scene-message.visible {
+  display: block;
+}

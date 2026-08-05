@@ -1,0 +1,82 @@
+/**
+ * Segment Countdown Overlay Styles
+ * For OBS Browser Source - Landscape (1920x1080)
+ *
+ * Compact widget, not full-bleed - it sits on top of whatever else is on
+ * screen (the scene card, or the regular show), so it is its own source
+ * positioned independently. Transparent canvas; top-right placement leaves
+ * the top-left free for other overlays. Hardcoded colors, no theme
+ * stylesheet (same reasoning as display-scene.html - fixed colors, no
+ * accidental opacity from a theme's body background).
+ */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: transparent;
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+  position: relative;
+}
+
+.segment-timer {
+  display: none;
+  position: absolute;
+  top: 40px;
+  right: 40px;
+  z-index: 20;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  padding: 16px 28px;
+  background: linear-gradient(135deg, #0d0d0d 0%, #1a0808 100%);
+  border: 2px solid rgba(230, 57, 70, 0.4);
+  border-radius: 12px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.6);
+}
+
+.segment-timer.visible {
+  display: flex;
+}
+
+.segment-label {
+  font-size: 24px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #e63946;
+}
+
+.segment-clock {
+  font-size: 64px;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+  color: #ffffff;
+}
+
+.segment-clock.warn {
+  color: #fbbf24;
+}
+
+.segment-clock.danger {
+  color: #f87171;
+  animation: segmentPulse 1.2s ease-in-out infinite;
+}
+
+@keyframes segmentPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920, height=1080">
+  <title>Scene Card</title>
+  <link rel="stylesheet" href="css/display-scene.css">
+</head>
+<body>
+  <!-- Full-bleed holding-scene card - its own OBS source so the operator can
+       cut to it between segments without touching the caller/verse sources
+       underneath. Chosen OPAQUE (not transparent-over-video): a holding
+       scene is meant to fully replace the picture during a break, and a
+       see-through card here would show whatever the last live source left
+       on screen behind it, which reads as broken, not intentional.
+       No theme stylesheet - colors are fixed brand red/black, same
+       reasoning as the topic-list overlay: a theme swap must not change
+       this page's look out from under the operator mid-show. -->
+  <div id="sceneCard" class="scene-card">
+    <div id="sceneHeadline" class="scene-headline"></div>
+    <div id="sceneMessage" class="scene-message"></div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="js/socket-connection.js"></script>
+  <script src="js/display-scene.js"></script>
+</body>
+</html>

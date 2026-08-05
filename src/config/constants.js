@@ -56,6 +56,22 @@ const STAGE = Object.freeze({
 });
 
 /**
+ * Scene-card + segment-timer settings.
+ * `KEYS` is the source of truth for socket validation of scene.key (labels
+ * for the overlay/dock live client-side); the TIMER_* thresholds describe
+ * *remaining* seconds on a countdown rather than elapsed seconds on a
+ * count-up, so a low threshold means "about to expire".
+ */
+const SCENE = Object.freeze({
+  KEYS: Object.freeze(['starting-soon', 'brb', 'ending']),
+  MESSAGE_MAX_LENGTH: 120,
+  LABEL_MAX_LENGTH: 40,
+  MAX_DURATION_SECONDS: 3600,  // 60:00 cap on an armed countdown
+  TIMER_WARN_SECONDS: 60,      // <=1:00 remaining — segment timer turns amber
+  TIMER_DANGER_SECONDS: 10,    // <=0:10 remaining — segment timer turns red
+});
+
+/**
  * Soundboard settings
  */
 const SOUNDBOARD = Object.freeze({
@@ -223,6 +239,7 @@ module.exports = {
   CALLER,
   QUEUE,
   STAGE,
+  SCENE,
   SOUNDBOARD,
   BIBLE_BOOK_ORDER,
   QURAN_EDITIONS,

@@ -5,7 +5,7 @@
  */
 
 const StateManager = require('../state');
-const { DISPLAY, CALLER, QUEUE, STAGE } = require('../config/constants');
+const { DISPLAY, CALLER, QUEUE, STAGE, SCENE } = require('../config/constants');
 const SoundboardService = require('../services/soundboard.service');
 const ShowConfigService = require('../services/show-config.service');
 const createLogger = require('../utils/logger');
@@ -211,6 +211,39 @@ function validateShowConfigData(data) {
 }
 
 /**
+ * Validates and sanitizes scene-card data
+ * @param {*} data - Raw socket data { key, message, visible }
+ * @returns {Object|null} Sanitized { key, message, visible } or null if invalid
+ */
+function validateSceneData(data) {
+  if (!data || typeof data !== 'object') return null;
+  const rawKey = sanitizeString(data.key, '', 20);
+  const key = SCENE.KEYS.includes(rawKey) ? rawKey : '';
+  return {
+    key,
+    message: sanitizeString(data.message, '', SCENE.MESSAGE_MAX_LENGTH),
+    visible: Boolean(data.visible),
+  };
+}
+
+/**
+ * Validates a request to arm the segment countdown
+ * @param {*} data - Raw socket data { label, durationMs }
+ * @returns {Object|null} Sanitized { label, durationMs } or null if invalid
+ */
+function validateSegmentTimerStart(data) {
+  if (!data || typeof data !== 'object') return null;
+  const durationMs = Number(data.durationMs);
+  if (!Number.isFinite(durationMs) || durationMs <= 0) return null;
+
+  const maxMs = SCENE.MAX_DURATION_SECONDS * 1000;
+  return {
+    label: sanitizeString(data.label, '', SCENE.LABEL_MAX_LENGTH),
+    durationMs: Math.min(durationMs, maxMs),
+  };
+}
+
+/**
  * Creates socket event handlers
  * @param {SocketIO.Server} io - Socket.io server instance
  * @returns {Function} Connection handler
@@ -251,6 +284,14 @@ const createSocketHandlers = (io) => {
     });
   };
 
+  const broadcastScene = () => {
+    io.emit('sceneUpdate', StateManager.getScene());
+  };
+
+  const broadcastSegmentTimer = () => {
+    io.emit('segmentTimerUpdate', StateManager.getSegmentTimer());
+  };
+
   /**
    * Handle new socket connections
    * @param {SocketIO.Socket} socket - Connected socket
@@ -270,6 +311,8 @@ const createSocketHandlers = (io) => {
       sounds: SoundboardService.getAll(),
     });
     socket.emit('showConfigUpdate', StateManager.getShowConfig());
+    socket.emit('sceneUpdate', StateManager.getScene());
+    socket.emit('segmentTimerUpdate', StateManager.getSegmentTimer());
 
     // ========================================
     // Caller Event Handlers
@@ -479,6 +522,50 @@ const createSocketHandlers = (io) => {
 
     socket.on('refreshSounds', () => {
       broadcastSoundboard();
+    });
+
+    // ========================================
+    // Scene Card Event Handlers
+    // ========================================
+
+    socket.on('updateScene', (data) => {
+      const validated = validateSceneData(data);
+      if (!validated) return;
+
+      StateManager.updateScene(validated);
+      log.info('Scene updated:', validated.key || '(cleared)', '- Visible:', validated.visible);
+      broadcastScene();
+    });
+
+    socket.on('clearScene', () => {
+      StateManager.clearScene();
+      log.info('Scene cleared');
+      broadcastScene();
+    });
+
+    // ========================================
+    // Segment Countdown Timer Event Handlers
+    // ========================================
+
+    socket.on('startSegmentTimer', (data) => {
+      const validated = validateSegmentTimerStart(data);
+      if (!validated) return;
+
+      StateManager.startSegmentTimer(validated.label, validated.durationMs);
+      log.info('Segment timer started:', validated.label || '(untitled)', '-', validated.durationMs, 'ms');
+      broadcastSegmentTimer();
+    });
+
+    socket.on('stopSegmentTimer', () => {
+      StateManager.stopSegmentTimer();
+      log.info('Segment timer stopped');
+      broadcastSegmentTimer();
+    });
+
+    socket.on('segmentTimerReset', () => {
+      StateManager.resetSegmentTimer();
+      log.info('Segment timer reset');
+      broadcastSegmentTimer();
     });
 
     // ========================================

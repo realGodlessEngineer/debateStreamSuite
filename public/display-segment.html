@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920, height=1080">
+  <title>Segment Timer</title>
+  <link rel="stylesheet" href="css/display-segment.css">
+</head>
+<body>
+  <!-- Countdown-only overlay, positioned separately from the scene card
+       (display-scene.html) so the operator can run a segment countdown on
+       top of a live scene, or on top of the regular show. Transparent
+       canvas, compact widget top-right. No theme stylesheet - fixed
+       colors, so there's no risk of a theme's body background making this
+       source opaque. -->
+  <div id="segmentTimer" class="segment-timer">
+    <div id="segmentLabel" class="segment-label"></div>
+    <div id="segmentClock" class="segment-clock">0:00</div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="js/socket-connection.js"></script>
+  <script src="js/display-segment.js"></script>
+</body>
+</html>

@@ -226,6 +226,46 @@
       </div>
     </div>
 
+    <!-- Scene Card & Segment Timer Section -->
+    <div class="dock-section">
+      <div class="section-label">Scene &amp; Segment Timer</div>
+
+      <div class="stage-block">
+        <div class="stage-sublabel">Scene Card</div>
+        <div class="button-row scene-btn-row">
+          <button type="button" class="dock-btn scene-btn" id="sceneStartingSoonBtn" data-scene-key="starting-soon">Starting Soon</button>
+          <button type="button" class="dock-btn scene-btn" id="sceneBrbBtn" data-scene-key="brb">BRB</button>
+          <button type="button" class="dock-btn scene-btn" id="sceneEndingBtn" data-scene-key="ending">Ending</button>
+        </div>
+        <div class="form-compact">
+          <input type="text" id="sceneMessageInput" placeholder="Subline (optional) — e.g. back in 5" maxlength="120">
+        </div>
+        <div class="button-row">
+          <button type="button" class="dock-btn btn-clear" id="sceneClearBtn">Clear Scene</button>
+        </div>
+        <div class="scene-status" id="sceneStatus">No scene showing</div>
+      </div>
+
+      <div class="stage-block">
+        <div class="stage-sublabel">Segment Countdown</div>
+        <div class="form-compact">
+          <input type="text" id="segmentLabelInput" placeholder="Label — e.g. Break, Q&amp;A, Rebuttal" maxlength="40">
+        </div>
+        <div class="segment-duration-row">
+          <input type="number" id="segmentDurationInput" placeholder="Minutes" min="0.5" max="60" step="0.5" value="5">
+          <button type="button" class="dock-btn btn-update" id="segmentStartBtn">Start</button>
+        </div>
+        <div class="button-row">
+          <button type="button" class="dock-btn btn-stop" id="segmentStopBtn">Stop</button>
+          <button type="button" class="dock-btn btn-clear" id="segmentResetBtn">Reset</button>
+        </div>
+        <div class="timer-compact">
+          <div class="timer-display-compact" id="segmentTimerDisplay">0:00</div>
+          <div class="timer-status-compact" id="segmentTimerStatus">STOPPED</div>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <script src="/socket.io/socket.io.js"></script>
@@ -235,6 +275,7 @@
   <script src="js/settings-modal.js"></script>
   <script src="js/caller-control.js"></script>
   <script src="js/show-config-modal.js"></script>
+  <script src="js/scene-control.js"></script>
   <script>
     // OBS Setup modal
     const modalOverlay = document.getElementById('modalOverlay');

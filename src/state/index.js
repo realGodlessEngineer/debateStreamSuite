@@ -94,6 +94,32 @@ const createFallacyState = () => Object.freeze({
   type: 'fallacy',
 });
 
+/**
+ * Creates initial scene-card state
+ * @returns {Object} Fresh scene state
+ * `key` is one of SCENE.KEYS ('starting-soon' | 'brb' | 'ending'), or '' when
+ * cleared; `message` is an optional operator-supplied subline.
+ */
+const createSceneState = () => Object.freeze({
+  key: '',
+  message: '',
+  visible: false,
+});
+
+/**
+ * Creates initial segment-countdown state
+ * @returns {Object} Fresh segment-timer state
+ * `endsAt` is the server-clock ms timestamp the countdown reaches zero
+ * (null when stopped); `remainingMs` holds the frozen remainder while
+ * stopped, so every client renders the same instant.
+ */
+const createSegmentTimerState = () => Object.freeze({
+  label: '',
+  endsAt: null,
+  remainingMs: 0,
+  running: false,
+});
+
 // Application state container
 let state = {
   caller: createCallerState(),
@@ -104,6 +130,8 @@ let state = {
   fallacy: createFallacyState(),
   soundboard: createSoundboardState(),
   showConfig: createShowConfigState(),
+  scene: createSceneState(),
+  segmentTimer: createSegmentTimerState(),
 };
 
 // Monotonic counter for queue item ids (stable across a server run)
@@ -482,6 +510,111 @@ const StateManager = {
       }),
     };
     return state.showConfig;
+  },
+
+  // ========================================
+  // Scene Card State
+  // ========================================
+
+  /**
+   * Get current scene-card state
+   * @returns {Object} Immutable scene state
+   */
+  getScene() {
+    return state.scene;
+  },
+
+  /**
+   * Update scene-card state with new values
+   * @param {Object} updates - { key, message, visible }
+   * @returns {Object} New scene state
+   */
+  updateScene(updates) {
+    state = {
+      ...state,
+      scene: Object.freeze({
+        ...state.scene,
+        ...updates,
+      }),
+    };
+    return state.scene;
+  },
+
+  /**
+   * Reset scene card to its initial (cleared) state
+   * @returns {Object} Fresh scene state
+   */
+  clearScene() {
+    state = {
+      ...state,
+      scene: createSceneState(),
+    };
+    return state.scene;
+  },
+
+  // ========================================
+  // Segment Countdown Timer State
+  // ========================================
+
+  /**
+   * Get current segment-timer state
+   * @returns {Object} Immutable segment-timer state
+   */
+  getSegmentTimer() {
+    return state.segmentTimer;
+  },
+
+  /**
+   * Arm and start the segment countdown
+   * @param {string} label - Operator-supplied segment label
+   * @param {number} durationMs - Countdown length in ms
+   * @returns {Object} New segment-timer state
+   */
+  startSegmentTimer(label, durationMs) {
+    state = {
+      ...state,
+      segmentTimer: Object.freeze({
+        label,
+        endsAt: Date.now() + durationMs,
+        remainingMs: durationMs,
+        running: true,
+      }),
+    };
+    return state.segmentTimer;
+  },
+
+  /**
+   * Stop the countdown, freezing the remaining time at the moment of stop
+   * @returns {Object} New segment-timer state
+   */
+  stopSegmentTimer() {
+    const { endsAt, running, remainingMs } = state.segmentTimer;
+    const frozenRemainingMs = running && endsAt
+      ? Math.max(0, endsAt - Date.now())
+      : remainingMs;
+
+    state = {
+      ...state,
+      segmentTimer: Object.freeze({
+        ...state.segmentTimer,
+        endsAt: null,
+        remainingMs: frozenRemainingMs,
+        running: false,
+      }),
+    };
+    return state.segmentTimer;
+  },
+
+  /**
+   * Reset the segment timer to its initial (cleared) state
+   * @returns {Object} Fresh segment-timer state
+   */
+  resetSegmentTimer() {
+    state = {
+      ...state,
+      segmentTimer: createSegmentTimerState(),
+    };
+    return state.segmentTimer;
   },
 
   /**
