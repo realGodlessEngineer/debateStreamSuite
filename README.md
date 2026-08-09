@@ -113,6 +113,8 @@ debate-stream-suite/
 │   ├── display-scoreboard.html    # Per-side tally OBS display
 │   ├── display-claim.html         # Claim / resolution banner
 │   ├── display-ticker.html        # Bottom-edge ticker crawl
+│   ├── stage-foreground.html      # Consolidated stage, over the cams
+│   ├── stage-background.html      # Consolidated stage, under the cams
 │   ├── bible-control.html         # Bible verse control panel
 │   ├── bible-display.html         # Bible verse OBS display
 │   ├── soundboard.html            # Soundboard control panel
@@ -187,6 +189,8 @@ The server starts at **http://localhost:3666** by default.
 | Scoreboard | `/display-scoreboard.html` | OBS overlay for the per-side tally |
 | Claim Banner | `/display-claim.html` | OBS overlay naming the proposition under debate |
 | Ticker | `/display-ticker.html` | OBS overlay for the bottom-edge crawl |
+| Stage Foreground | `/stage-foreground.html` | Consolidated overlay that paints **over** the cams |
+| Stage Background | `/stage-background.html` | Consolidated overlay that sits **under** the cams |
 | Bible Control | `/bible-control.html` | Search & display Bible verses |
 | Bible Display | `/bible-display.html` | OBS overlay for verses |
 | Soundboard | `/soundboard.html` | Upload & trigger sounds |
@@ -209,6 +213,31 @@ The server starts at **http://localhost:3666** by default.
    The one exception is `display-scene.html`, which is deliberately opaque:
    it is a holding screen meant to replace the picture during a break, and a
    see-through one would show whatever the last live source left behind.
+
+### Consolidated Stages
+
+Rather than adding a source per overlay, you can add **two**:
+
+| Source | URL | Where it goes in the scene |
+|---|---|---|
+| Foreground | `/stage-foreground.html` | **Above** your camera sources |
+| Background | `/stage-background.html` | **Below** your camera sources |
+
+The foreground carries the title bar, caller card, "Up Next" pill, claim strip,
+scoreboard, segment countdown and ticker crawl. The background carries the topic
+list and the call-in pill, so they show through the margins your cams don't cover
+while the nameplates paint over the video. The middle of the background stage is
+left empty on purpose, so your own backdrop artwork shows through untouched.
+
+Unlike the single-purpose pages, these two **size themselves to the canvas** —
+set the Browser source to `1920x1080` for a landscape scene or `1080x1920` for a
+vertical one and each lays itself out for that shape. Other sizes work too
+(`1280x720`, `2560x1440`); the design scales rather than clipping.
+
+Two overlays deliberately stay standalone: `display-scene.html` is full-bleed and
+opaque, so it would cover the cams, and `bible-display.html` is large enough to
+want its own placement. Every single-purpose page still works — use those instead
+if you'd rather position each overlay separately.
 
 ### Hostname Mapping (Optional)
 

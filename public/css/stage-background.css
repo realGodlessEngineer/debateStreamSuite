@@ -1,0 +1,237 @@
+/**
+ * Consolidated Background Stage Styles
+ * For OBS Browser Source - canvas-reactive (16:9 landscape / 9:16 portrait)
+ *
+ * Folds display-topics.html's two overlays into a single source meant to sit
+ * BEHIND the host cams in the scene. display-topics.html itself is unchanged
+ * and still works standalone.
+ *
+ * No theme stylesheet: every colour here is fixed, and a theme's body gradient
+ * would make the source opaque.
+ *
+ * Local heavy-condensed-italic display face; overlays are OBS/CEF so
+ * -webkit-text-stroke + paint-order render as intended. No CDN assets.
+ *
+ * ---------------------------------------------------------------------------
+ * THE SCALING CONTRACT (--u)
+ * ---------------------------------------------------------------------------
+ * Unlike the single-purpose pages, this one does NOT pin the body to a fixed
+ * 1920x1080. It reads whatever canvas the OBS source is given and scales the
+ * design to it, so one page serves 1920x1080, 1280x720, 2560x1440 and the
+ * portrait equivalents.
+ *
+ * `--u` is one design pixel expressed as a real length. Every measurement below
+ * is written `calc(N * var(--u))`, where N is the value the design was drawn at
+ * - so on a 1920-wide canvas --u resolves to exactly 1px and the numbers read
+ * as the plain pixel values they always were.
+ *
+ * min() of the two ratios (rather than just the width one) is what keeps the
+ * design inside an off-aspect canvas: on 1920x1200 the width term wins and the
+ * extra height simply goes unused, instead of the layout scaling up and running
+ * off the top and bottom edges. Elements anchored to an edge still track the
+ * real edge, because their insets are also in --u against the real viewport.
+ *
+ * The orientation switch is a plain aspect-ratio media query - no JS, no resize
+ * listener, and it re-evaluates for free if the operator rescales the source.
+ */
+
+:root {
+  /* Landscape: design drawn at 1920x1080 */
+  --u: min(100vw / 1920, 100vh / 1080);
+}
+
+/* Portrait: design drawn at 1080x1920. A square canvas counts as landscape. */
+@media (max-aspect-ratio: 1/1) {
+  :root {
+    --u: min(100vw / 1080, 100vh / 1920);
+  }
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  background: transparent;
+  color: #ffffff;
+  overflow: hidden;
+  position: relative;
+}
+
+@font-face {
+  font-family: 'Futura XBlkCnIt BT';
+  src: url('/fonts/futura-xblkcnit-bt.ttf') format('truetype');
+  font-display: swap;
+}
+
+/* ===========================================================================
+   Landscape (16:9) - topic list with the call-in pill directly beneath it,
+   centered across the top of the canvas.
+   =========================================================================== */
+
+/* The wrapper is what makes the pill sit just below a list whose height varies
+   with the topic count. Both children keep their own `visible` class, so hiding
+   the topics simply lets the pill rise to the top of the stack.
+   The DOM order is pill-then-topics (portrait wants the pill above); `order`
+   flips them here without a second copy of the markup. */
+.stage-stack {
+  position: absolute;
+  top: calc(84 * var(--u));
+  left: 0;
+  right: 0;
+  z-index: 25;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(26 * var(--u));
+  pointer-events: none;
+}
+
+.stage-topics { order: 1; }
+.stage-callin { order: 2; }
+
+/* Topic list. width:max-content pins the block to the widest row rather than
+   leaving it to shrink-to-fit, and min-width holds a floor beneath that.
+   The floor is the load-bearing part: the block is display:none until the
+   socket arrives, so nothing on the page requests the webfont and the first
+   layout runs in the Impact fallback - whose glyphs are *narrower* than
+   Futura's. A box sized from fallback metrics is a hair too small for the text
+   painted into it, and a short topic drops its last word to a second line. The
+   floor absorbs that difference. Its only cost is dead space beside a
+   left-aligned list, which is invisible.
+   max-width caps the line length once a topic genuinely needs the room. */
+.stage-topics {
+  width: max-content;
+  min-width: calc(440 * var(--u));
+  max-width: 58%;
+  display: none;
+  text-align: left;
+  color: #ffffff;
+  font-family: 'Futura XBlkCnIt BT', Impact, sans-serif;
+  -webkit-text-stroke: calc(4 * var(--u)) #000;
+  paint-order: stroke fill;
+  text-transform: uppercase;
+}
+
+.stage-topics.visible {
+  display: block;
+}
+
+/* One numbered topic per row, laid out as a two-column flex row. The "N."
+   prefix is normal stroked text (not an ::marker, which won't take the stroke)
+   sitting in a fixed-width column, so every number shares one left edge and
+   every topic shares one left edge. The text column being its own flex item is
+   what gives wrapped lines their hanging indent - continuation lines align
+   under the topic text, never under the number. */
+.stage-topic {
+  display: flex;
+  gap: 0.25em;
+  font-size: calc(48 * var(--u));
+  line-height: 1.08;
+  margin-bottom: calc(20 * var(--u));
+}
+
+.stage-topic:last-child {
+  margin-bottom: 0;
+}
+
+/* Fixed-width number column - wide enough for double digits. nowrap keeps
+   "10." on one line; wrapping it would knock the whole row out of alignment. */
+.stage-topic-num {
+  flex: 0 0 1.6em;
+  white-space: nowrap;
+}
+
+/* min-width: 0 lets a long unbroken topic shrink/wrap inside the flex row
+   instead of pushing past the block's right edge. */
+.stage-topic-text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Call-in pill - red stroked text on a black rounded pill with a soft glow. */
+.stage-callin {
+  display: none;
+}
+
+.stage-callin.visible {
+  display: block;
+}
+
+.stage-callin span {
+  display: inline-block;
+  background: #000000;
+  border-radius: 999px;
+  padding: calc(14 * var(--u)) calc(34 * var(--u));
+  box-shadow:
+    0 0 calc(34 * var(--u)) rgba(230, 57, 70, 0.55),
+    0 calc(8 * var(--u)) calc(24 * var(--u)) rgba(0, 0, 0, 0.6);
+  color: #e63946;
+  font-family: 'Futura XBlkCnIt BT', Impact, sans-serif;
+  font-size: calc(46 * var(--u));
+  -webkit-text-stroke: calc(4 * var(--u)) #000;
+  paint-order: stroke fill;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* ===========================================================================
+   Portrait (9:16) - the arrangement vertical-display.html established: topic
+   list down the mid-left over the message-board plaque in the stage art, with
+   the call-in pill centered above it.
+   =========================================================================== */
+
+@media (max-aspect-ratio: 1/1) {
+  /* Drop the stack. Portrait doesn't need the pill to track the bottom of the
+     list - the pill sits *above* a list that grows downward, so both can be
+     anchored outright at the positions the stage art was drawn around.
+     Making the wrapper static lets its children resolve against <body>. */
+  .stage-stack {
+    position: static;
+    display: block;
+  }
+
+  .stage-callin {
+    position: absolute;
+    bottom: calc(1037 * var(--u));  /* ~54.0% of the 1920 canvas */
+    left: 0;
+    right: 0;
+    z-index: 40;
+    text-align: center;
+  }
+
+  .stage-callin span {
+    padding: calc(18 * var(--u)) calc(44 * var(--u));
+    box-shadow: 0 0 calc(40 * var(--u)) calc(8 * var(--u)) rgba(230, 57, 70, 0.45);
+  }
+
+  .stage-topics {
+    position: absolute;
+    left: calc(73 * var(--u));   /* ~6.8% of the 1080 canvas */
+    top: calc(948 * var(--u));   /* ~49.4% of the 1920 canvas */
+    z-index: 40;
+    /* Same content-hugging rule as landscape, re-floored for portrait's larger
+       type. vertical-display.css pins `width: 40%` here, which is 432u - and at
+       52u the number column eats ~96u of that, leaving ~336u for text that
+       "God Is Immoral" needs ~350u to set. Every topic of that length wraps to
+       two lines. Measured at 540x960 and confirmed by arithmetic at full size.
+       470u is the widest of the operator's current topics plus slack; the 62%
+       cap still leaves a third of the canvas clear to the right. */
+    width: max-content;
+    min-width: calc(470 * var(--u));
+    max-width: 62%;
+  }
+
+  .stage-topic {
+    font-size: calc(52 * var(--u));
+    margin-bottom: calc(22 * var(--u));
+  }
+}

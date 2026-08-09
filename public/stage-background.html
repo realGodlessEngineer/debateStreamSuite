@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Consolidated Stage - Background</title>
+  <link rel="stylesheet" href="css/stage-background.css">
+</head>
+<body>
+  <!-- CONSOLIDATED BACKGROUND STAGE
+       Everything here is meant to sit BEHIND the host video feeds in the OBS
+       scene, showing through the margins the cams don't cover. Add this source
+       below the cams and above your backdrop artwork.
+
+       The centre of the canvas is deliberately left empty so backdrop artwork
+       shows through untouched - nothing is painted there.
+
+       No theme stylesheet: every colour here is fixed (white topics, red pill),
+       and a theme's body gradient would make the source opaque.
+
+       The single-purpose pages this consolidates (display-topics.html) are
+       unchanged and still work standalone - use those instead if you'd rather
+       position each overlay separately in OBS. -->
+  <div class="stage-stack">
+    <!-- Call-in pill - shown via socket 'callInUpdate'.
+         Ordered before the topics in the DOM because portrait puts the pill
+         above the list; landscape reverses them with `order`. -->
+    <div id="stageCallIn" class="stage-callin">
+      <span id="stageCallInText"></span>
+    </div>
+
+    <!-- Topic list - shown via socket 'topicsUpdate' -->
+    <div id="stageTopics" class="stage-topics">
+      <div id="stageTopicsList"></div>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="js/socket-connection.js"></script>
+  <script src="js/stage-background.js"></script>
+</body>
+</html>

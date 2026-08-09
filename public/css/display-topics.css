@@ -56,13 +56,35 @@ body {
   pointer-events: none;
 }
 
-/* Topic list. As a centered flex item its width is fit-content, so the block
-   hugs the topics and stays optically centered rather than sitting inside a
-   fixed column; max-width caps the line length on a long topic. The text
-   inside is left-aligned so the number column and the topic text each keep
-   one flush vertical edge. */
+/* Topic list. The block hugs its widest topic and stays optically centered
+   rather than sitting inside a fixed column; the text inside is left-aligned
+   so the number column and the topic text each keep one flush vertical edge.
+   The three width declarations together read: at least 440px, otherwise as
+   wide as the longest topic, never more than 58% of the canvas.
+
+   width: max-content is that middle term stated outright. As a centered flex
+   item the block would size to fit-content anyway, but fit-content is
+   resolved against available space and is the one part of this layout that
+   an engine can legitimately resolve *down* to min-content - which would
+   break every topic at its widest word. Pinning it removes the question.
+
+   min-width is a floor that keeps short topics off their own max-content
+   boundary. Without it the block is exactly as wide as the widest row's
+   text, so the line box has zero slack and any disagreement between the
+   width the text was measured at and the width it is finally painted at
+   drops the last word onto a second line. That disagreement is real here:
+   the list is display:none until the socket arrives, so nothing requests the
+   webfont and the first layout runs in the Impact fallback - then the
+   bundled Futura, which measures 1-10px *wider* per topic at 48px, swaps in
+   underneath it. The floor leaves ~28px of headroom on a three-word topic.
+   Its cost is dead space to the right of a short list, which pulls the ink
+   half that far off centre (~14px for the topics this was tuned against);
+   that is why the floor is only as large as it needs to be. A genuinely long
+   topic ignores the floor and grows to max-width, then wraps. */
 .stage-topics {
-  max-width: 52%;
+  width: max-content;
+  min-width: 440px;
+  max-width: 58%;  /* ~1114px of the 1920px canvas */
   display: none;
   text-align: left;
   color: #ffffff;
@@ -102,7 +124,10 @@ body {
 }
 
 /* min-width: 0 lets a long unbroken topic shrink/wrap inside the flex row
-   instead of pushing past the block's right edge. */
+   instead of pushing past the block's right edge. The flex-grow half of the
+   shorthand is load-bearing too: it hands the block's min-width headroom to
+   the line box instead of leaving it as dead space to the right of the text,
+   which is what actually keeps a short topic on one line. */
 .stage-topic-text {
   flex: 1 1 auto;
   min-width: 0;

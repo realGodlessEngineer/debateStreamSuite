@@ -1,0 +1,898 @@
+/**
+ * Consolidated Foreground Stage Styles
+ * For OBS Browser Source - canvas-reactive (16:9 landscape / 9:16 portrait)
+ *
+ * Folds seven overlays into a single source meant to paint OVER the host cams:
+ * title bar, caller card, "Up Next" pill, claim strip, scoreboard, segment
+ * countdown and ticker crawl. Every single-purpose page this consolidates is
+ * unchanged and still works standalone.
+ *
+ * Theme stylesheet IS loaded here (unlike stage-background.css), because the
+ * caller card and title bar read their gradient, border and accent from theme
+ * variables. The `background: transparent` on body below is what keeps the
+ * source see-through - this file is linked after the theme, so it wins.
+ *
+ * Font: Inter if the machine has it, otherwise the platform UI face. The
+ * single-purpose display.css pulls Inter from Google Fonts with an @import;
+ * that is deliberately not repeated here, since an overlay that blocks on a
+ * CDN at stream start is a bad trade for a font substitution nobody will see.
+ *
+ * ---------------------------------------------------------------------------
+ * THE SCALING CONTRACT (--u)
+ * ---------------------------------------------------------------------------
+ * This page does NOT pin the body to a fixed 1920x1080. It reads whatever
+ * canvas the OBS source is given and scales the design to it, so one page
+ * serves 1920x1080, 1280x720, 2560x1440 and the portrait equivalents.
+ *
+ * `--u` is one design pixel expressed as a real length. Measurements are
+ * written `calc(N * var(--u))`, where N is the value the design was drawn at -
+ * so on a 1920-wide canvas --u resolves to exactly 1px and the numbers read as
+ * the plain pixel values they always were.
+ *
+ * min() of the two ratios (rather than just the width one) is what keeps the
+ * design inside an off-aspect canvas: on 1920x1200 the width term wins and the
+ * extra height simply goes unused, instead of the layout scaling up and running
+ * off the top and bottom edges. Elements anchored to an edge still track the
+ * real edge, because their insets are also in --u against the real viewport.
+ *
+ * Type is handled by one line rather than N of them: `body { font-size }` is
+ * itself in --u, and the card interiors were already written in `em`, so the
+ * whole inherited type scale comes along for free at any canvas size.
+ *
+ * The orientation switch is a plain aspect-ratio media query - no JS, no resize
+ * listener, and it re-evaluates for free if the operator rescales the source.
+ */
+
+:root {
+  /* Landscape: design drawn at 1920x1080 */
+  --u: min(100vw / 1920, 100vh / 1080);
+}
+
+/* Portrait: design drawn at 1080x1920. A square canvas counts as landscape. */
+@media (max-aspect-ratio: 1/1) {
+  :root {
+    --u: min(100vw / 1080, 100vh / 1920);
+  }
+}
+
+@font-face {
+  font-family: 'Futura XBlkCnIt BT';
+  src: url('/fonts/futura-xblkcnit-bt.ttf') format('truetype');
+  font-display: swap;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+  /* Every `em` below hangs off this one declaration - see the header note. */
+  font-size: calc(16 * var(--u));
+  background: transparent;
+  color: #ffffff;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Per-stance accent color, shared by the caller card's accent edge, the stance
+   chips, the on-deck chip and the scoreboard rows - so a side reads as the
+   same color everywhere. Copied verbatim from display.css. */
+[data-stance="theist"]    { --stance-color: #a78bfa; }
+[data-stance="atheist"]   { --stance-color: #ef4444; }
+[data-stance="agnostic"]  { --stance-color: #9ca3af; }
+[data-stance="christian"] { --stance-color: #3b82f6; }
+[data-stance="muslim"]    { --stance-color: #22c55e; }
+[data-stance="jewish"]    { --stance-color: #38bdf8; }
+[data-stance="undecided"] { --stance-color: #eab308; }
+[data-stance="other"]     { --stance-color: #f97316; }
+
+/* ===========================================================================
+   TOP ZONE
+   ===========================================================================
+   Three clusters that each own a corner of the top edge. On their standalone
+   pages the scoreboard and the segment countdown are BOTH pinned top-right at
+   the same 40px inset, and the claim band spans 82% of the canvas - so simply
+   stacking those three sources would overlap them two ways. A grid is the
+   payoff for consolidating: one layout can see all three and give each a lane.
+
+   `1fr auto 1fr` keeps the claim optically centered on the canvas regardless of
+   how wide the corner clusters are, because the two fr columns always split the
+   leftover space evenly. The claim is capped (below) rather than left to grow,
+   so a long proposition can't squeeze the corners.
+   =========================================================================== */
+
+.fg-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 30;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  grid-template-areas: "left center right";
+  align-items: start;
+  gap: calc(24 * var(--u));
+  padding: calc(40 * var(--u));
+  pointer-events: none;
+}
+
+/* min-width: 0 on every cell so an over-long child wraps inside its lane
+   instead of forcing the grid wider than the canvas. */
+.fg-top-left {
+  grid-area: left;
+  justify-self: start;
+  min-width: 0;
+}
+
+.fg-top-center {
+  grid-area: center;
+  justify-self: center;
+  min-width: 0;
+  /* ~57% of the 1920 canvas, leaving ~410u per side for the corner clusters.
+     The standalone claim page allows 82%, which has no corners to respect. */
+  max-width: calc(1100 * var(--u));
+}
+
+/* Countdown above the score tally. Both are display:none until their state
+   arrives, so the column collapses and a lone visible one sits flush in the
+   corner exactly where it does on its own page. */
+.fg-top-right {
+  grid-area: right;
+  justify-self: end;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: calc(16 * var(--u));
+}
+
+/* ========================================
+   On-deck (Up Next) pill
+   ======================================== */
+
+.on-deck {
+  display: none;
+  align-items: center;
+  gap: calc(14 * var(--u));
+  padding: calc(10 * var(--u)) calc(20 * var(--u));
+  background: linear-gradient(135deg, var(--color-bg-dark, #0d0d0d) 0%, var(--color-bg-tinted, #1a0808) 100%);
+  border: calc(2 * var(--u)) solid var(--color-primary-border, rgba(180, 30, 30, 0.4));
+  border-radius: calc(12 * var(--u));
+  box-shadow: 0 calc(6 * var(--u)) calc(24 * var(--u)) rgba(0, 0, 0, 0.6);
+}
+
+.on-deck.visible {
+  display: inline-flex;
+}
+
+.on-deck-label {
+  font-size: 0.95em;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: calc(2 * var(--u));
+  color: var(--color-primary, #e63946);
+  white-space: nowrap;
+}
+
+.on-deck-name {
+  font-size: 1.5em;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.on-deck-stance {
+  display: none;
+  padding: calc(3 * var(--u)) calc(14 * var(--u));
+  border-radius: 999px;
+  font-size: 0.8em;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: calc(1 * var(--u));
+  color: #ffffff;
+  background: var(--stance-color, #555);
+  border: calc(1 * var(--u)) solid rgba(255, 255, 255, 0.25);
+  white-space: nowrap;
+}
+
+.on-deck-stance.visible {
+  display: inline-block;
+}
+
+/* ========================================
+   Claim / resolution banner
+   ======================================== */
+
+.claim-banner {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(10 * var(--u));
+}
+
+.claim-banner.visible {
+  display: flex;
+}
+
+/* Proposition line. A solid banner (not bare stroked text like the topic list)
+   because this line is the whole point of the overlay and needs to read
+   instantly over any background. */
+.claim-text {
+  max-width: 100%;
+  background: rgba(0, 0, 0, 0.82);
+  border-radius: calc(14 * var(--u));
+  border-bottom: calc(4 * var(--u)) solid #e63946;
+  padding: calc(18 * var(--u)) calc(42 * var(--u));
+  text-align: center;
+  color: #ffffff;
+  font-family: 'Futura XBlkCnIt BT', Impact, sans-serif;
+  font-size: calc(52 * var(--u));
+  line-height: 1.15;
+  -webkit-text-stroke: calc(3 * var(--u)) #000;
+  paint-order: stroke fill;
+  text-transform: uppercase;
+  box-shadow: 0 calc(8 * var(--u)) calc(24 * var(--u)) rgba(0, 0, 0, 0.6);
+}
+
+/* Attribution / qualifier pill - optional second line, smaller and quieter
+   than the proposition so it reads as a caption rather than competing text. */
+.claim-subtext {
+  display: none;
+  max-width: 82%;
+  background: rgba(0, 0, 0, 0.75);
+  border-radius: 999px;
+  padding: calc(8 * var(--u)) calc(26 * var(--u));
+  text-align: center;
+  color: #e63946;
+  font-family: 'Futura XBlkCnIt BT', Impact, sans-serif;
+  font-size: calc(26 * var(--u));
+  line-height: 1.2;
+  -webkit-text-stroke: calc(2 * var(--u)) #000;
+  paint-order: stroke fill;
+  text-transform: uppercase;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.claim-subtext.has-subtext {
+  display: block;
+}
+
+/* ========================================
+   Segment countdown
+   ======================================== */
+
+.segment-timer {
+  display: none;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: calc(6 * var(--u));
+  padding: calc(16 * var(--u)) calc(28 * var(--u));
+  background: linear-gradient(135deg, #0d0d0d 0%, #1a0808 100%);
+  border: calc(2 * var(--u)) solid rgba(230, 57, 70, 0.4);
+  border-radius: calc(12 * var(--u));
+  box-shadow: 0 calc(6 * var(--u)) calc(24 * var(--u)) rgba(0, 0, 0, 0.6);
+}
+
+.segment-timer.visible {
+  display: flex;
+}
+
+.segment-label {
+  font-size: calc(24 * var(--u));
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: calc(2 * var(--u));
+  color: #e63946;
+  white-space: nowrap;
+}
+
+.segment-clock {
+  font-size: calc(64 * var(--u));
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+  color: #ffffff;
+}
+
+.segment-clock.warn {
+  color: #fbbf24;
+}
+
+.segment-clock.danger {
+  color: #f87171;
+  animation: segmentPulse 1.2s ease-in-out infinite;
+}
+
+/* ========================================
+   Scoreboard
+   ======================================== */
+
+/* Only shown once the server reports visible:true AND at least one side has a
+   nonzero score (see stage-foreground.js), so a fresh 0-0 board never renders
+   a wall of zeroed-out sides. */
+.scoreboard-card {
+  display: none;
+  flex-direction: column;
+  gap: calc(10 * var(--u));
+  min-width: calc(240 * var(--u));
+  padding: calc(16 * var(--u)) calc(22 * var(--u));
+  background: linear-gradient(135deg, #0d0d0d 0%, #1a0808 100%);
+  border: calc(2 * var(--u)) solid rgba(180, 30, 30, 0.4);
+  border-radius: calc(12 * var(--u));
+  box-shadow: 0 calc(6 * var(--u)) calc(24 * var(--u)) rgba(0, 0, 0, 0.6);
+}
+
+.scoreboard-card.visible {
+  display: flex;
+}
+
+.scoreboard-title {
+  font-size: calc(14 * var(--u));
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: calc(2 * var(--u));
+  color: #e63946;
+  text-align: center;
+}
+
+.scoreboard-rows {
+  display: flex;
+  flex-direction: column;
+  gap: calc(8 * var(--u));
+}
+
+/* One row per active side. The left accent bar is the same --stance-color used
+   everywhere else, so a viewer reads "theist" from the color alone. */
+.scoreboard-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(20 * var(--u));
+  padding: calc(6 * var(--u)) calc(14 * var(--u));
+  border-radius: calc(8 * var(--u));
+  background: rgba(255, 255, 255, 0.06);
+  border-left: calc(4 * var(--u)) solid var(--stance-color, #555);
+}
+
+.scoreboard-side {
+  font-size: calc(15 * var(--u));
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: calc(0.5 * var(--u));
+  white-space: nowrap;
+}
+
+/* tabular-nums keeps the digit column steady as a score changes width
+   (e.g. "9" -> "10"), so the card doesn't jitter on every adjustment. */
+.scoreboard-score {
+  font-size: calc(30 * var(--u));
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum';
+  min-width: 2ch;
+  text-align: right;
+}
+
+.scoreboard-row.pulse {
+  animation: scoreboardPulse 0.6s ease-out;
+}
+
+/* ===========================================================================
+   LOWER THIRD - title bar and caller card share this slot
+   ===========================================================================
+   Both are absolutely positioned in the same place and cross-fade; the title
+   bar shows when no caller is live. Neither is display:none in its resting
+   state (they sit at opacity 0), which is why they overlap rather than stack.
+   =========================================================================== */
+
+.title-bar-overlay,
+.caller-overlay {
+  position: absolute;
+  bottom: calc(40 * var(--u));
+  left: calc(40 * var(--u));
+  right: calc(40 * var(--u));
+  opacity: 0;
+  transform: translateY(calc(100 * var(--u)));
+  pointer-events: none;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.title-bar-overlay { z-index: 10; }
+.caller-overlay    { z-index: 20; }
+
+/* Lift the lower third clear of the crawl band when the ticker is up. The
+   class is set from JS on every tickerUpdate. The standalone pages can't do
+   this - display-ticker.css pins a 44px band flush to the bottom edge while
+   display.css puts the card at bottom:40px, so on separate sources they
+   overlap by those last 4px. Consolidating is what makes the two aware of
+   each other. */
+body.has-ticker .title-bar-overlay,
+body.has-ticker .caller-overlay {
+  bottom: calc(92 * var(--u));
+}
+
+.title-bar-overlay.visible,
+.caller-overlay.visible {
+  animation: stageBounceIn 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.title-bar-overlay.hiding,
+.caller-overlay.hiding {
+  animation: stageSlideOut 0.4s ease-in forwards;
+}
+
+/* Card chrome is shared so the two overlays read as one system - only the
+   interior layout differs. */
+.title-bar-card,
+.caller-card {
+  background: linear-gradient(135deg, var(--color-bg-dark, #0d0d0d) 0%, var(--color-bg-tinted, #1a0808) 100%);
+  border-radius: calc(16 * var(--u));
+  box-shadow:
+    0 calc(10 * var(--u)) calc(40 * var(--u)) rgba(0, 0, 0, 0.7),
+    var(--shadow-glow, 0 0 calc(30 * var(--u)) rgba(180, 30, 30, 0.2));
+  border: calc(2 * var(--u)) solid var(--color-primary-border, rgba(180, 30, 30, 0.4));
+  display: none;
+  max-width: 100%;
+}
+
+.title-bar-card.active {
+  display: block;
+}
+
+/* ---- 2-host title bar ---- */
+
+.title-bar-card.two-host {
+  padding: calc(30 * var(--u)) calc(50 * var(--u)) calc(24 * var(--u));
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.title-hosts-row {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  gap: calc(40 * var(--u));
+}
+
+.title-host {
+  flex: 1;
+  text-align: center;
+}
+
+.title-host-name {
+  font-size: 3em;
+  font-weight: 700;
+  color: #ffffff;
+  text-shadow: 0 calc(2 * var(--u)) calc(4 * var(--u)) rgba(0, 0, 0, 0.5);
+  line-height: 1.2;
+}
+
+.title-host-pronouns {
+  font-size: 1.4em;
+  font-weight: 500;
+  color: var(--color-primary, #e63946);
+  text-shadow: 0 calc(2 * var(--u)) calc(4 * var(--u)) rgba(0, 0, 0, 0.5);
+  margin-top: calc(4 * var(--u));
+}
+
+.title-show-row {
+  text-align: center;
+  margin-top: calc(16 * var(--u));
+}
+
+.title-show-name {
+  font-size: 2em;
+  font-weight: 600;
+  color: var(--color-text-muted, #ccc);
+  text-shadow: 0 calc(2 * var(--u)) calc(4 * var(--u)) rgba(0, 0, 0, 0.5);
+  letter-spacing: calc(0.5 * var(--u));
+}
+
+/* ---- 1-host title bar ---- */
+
+.title-bar-card.one-host {
+  padding: calc(24 * var(--u)) calc(40 * var(--u));
+  display: none;
+  text-align: center;
+  flex-shrink: 1;
+  min-width: calc(500 * var(--u));
+}
+
+.title-bar-card.one-host.active {
+  display: inline-block;
+}
+
+.title-show-divider {
+  margin-top: calc(10 * var(--u));
+  padding-top: calc(10 * var(--u));
+  border-top: calc(1 * var(--u)) solid var(--color-primary-border, rgba(180, 30, 30, 0.3));
+}
+
+/* ---- Caller cards ---- */
+
+/* overflow:hidden clips the stance accent edge to the rounded corners. */
+.caller-card {
+  position: relative;
+  overflow: hidden;
+  text-align: left;
+  align-items: center;
+  gap: calc(40 * var(--u));
+}
+
+.caller-card.active {
+  display: flex;
+}
+
+/* Stance accent edge. Reads --stance-color off the card's own data-stance
+   (set in stage-foreground.js); falls back to the theme primary when the
+   operator hasn't picked a stance.
+   A real element rather than ::before because the sandstone theme claims both
+   .caller-card::before and ::after for its grain/weathering layers at higher
+   specificity. z-index:2 keeps it above those layers. */
+.caller-accent {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 2;
+  width: calc(8 * var(--u));
+  background: var(--stance-color, var(--color-primary, #e63946));
+  box-shadow: 0 0 calc(18 * var(--u)) var(--stance-color, var(--color-primary, #e63946));
+}
+
+.caller-card.two-host {
+  padding: calc(26 * var(--u)) calc(46 * var(--u)) calc(26 * var(--u)) calc(54 * var(--u));
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.caller-card.one-host {
+  padding: calc(22 * var(--u)) calc(38 * var(--u)) calc(22 * var(--u)) calc(46 * var(--u));
+  display: none;
+  flex-shrink: 1;
+  min-width: calc(520 * var(--u));
+}
+
+.caller-card.one-host.active {
+  display: flex;
+}
+
+/* Identity column - min-width:0 lets a long name wrap inside the flex row
+   instead of shoving the meta cluster off the card's right edge. */
+.caller-identity {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.caller-label {
+  font-size: 0.95em;
+  font-weight: 700;
+  letter-spacing: calc(4 * var(--u));
+  text-transform: uppercase;
+  color: var(--color-primary, #e63946);
+  margin-bottom: calc(6 * var(--u));
+}
+
+/* Baseline alignment sits the pronoun pill on the name's baseline rather than
+   its box, so it optically hangs off the name at any name length. */
+.caller-name-row {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: calc(8 * var(--u)) calc(18 * var(--u));
+}
+
+/* overflow-wrap:anywhere is insurance for an unbroken handle (a long screen
+   name with no spaces) - it breaks rather than spilling. */
+.caller-name {
+  font-size: 3.2em;
+  font-weight: 700;
+  color: #ffffff;
+  text-shadow: 0 calc(2 * var(--u)) calc(4 * var(--u)) rgba(0, 0, 0, 0.5);
+  line-height: 1.1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* Muted pill trailing the name. :empty collapses it so a caller with no
+   pronouns set leaves no stray chip behind. */
+.caller-pronouns {
+  font-size: 1.15em;
+  font-weight: 600;
+  letter-spacing: calc(1 * var(--u));
+  color: var(--color-text-muted, #b0b0b0);
+  background: rgba(255, 255, 255, 0.08);
+  border: calc(1 * var(--u)) solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  padding: calc(4 * var(--u)) calc(14 * var(--u));
+  white-space: nowrap;
+}
+
+.caller-pronouns:empty {
+  display: none;
+}
+
+/* Meta column - stance chip + call timer, never shrinks */
+.caller-meta {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: calc(22 * var(--u));
+}
+
+.caller-stance {
+  display: none;
+  padding: calc(8 * var(--u)) calc(24 * var(--u));
+  border-radius: 999px;
+  font-size: 1.05em;
+  font-weight: 700;
+  letter-spacing: calc(2 * var(--u));
+  text-transform: uppercase;
+  color: #ffffff;
+  background: var(--stance-color, #555);
+  border: calc(1 * var(--u)) solid rgba(255, 255, 255, 0.25);
+  text-shadow: 0 calc(1 * var(--u)) calc(3 * var(--u)) rgba(0, 0, 0, 0.6);
+  white-space: nowrap;
+}
+
+.caller-stance.visible {
+  display: inline-block;
+}
+
+/* Call timer. tabular-nums plus a zero-padded MM keeps every digit the same
+   width, so the readout doesn't twitch as it ticks. */
+.caller-timer {
+  display: none;
+  align-items: center;
+  gap: calc(10 * var(--u));
+  padding: calc(8 * var(--u)) calc(18 * var(--u));
+  border-radius: calc(10 * var(--u));
+  background: rgba(0, 0, 0, 0.45);
+  border: calc(1 * var(--u)) solid rgba(255, 255, 255, 0.1);
+  font-size: 1.5em;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+  color: var(--color-text-secondary, #e0e0e0);
+}
+
+.caller-timer.visible {
+  display: inline-flex;
+}
+
+/* Live dot - the only thing that pulses at danger. Blinking the whole readout
+   (the old behavior) made the digits hard to read on stream. */
+.caller-timer::before {
+  content: '';
+  flex: 0 0 auto;
+  width: calc(12 * var(--u));
+  height: calc(12 * var(--u));
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.caller-timer.warn {
+  color: #fbbf24;
+  background: rgba(251, 191, 36, 0.12);
+  border-color: rgba(251, 191, 36, 0.4);
+}
+
+.caller-timer.danger {
+  color: #f87171;
+  background: rgba(248, 113, 113, 0.14);
+  border-color: rgba(248, 113, 113, 0.45);
+}
+
+.caller-timer.danger::before {
+  animation: timerPulse 1.2s ease-in-out infinite;
+}
+
+/* ===========================================================================
+   TICKER - crawl band flush against the true bottom edge
+   =========================================================================== */
+
+/* overflow:hidden is what clips the horizontally-scrolling track to a single
+   visible line. */
+.ticker-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: calc(44 * var(--u));
+  z-index: 25;
+  display: none;
+  align-items: center;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.ticker-bar.visible {
+  display: flex;
+}
+
+/* Track holds two identical copies of the item run, laid out side by side.
+   width: max-content lets it size to its actual content (both runs) rather than
+   the viewport, which is what makes a translateX(-50%) land exactly on the
+   boundary between the two copies - a seamless loop with no snap, regardless of
+   how many items are loaded. The animation itself is assigned from JS (duration
+   depends on rendered width), not declared here. */
+.ticker-track {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+}
+
+/* -50% lands exactly on the seam between the two identical runs, so the reset
+   to 0% is invisible. Assigned by name from JS with a measured duration. */
+@keyframes ticker-crawl {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+.ticker-run {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.ticker-item {
+  font-family: 'Futura XBlkCnIt BT', Impact, sans-serif;
+  font-size: calc(30 * var(--u));
+  line-height: 1;
+  color: #ffffff;
+  -webkit-text-stroke: calc(4 * var(--u)) #000;
+  paint-order: stroke fill;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* Delimiter glyph between items (and after the last item in a run, so the wrap
+   point between the two copies reads as continuous). Accent-colored so distinct
+   entries never run together visually. */
+.ticker-sep {
+  display: inline-block;
+  font-family: 'Futura XBlkCnIt BT', Impact, sans-serif;
+  font-size: calc(24 * var(--u));
+  line-height: 1;
+  color: #e63946;
+  -webkit-text-stroke: calc(4 * var(--u)) #000;
+  paint-order: stroke fill;
+  margin: 0 calc(32 * var(--u));
+}
+
+/* ===========================================================================
+   PORTRAIT (9:16)
+   ===========================================================================
+   1080 wide can't carry the claim and both corner clusters on one row, so the
+   top zone becomes two rows: the claim across the full width, the two corners
+   beneath it. Same three cells, re-dealt by grid-template-areas - no duplicate
+   markup and no JS.
+   =========================================================================== */
+
+@media (max-aspect-ratio: 1/1) {
+  .fg-top {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "center center"
+      "left   right";
+    row-gap: calc(30 * var(--u));
+  }
+
+  .fg-top-center {
+    max-width: 100%;
+    justify-self: stretch;
+  }
+
+  .claim-text {
+    font-size: calc(46 * var(--u));
+  }
+
+  /* The 60u inset vertical-display.css established, and its ticker-aware
+     counterpart. */
+  .title-bar-overlay,
+  .caller-overlay {
+    bottom: calc(60 * var(--u));
+  }
+
+  body.has-ticker .title-bar-overlay,
+  body.has-ticker .caller-overlay {
+    bottom: calc(112 * var(--u));
+  }
+
+  /* Portrait has width for one card, not a right-aligned compact one - both
+     layouts span the full column. */
+  .caller-card.one-host,
+  .title-bar-card.one-host {
+    width: 100%;
+    min-width: 0;
+  }
+
+  /* Two host names side by side get cramped at 1080 minus insets; stack them. */
+  .title-hosts-row {
+    flex-direction: column;
+    gap: calc(18 * var(--u));
+  }
+
+  .segment-clock {
+    font-size: calc(56 * var(--u));
+  }
+}
+
+/* ===========================================================================
+   ANIMATIONS
+   ===========================================================================
+   The translate distances are in --u like everything else, so the lower third
+   travels the same proportional distance on any canvas rather than a fixed
+   100px that would read as a twitch at 4K and a lurch at 720p.
+   =========================================================================== */
+
+@keyframes stageBounceIn {
+  0% {
+    opacity: 0;
+    transform: translateY(calc(100 * var(--u)));
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(calc(-12 * var(--u)));
+  }
+  70% {
+    transform: translateY(calc(5 * var(--u)));
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes stageSlideOut {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(calc(80 * var(--u)));
+  }
+}
+
+@keyframes timerPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+
+@keyframes segmentPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+
+/* Brief flash on the scoreboard row that just changed - the only cue a viewer
+   gets that a point landed. Runs once on insertion since rows are rebuilt from
+   scratch on every update. */
+@keyframes scoreboardPulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 rgba(255, 255, 255, 0);
+  }
+  35% {
+    transform: scale(1.08);
+    box-shadow: 0 0 calc(22 * var(--u)) var(--stance-color, rgba(255, 255, 255, 0.6));
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 rgba(255, 255, 255, 0);
+  }
+}

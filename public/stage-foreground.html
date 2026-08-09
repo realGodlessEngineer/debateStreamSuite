@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Consolidated Stage - Foreground</title>
+  <link rel="stylesheet" href="css/themes/godless-engineer.css">
+  <link rel="stylesheet" href="css/stage-foreground.css">
+</head>
+<body>
+  <!-- CONSOLIDATED FOREGROUND STAGE
+       Everything here is meant to paint OVER the host video feeds. Add this
+       source above the cams in the OBS scene; add stage-background.html below
+       them for the topic list and call-in pill.
+
+       Folds seven overlays into one source: title bar, caller card, "Up Next"
+       pill, claim strip, scoreboard, segment countdown and ticker crawl. Each
+       single-purpose page (display.html, vertical-display.html,
+       display-claim.html, display-scoreboard.html, display-segment.html,
+       display-ticker.html) is unchanged and still works standalone - use those
+       instead if you'd rather position each one separately in OBS.
+
+       Two overlays are deliberately NOT here. display-scene.html is full-bleed
+       and opaque, so it would cover the cams. The reference/verse panel
+       (bible-display.html) is large and wants its own placement. -->
+
+  <!-- ===================================================================
+       TOP ZONE - three clusters that would collide if each source were
+       dropped in at its own default position (the scoreboard and the segment
+       countdown both sit top-right on their standalone pages, and the claim
+       band spans wide enough to run under both). A grid is the payoff for
+       consolidating: one layout can see all three at once and give each its
+       own lane. Landscape puts them side by side; portrait stacks the claim
+       above the two corners. See stage-foreground.css.
+       =================================================================== -->
+  <div class="fg-top">
+    <!-- On-deck pill - shown when the caller queue is non-empty -->
+    <div class="fg-top-left">
+      <div id="onDeck" class="on-deck">
+        <span class="on-deck-label">Up Next</span>
+        <span class="on-deck-name" id="onDeckName"></span>
+        <span class="on-deck-stance" id="onDeckStance" data-stance=""></span>
+      </div>
+    </div>
+
+    <!-- Claim / resolution banner - the proposition under debate -->
+    <div class="fg-top-center">
+      <div id="claimBanner" class="claim-banner">
+        <div id="claimText" class="claim-text"></div>
+        <div id="claimSubtext" class="claim-subtext"></div>
+      </div>
+    </div>
+
+    <!-- Segment countdown above the score tally. Both collapse out of the
+         column when hidden, so a lone visible one sits flush in the corner. -->
+    <div class="fg-top-right">
+      <div id="segmentTimer" class="segment-timer">
+        <div id="segmentLabel" class="segment-label"></div>
+        <div id="segmentClock" class="segment-clock">0:00</div>
+      </div>
+
+      <div id="scoreboardCard" class="scoreboard-card">
+        <div class="scoreboard-title">Scoreboard</div>
+        <div id="scoreboardRows" class="scoreboard-rows"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================
+       LOWER THIRD - the title bar and the caller card share this slot and
+       swap: the title bar shows when no caller is live. Both are absolutely
+       positioned in the same place and cross-fade, which is why they are
+       siblings here rather than in a flow container.
+       =================================================================== -->
+
+  <!-- Title Bar (show title + hosts) - shown when no caller -->
+  <div id="titleBar" class="title-bar-overlay">
+    <!-- 2-host layout -->
+    <div class="title-bar-card two-host" id="titleBarTwoHost">
+      <div class="title-hosts-row">
+        <div class="title-host">
+          <div class="title-host-name" id="host1NameDisplay"></div>
+          <div class="title-host-pronouns" id="host1PronounsDisplay"></div>
+        </div>
+        <div class="title-host">
+          <div class="title-host-name" id="host2NameDisplay"></div>
+          <div class="title-host-pronouns" id="host2PronounsDisplay"></div>
+        </div>
+      </div>
+      <div class="title-show-row">
+        <div class="title-show-name" id="showTitleDisplay"></div>
+      </div>
+    </div>
+
+    <!-- 1-host layout -->
+    <div class="title-bar-card one-host" id="titleBarOneHost">
+      <div class="title-host-name" id="soloHostNameDisplay"></div>
+      <div class="title-host-pronouns" id="soloHostPronounsDisplay"></div>
+      <div class="title-show-name title-show-divider" id="soloShowTitleDisplay"></div>
+    </div>
+  </div>
+
+  <!-- Caller Card - shown when caller is set. Each card is a two-column lower
+       third: identity (label + name + pronouns) on the left, meta cluster
+       (stance chip + call timer) on the right. The card carries its own
+       data-stance so the accent edge picks up the color. -->
+  <div id="callerDisplay" class="caller-overlay">
+    <!-- 2-host caller card (full width) -->
+    <div class="caller-card two-host" id="callerCardTwoHost" data-stance="">
+      <span class="caller-accent"></span>
+      <div class="caller-identity">
+        <div class="caller-label">Caller</div>
+        <div class="caller-name-row">
+          <span class="caller-name" id="callerNameTwoHost"></span>
+          <span class="caller-pronouns" id="callerPronounsTwoHost"></span>
+        </div>
+      </div>
+      <div class="caller-meta">
+        <div class="caller-stance" id="callerStanceTwoHost" data-stance=""></div>
+        <div class="caller-timer" id="callerTimerTwoHost"></div>
+      </div>
+    </div>
+
+    <!-- 1-host caller card (right-aligned compact) -->
+    <div class="caller-card one-host" id="callerCardOneHost" data-stance="">
+      <span class="caller-accent"></span>
+      <div class="caller-identity">
+        <div class="caller-label">Caller</div>
+        <div class="caller-name-row">
+          <span class="caller-name" id="callerNameOneHost"></span>
+          <span class="caller-pronouns" id="callerPronounsOneHost"></span>
+        </div>
+      </div>
+      <div class="caller-meta">
+        <div class="caller-stance" id="callerStanceOneHost" data-stance=""></div>
+        <div class="caller-timer" id="callerTimerOneHost"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ticker crawl - flush against the true bottom edge. When it is visible
+       the lower third lifts to clear it (body.has-ticker in the CSS), which is
+       the second thing consolidating buys: the standalone pages can't know
+       about each other and overlap here by a few pixels. -->
+  <div id="tickerBar" class="ticker-bar">
+    <div class="ticker-track" id="tickerTrack">
+      <div class="ticker-run" id="tickerRunA"></div>
+      <div class="ticker-run" id="tickerRunB"></div>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="js/sanitize.js"></script>
+  <script src="js/socket-connection.js"></script>
+  <script src="js/theme-loader.js"></script>
+  <script src="js/stage-foreground.js"></script>
+</body>
+</html>

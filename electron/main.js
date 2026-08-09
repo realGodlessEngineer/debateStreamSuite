@@ -139,6 +139,19 @@ function createTray() {
     },
     { type: 'separator' },
     {
+      label: 'Copy Stage Foreground URL (over cams)',
+      click: () => {
+        clipboard.writeText(`${BASE_URL}/stage-foreground.html`);
+      }
+    },
+    {
+      label: 'Copy Stage Background URL (under cams)',
+      click: () => {
+        clipboard.writeText(`${BASE_URL}/stage-background.html`);
+      }
+    },
+    { type: 'separator' },
+    {
       label: 'Copy Reference Control URL',
       click: () => {
         clipboard.writeText(`${BASE_URL}/reference-control.html`);

@@ -261,6 +261,26 @@
         <span class="url-value" id="tickerDisplayUrl">http://localhost:3666/display-ticker.html</span>
       </div>
 
+      <h3>Consolidated stages (two sources instead of seven)</h3>
+      <p>These fold the overlays above into two Browser sources that size
+         themselves to whatever canvas you give them &mdash; use
+         <strong>1920&times;1080</strong> for a landscape scene or
+         <strong>1080&times;1920</strong> for a vertical one, and each lays
+         itself out for that shape. Add <strong>Foreground</strong>
+         <em>above</em> your camera sources and <strong>Background</strong>
+         <em>below</em> them, so the topic list and call-in pill show through
+         the margins while the nameplates paint over the video.</p>
+      <p>The single-purpose URLs above still work &mdash; use those instead if
+         you would rather position each overlay separately.</p>
+      <div class="url-block">
+        <span class="url-label">Foreground:</span>
+        <span class="url-value" id="stageForegroundUrl">http://localhost:3666/stage-foreground.html</span>
+      </div>
+      <div class="url-block">
+        <span class="url-label">Background:</span>
+        <span class="url-value" id="stageBackgroundUrl">http://localhost:3666/stage-background.html</span>
+      </div>
+
       <h3>Control Panel (OBS Custom Dock or Browser)</h3>
       <div class="url-block">
         <span class="url-label">Control URL:</span>

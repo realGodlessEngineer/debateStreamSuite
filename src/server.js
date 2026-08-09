@@ -133,6 +133,11 @@ server.listen(SERVER.PORT, () => {
 ║    Claim Banner:  http://localhost:${SERVER.PORT}/display-claim.html  ║
 ║    Ticker:        http://localhost:${SERVER.PORT}/display-ticker.html ║
 ╠══════════════════════════════════════════════════════════════╣
+║  Consolidated Stages (canvas-reactive 16:9 / 9:16):          ║
+║    Foreground:    http://localhost:${SERVER.PORT}/stage-foreground.html ║
+║    Background:    http://localhost:${SERVER.PORT}/stage-background.html ║
+║    (add foreground ABOVE your cams, background BELOW)        ║
+╠══════════════════════════════════════════════════════════════╣
 ║  Reference Repository:                                       ║
 ║    Control Panel: http://localhost:${SERVER.PORT}/reference-control.html ║
 ║    OBS Display:   http://localhost:${SERVER.PORT}/bible-display.html  ║

@@ -22,6 +22,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
     scoreboardDisplay: `${BASE_URL}/display-scoreboard.html`,
     claimDisplay: `${BASE_URL}/display-claim.html`,
     tickerDisplay: `${BASE_URL}/display-ticker.html`,
+    stageForeground: `${BASE_URL}/stage-foreground.html`,
+    stageBackground: `${BASE_URL}/stage-background.html`,
     bibleControl: `${BASE_URL}/reference-control.html`,
     bibleDisplay: `${BASE_URL}/bible-display.html`,
     soundboard: `${BASE_URL}/soundboard.html`
