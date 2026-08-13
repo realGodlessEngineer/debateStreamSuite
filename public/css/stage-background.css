@@ -98,6 +98,28 @@ body {
 .stage-topics { order: 1; }
 .stage-callin { order: 2; }
 
+/* Solo-host landscape: hug the right edge instead of the centre.
+   With two hosts the cams fill the width and the top centre strip is the only
+   clear ground; with one, the cam sits centre-ish and leaves the right third
+   open, so the stack moves out of the middle. `solo-host` is toggled on <body>
+   by stage-background.js off the host count - exactly one, never zero, since
+   zero means nothing is configured yet and centred is the safer guess.
+
+   left stays 0 deliberately: the stack keeps its full-width box and the items
+   right-align inside it. Shrinking the box to fit (left:auto) would make
+   .stage-topics' `max-width: 58%` resolve against its own max-content width
+   and wrap every long topic. Only the inset and the alignment change here, so
+   the width rules below are untouched.
+
+   The min-width floor's dead space now sits between the ink and the right
+   inset rather than being split either side of centre, so a short list reads
+   as ~28u further from the edge than a long one. That is the same slack the
+   floor always carried, just all on one side. */
+body.solo-host .stage-stack {
+  right: calc(64 * var(--u));
+  align-items: flex-end;
+}
+
 /* Topic list. width:max-content pins the block to the widest row rather than
    leaving it to shrink-to-fit, and min-width holds a floor beneath that.
    The floor is the load-bearing part: the block is display:none until the
@@ -197,6 +219,16 @@ body {
   .stage-stack {
     position: static;
     display: block;
+  }
+
+  /* Undo the solo-host shift. Portrait anchors both children outright, so the
+     stack has no position to move; the alignment is inert here too once the
+     flex box is gone. This is why the landscape rule above needs no media
+     query of its own - `body.solo-host .stage-stack` outweighs a bare
+     `.stage-stack`, so the portrait path has to say so explicitly rather than
+     rely on source order. Equal specificity, later in the file: this wins. */
+  body.solo-host .stage-stack {
+    right: auto;
   }
 
   .stage-callin {

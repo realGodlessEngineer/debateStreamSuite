@@ -3,8 +3,10 @@
  * OBS overlay for the numbered topic list and the call-in link/number pill.
  * Split out of caller-display.js so the topic list is its own browser source
  * and can be positioned, scaled, and toggled independently of the caller
- * lower-third. Listens only to 'topicsUpdate' and 'callInUpdate'; the server
- * replays both on connect, so a source added mid-show fills itself in.
+ * lower-third. Listens to 'topicsUpdate', 'callInUpdate' and 'showConfigUpdate';
+ * the server replays all three on connect, so a source added mid-show fills
+ * itself in. The show config is read for its host count alone - a one-host show
+ * moves the stack to the right corner, which CSS cannot decide on its own.
  * @module js/display-topics
  */
 
@@ -75,8 +77,23 @@
     elements.stageCallIn.classList.add('visible');
   }
 
+  /**
+   * Flag a one-host show so the stack moves to the right corner.
+   * Counts hosts the way caller-display.js does - an entry only counts once it
+   * has a name, so a half-filled row in the dock doesn't shift the layout.
+   * Exactly one moves it; zero means nothing is configured yet, where the
+   * centered default is the safer guess.
+   * @param {{ hosts: Array<{ name: string }> }} config
+   */
+  function applyHostCount(config) {
+    const hosts = (config && config.hosts) || [];
+    const named = hosts.filter(function (host) { return host && host.name; });
+    document.body.classList.toggle('solo-host', named.length === 1);
+  }
+
   socket.on('topicsUpdate', renderTopics);
   socket.on('callInUpdate', renderCallIn);
+  socket.on('showConfigUpdate', applyHostCount);
 
   console.log('Stage overlay display initialized - waiting for data...');
 })();

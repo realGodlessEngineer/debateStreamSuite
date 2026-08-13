@@ -5,12 +5,13 @@
  *
  * Same socket contract as display-topics.js, which remains the standalone
  * one-source-per-overlay version - this page exists so an operator who doesn't
- * need to position them separately can add a single source instead. Listens
- * only to 'topicsUpdate' and 'callInUpdate'; the server replays both on
- * connect, so a source added mid-show fills itself in.
+ * need to position them separately can add a single source instead. Listens to
+ * 'topicsUpdate', 'callInUpdate' and 'showConfigUpdate'; the server replays all
+ * three on connect, so a source added mid-show fills itself in.
  *
  * Layout (landscape vs portrait) is settled entirely in CSS by an aspect-ratio
- * media query - there is deliberately no orientation logic here.
+ * media query - there is deliberately no orientation logic here. The one thing
+ * JS owns is the `solo-host` body class, because CSS cannot see the host count.
  * @module js/stage-background
  */
 
@@ -81,8 +82,23 @@
     elements.stageCallIn.classList.add('visible');
   }
 
+  /**
+   * Flag a one-host show so landscape can move the stack to the right corner.
+   * Counts hosts the way stage-foreground.js does - an entry only counts once
+   * it has a name, so a half-filled row in the dock doesn't shift the layout.
+   * Exactly one moves it; zero means nothing is configured yet, where the
+   * centred default is the safer guess. Portrait ignores the class.
+   * @param {{ hosts: Array<{ name: string }> }} config
+   */
+  function applyHostCount(config) {
+    const hosts = (config && config.hosts) || [];
+    const named = hosts.filter(function (host) { return host && host.name; });
+    document.body.classList.toggle('solo-host', named.length === 1);
+  }
+
   socket.on('topicsUpdate', renderTopics);
   socket.on('callInUpdate', renderCallIn);
+  socket.on('showConfigUpdate', applyHostCount);
 
   console.log('Consolidated background stage initialized - waiting for data...');
 })();
