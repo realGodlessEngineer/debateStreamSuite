@@ -1,6 +1,11 @@
 /**
  * Caller Control Dock Styles
  * Uses theme variables from css/themes/*.css
+ *
+ * The dock is its own top-level OBS browser widget, so the viewport width IS
+ * the dock width - a narrow side rail (250-400px) or a wide float (900-1200px).
+ * Layout therefore keys off @media, not @container: OBS's bundled CEF version
+ * varies by release and container queries (Chrome 105) are not safe to assume.
  */
 
 * {
@@ -9,16 +14,70 @@
   box-sizing: border-box;
 }
 
+/* ========================================
+   Dock shell
+
+   Three fixed bands (title bar / show-config bar / on-air strip) and then
+   <main>, which takes the rest and splits it again into the pinned live-caller
+   zone, the tab bar and the scrolling panel region. The page itself never
+   scrolls at any dock size; scrolling belongs to .dock-panels, and to
+   .dock-live only when the dock is too short to show the pinned zone whole.
+   ======================================== */
+
+html,
+body {
+  height: 100%;
+}
+
+/* minmax(0, 1fr) on the single column, not the implicit `auto`: an auto column
+   is sized to its widest item's min-content, and one line of unbreakable
+   controls (the title bar's three buttons) then widens the whole page past the
+   viewport. The row axis needs the same floor - see .dock-panels below. */
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background: var(--color-bg-primary, #0a0a0a);
   color: var(--color-text-secondary, #e5e5e5);
-  overflow-x: hidden;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto auto auto 1fr;
+  overflow: hidden;
 }
 
-.dock-container {
+/* The panel row gets a floor rather than a bare 1fr. An auto row is maximised
+   before a flexible one gets anything, so on a narrow rail - where the pinned
+   zone alone measures ~700px against a 900px dock - the panels would otherwise
+   be handed 0px and the tabs would be useless. The floor is inert wherever the
+   pinned zone already fits: at 720px+ the panels take ~390px on their own. */
+.dock-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto auto minmax(clamp(140px, 26vh, 280px), 1fr);
+  min-height: 0;
+}
+
+/* overflow-y rather than hidden: when the rail is too short to show the whole
+   pinned zone, the operator gets a scrollbar rather than an unreachable Clear
+   button. Measured, it never appears at 720px wide or more; at 250-400px the
+   pinned zone is 680-740px of content and does scroll.
+
+   position: relative because the .sr-only labels inside are absolutely
+   positioned. With no positioned ancestor their containing block is the page,
+   which lets them escape every overflow:hidden between here and the root and
+   stretch the document's scroll area down to their static position. */
+.dock-live {
+  position: relative;
+  padding: 12px 12px 0;
+  overflow-y: auto;
+}
+
+/* min-height: 0 is load-bearing. A grid row defaults to a min-content floor
+   and refuses to shrink below its content; without it this band grows to fit
+   the tallest panel and page-level scroll comes straight back. */
+.dock-panels {
+  position: relative;
   padding: 12px;
-  max-width: 100%;
+  overflow-y: auto;
+  min-height: 0;
 }
 
 /* Title Bar */
@@ -26,6 +85,8 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
   padding: 8px 12px;
   background: var(--color-surface-elevated, #1f1f1f);
   border-bottom: 1px solid var(--color-surface-border, #2d2d2d);
@@ -34,7 +95,7 @@ body {
 .title-bar h1 {
   font-size: 14px;
   font-weight: 600;
-  color: var(--color-primary, #dc2626);
+  color: var(--color-primary-light, #ff5a67);
   margin: 0;
   display: flex;
   align-items: center;
@@ -56,6 +117,32 @@ body {
 
 .title-bar .status-dot.disconnected {
   background: var(--color-disconnected, #991b1b);
+}
+
+/* socket-connection.js writes "Connected"/"Disconnected" here and replaces the
+   class list wholesale, so this element carries no other classes. The word
+   itself is the non-colour cue; shared.css's version of this class is
+   position: fixed and shared.css is not loaded on the dock. */
+.connection-status {
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--color-surface-border, #2d2d2d);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-text-muted, #b0b0b0);
+  white-space: nowrap;
+}
+
+.connection-status.connected {
+  color: var(--color-connected, #22c55e);
+  border-color: var(--color-connected, #22c55e);
+}
+
+.connection-status.disconnected {
+  color: var(--color-error, #ff6b6b);
+  border-color: var(--color-error, #ff6b6b);
 }
 
 .title-bar-actions {
@@ -82,6 +169,150 @@ body {
   background: var(--color-primary, #dc2626);
 }
 
+/* ========================================
+   On-Air strip
+
+   One line naming every overlay currently on screen. This is what makes it
+   safe to put a Show/Hide toggle behind a tab: "what am I putting on air?"
+   stays answerable at a glance without leaving the current tab.
+   Built by js/dock-onair.js; :empty keeps the band out of the layout until it
+   runs (and if it ever fails).
+   ======================================== */
+
+.onair-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 4px;
+  padding: 4px 10px;
+  background: var(--color-bg-input-solid, #0a0a0a);
+  border-bottom: 1px solid var(--color-surface-border, #2d2d2d);
+}
+
+.onair-strip:empty {
+  display: none;
+}
+
+.onair-title {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--color-text-muted, #b0b0b0);
+  margin-right: 2px;
+}
+
+.onair-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 24px;
+  padding: 2px 8px;
+  border: none;
+  border-radius: 999px;
+  background: none;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-dim, #808080);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.onair-item:hover {
+  background: var(--color-bg-hover, rgba(255, 255, 255, 0.08));
+}
+
+/* Hollow dot = staged, filled dot = live. Shape, not colour alone. */
+.onair-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1px solid var(--color-text-dim, #808080);
+  flex-shrink: 0;
+}
+
+/* Dashed = nothing has been broadcast for this overlay yet, which is not the
+   same claim as "off air". If the socket never connects, a solid hollow dot
+   would confidently report an empty screen while overlays are live. */
+.onair-item.pending .onair-dot {
+  border-style: dashed;
+  opacity: 0.6;
+}
+
+.onair-item.live {
+  color: var(--color-primary-light, #ff5a67);
+}
+
+.onair-item.live .onair-dot {
+  background: var(--color-primary, #dc2626);
+  border-color: var(--color-primary, #dc2626);
+  box-shadow: 0 0 6px var(--color-primary-glow, rgba(230, 57, 70, 0.4));
+}
+
+/* ========================================
+   Tabs
+
+   Same class names and visual language as css/reference-control.css so the two
+   control pages stay identical, but built to the WAI-ARIA APG Tabs pattern in
+   js/dock-tabs.js (roles, roving tabindex, arrow keys). reference-control.css
+   is deliberately NOT linked here - it drags in Quran/dictionary/fallacy
+   accents the dock has no use for.
+
+   The tab bar sits on --color-bg-card over the near-black body, not on the
+   elevated card surface: the same tab colours over #1f1f1f drop to 4.17/3.95
+   and fail WCAG 1.4.3.
+   ======================================== */
+
+.tab-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  padding: 0 12px;
+  background: var(--color-bg-card, rgba(255, 255, 255, 0.03));
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tab {
+  flex: 1 1 auto;
+  min-width: 72px;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--color-text-muted, #b0b0b0);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tab:hover {
+  color: var(--color-text-secondary, #e5e5e5);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* font-weight is the non-colour cue - selection must not be colour alone. */
+.tab[aria-selected="true"] {
+  color: var(--color-primary-light, #ff5a67);
+  border-bottom-color: var(--color-primary, #dc2626);
+  font-weight: 700;
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* Scoped so `hidden` outranks .active in every state, including the wide-dock
+   `display: grid` override further down the file. */
+.dock-panels .tab-content[hidden] {
+  display: none;
+}
+
 /* Section Styling */
 .dock-section {
   background: var(--color-surface-elevated, #1f1f1f);
@@ -94,7 +325,7 @@ body {
 .section-label {
   font-size: 11px;
   font-weight: 700;
-  color: var(--color-primary, #dc2626);
+  color: var(--color-primary-light, #ff5a67);
   text-transform: uppercase;
   letter-spacing: 1px;
   margin-bottom: 8px;
@@ -104,19 +335,53 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 8px;
   margin-bottom: 8px;
 }
 
-/* Timer Section */
+.section-header .section-label {
+  margin-bottom: 0;
+}
+
+/* ========================================
+   Live Caller card
+
+   The call timer and the current-caller readout merged into one card: they are
+   read together, and two bordered boxes cost 118px more than one.
+   ======================================== */
+
+.live-card-grid {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.current-display {
+  min-width: 0;
+}
+
+.current-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-primary-light, #ff5a67);
+  margin-bottom: 4px;
+}
+
+.current-pronouns {
+  font-size: 14px;
+  color: var(--color-text-muted, #b0b0b0);
+}
+
 .timer-section {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
 }
 
 .timer-compact {
-  flex: 1;
+  text-align: right;
 }
 
 .timer-display-compact {
@@ -129,40 +394,19 @@ body {
 
 .timer-status-compact {
   font-size: 10px;
-  color: var(--color-text-dim, #999);
+  color: var(--color-text-muted, #b0b0b0);
   font-weight: 600;
   margin-top: 2px;
 }
 
 .timer-status-compact.active {
-  color: var(--color-primary, #dc2626);
+  color: var(--color-primary-light, #ff5a67);
   animation: pulse 2s infinite;
 }
 
 .timer-controls {
   display: flex;
   gap: 5px;
-}
-
-/* Current Caller Display */
-.current-section {
-  text-align: center;
-}
-
-.current-display {
-  padding: 8px;
-}
-
-.current-name {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--color-primary, #dc2626);
-  margin-bottom: 4px;
-}
-
-.current-pronouns {
-  font-size: 14px;
-  color: var(--color-text-dim, #999);
 }
 
 /* Form Section */
@@ -181,14 +425,9 @@ input[type="text"] {
   transition: border-color 0.3s;
 }
 
-input[type="text"]:focus {
-  outline: none;
-  border-color: var(--color-primary, #dc2626);
-  box-shadow: 0 0 0 2px var(--color-primary-subtle, rgba(220, 38, 38, 0.1));
-}
-
-input[type="text"]::placeholder {
-  color: var(--color-text-dimmer, #666);
+input::placeholder,
+textarea::placeholder {
+  color: var(--color-text-dim, #808080);
 }
 
 .button-row {
@@ -214,14 +453,16 @@ input[type="text"]::placeholder {
   cursor: not-allowed;
 }
 
+/* Rest is the dark red and hover is the bright one, not the other way round:
+   white on #e63946 is 4.17:1 and fails 1.4.3, white on #b52d39 is 6.18:1. */
 .btn-update {
   flex: 1;
-  background: var(--color-primary, #dc2626);
+  background: var(--color-primary-dark, #b91c1c);
   color: white;
 }
 
 .btn-update:hover:not(:disabled) {
-  background: var(--color-primary-dark, #b91c1c);
+  background: var(--color-primary, #dc2626);
   transform: translateY(-1px);
 }
 
@@ -260,6 +501,39 @@ input[type="text"]::placeholder {
   background: #2a2a2a;
 }
 
+/* One rule for all five overlay Show/Hide toggles - neutral while the overlay
+   is off, primary while it is on. The modules flip only .active and the label,
+   so the toggles differ from each other in geometry alone: the four row
+   toggles ride on .dock-btn, the scoreboard's on .scoreboard-toggle-btn. */
+.btn-toggle {
+  background: #3a3a3a;
+  color: #ffffff;
+}
+
+.btn-toggle:hover:not(:disabled) {
+  background: #2a2a2a;
+}
+
+/* Same swap as .btn-update above, and for the same reason: white on #e63946
+   is 4.17:1 and fails 1.4.3, white on #b52d39 is 6.18:1. "This overlay is on
+   air" is the state the operator reads at a glance mid-show, so it is the last
+   one that should be the failing red. */
+.btn-toggle.active {
+  background: var(--color-primary-dark, #b91c1c);
+}
+
+.btn-toggle.active:hover:not(:disabled) {
+  background: var(--color-primary, #dc2626);
+}
+
+.dock-btn.btn-toggle {
+  flex: 1;
+}
+
+.dock-btn.btn-toggle:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
 .dock-btn-mini {
   background: #3a3a3a;
   border: none;
@@ -274,6 +548,57 @@ input[type="text"]::placeholder {
   background: var(--color-primary, #dc2626);
 }
 
+/* ========================================
+   Disclosures (add-to-queue form, call log)
+
+   Both are consulted a couple of times a show, so they cost one click and no
+   tab switch. They sit at the bottom of the pinned zone, so opening one shifts
+   nothing above it. <details> keeps its children in the DOM while closed, so
+   every getElementById in caller-control.js still resolves.
+   ======================================== */
+
+.dock-disclosure {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--color-surface-border, #2d2d2d);
+}
+
+.dock-disclosure > summary {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 24px;
+  list-style: none;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-text-muted, #b0b0b0);
+}
+
+.dock-disclosure > summary::-webkit-details-marker {
+  display: none;
+}
+
+.dock-disclosure > summary::before {
+  content: '\25B8';
+  font-size: 10px;
+  color: var(--color-primary-light, #ff5a67);
+}
+
+.dock-disclosure[open] > summary::before {
+  content: '\25BE';
+}
+
+.dock-disclosure > summary:hover {
+  color: var(--color-text-secondary, #e5e5e5);
+}
+
+.dock-disclosure > *:not(summary) {
+  margin-top: 8px;
+}
+
 /* Log Section */
 .log-compact {
   max-height: 200px;
@@ -283,7 +608,7 @@ input[type="text"]::placeholder {
 
 .log-empty-compact {
   text-align: center;
-  color: var(--color-text-dimmer, #666);
+  color: var(--color-text-muted, #b0b0b0);
   padding: 10px;
   font-style: italic;
 }
@@ -303,7 +628,7 @@ input[type="text"]::placeholder {
 
 .log-time {
   font-family: var(--font-mono, 'Courier New', monospace);
-  color: var(--color-primary, #dc2626);
+  color: var(--color-primary-light, #ff5a67);
   font-weight: 700;
   font-size: 11px;
   margin-bottom: 2px;
@@ -314,58 +639,39 @@ input[type="text"]::placeholder {
   font-size: 11px;
 }
 
-/* Scrollbar */
-.log-compact::-webkit-scrollbar {
+/* Scrollbars - the four regions that scroll internally. .dock-live belongs
+   here too: it is the pinned zone's own scrollbar, it is the only route to a
+   control that has fallen below the clip on a short or narrow dock, and left
+   unstyled it takes Chromium's 15px default - 6% of a 250px rail, and enough
+   to render the pinned cards 9px narrower than the panel cards below them. */
+.dock-live::-webkit-scrollbar,
+.dock-panels::-webkit-scrollbar,
+.log-compact::-webkit-scrollbar,
+.queue-list::-webkit-scrollbar {
   width: 6px;
 }
 
-.log-compact::-webkit-scrollbar-track {
+.dock-live::-webkit-scrollbar-track,
+.dock-panels::-webkit-scrollbar-track,
+.log-compact::-webkit-scrollbar-track,
+.queue-list::-webkit-scrollbar-track {
   background: var(--color-surface-border, #2d2d2d);
   border-radius: 3px;
 }
 
-.log-compact::-webkit-scrollbar-thumb {
+.dock-live::-webkit-scrollbar-thumb,
+.dock-panels::-webkit-scrollbar-thumb,
+.log-compact::-webkit-scrollbar-thumb,
+.queue-list::-webkit-scrollbar-thumb {
   background: var(--color-primary, #dc2626);
   border-radius: 3px;
 }
 
-.log-compact::-webkit-scrollbar-thumb:hover {
+.dock-live::-webkit-scrollbar-thumb:hover,
+.dock-panels::-webkit-scrollbar-thumb:hover,
+.log-compact::-webkit-scrollbar-thumb:hover,
+.queue-list::-webkit-scrollbar-thumb:hover {
   background: var(--color-primary-dark, #b91c1c);
-}
-
-/* Status Bar */
-.dock-status {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 8px;
-  background: var(--color-primary-subtle, rgba(220, 38, 38, 0.1));
-  border: 1px solid var(--color-primary-border, rgba(220, 38, 38, 0.3));
-  border-radius: 6px;
-  margin-top: 10px;
-}
-
-.status-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #3a3a3a;
-}
-
-.status-dot.connected {
-  background: var(--color-primary, #dc2626);
-  animation: pulse 2s infinite;
-}
-
-.status-dot.disconnected {
-  background: var(--color-disconnected, #991b1b);
-}
-
-.status-text {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--color-text-secondary, #e5e5e5);
 }
 
 /* Modal Overlay */
@@ -408,7 +714,7 @@ input[type="text"]::placeholder {
 .modal-header h2 {
   font-size: 14px;
   font-weight: 600;
-  color: var(--color-primary, #dc2626);
+  color: var(--color-primary-light, #ff5a67);
   margin: 0;
 }
 
@@ -435,7 +741,7 @@ input[type="text"]::placeholder {
 .modal-body h3 {
   font-size: 12px;
   font-weight: 700;
-  color: var(--color-primary, #dc2626);
+  color: var(--color-primary-light, #ff5a67);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin: 0 0 10px 0;
@@ -472,7 +778,7 @@ input[type="text"]::placeholder {
 
 .modal-body p {
   font-size: 12px;
-  color: var(--color-text-dim, #999);
+  color: var(--color-text-muted, #b0b0b0);
   margin: 8px 0;
 }
 
@@ -498,7 +804,7 @@ input[type="text"]::placeholder {
   background: var(--color-bg-input-solid, #0a0a0a);
   border-bottom: 1px solid var(--color-surface-border, #2d2d2d);
   font-size: 11px;
-  color: var(--color-text-dimmer, #666);
+  color: var(--color-text-dim, #808080);
   font-style: italic;
 }
 
@@ -519,11 +825,13 @@ input[type="text"]::placeholder {
 .show-config-bar-edit {
   background: none;
   border: none;
+  min-width: 24px;
+  min-height: 24px;
   padding: 2px 6px;
   border-radius: 3px;
   cursor: pointer;
   font-size: 12px;
-  color: var(--color-text-dim, #999);
+  color: var(--color-text-dim, #808080);
   transition: all 0.2s;
   flex-shrink: 0;
 }
@@ -535,7 +843,7 @@ input[type="text"]::placeholder {
 
 .optional-label {
   font-weight: 400;
-  color: var(--color-text-dimmer, #666);
+  color: var(--color-text-muted, #b0b0b0);
   text-transform: none;
   letter-spacing: 0;
   font-size: 10px;
@@ -555,20 +863,21 @@ input[type="text"]::placeholder {
 [data-stance="undecided"] { --stance-color: #eab308; }
 [data-stance="other"]     { --stance-color: #f97316; }
 
+/* One column below 340px so the stance select stops clipping its own
+   placeholder: measured at a 250px dock it renders 92px and needs 96px. */
 .form-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr;
   gap: 6px;
   margin-bottom: 8px;
 }
 
 .form-row input[type="text"] {
-  flex: 1;
   min-width: 0;
 }
 
 .stance-select {
-  flex: 0 0 auto;
-  max-width: 46%;
+  min-width: 0;
   padding: 8px 10px;
   border: 1px solid var(--color-surface-border, #2d2d2d);
   border-radius: 6px;
@@ -579,24 +888,27 @@ input[type="text"]::placeholder {
   transition: border-color 0.3s;
 }
 
-.stance-select:focus {
-  outline: none;
-  border-color: var(--color-primary, #dc2626);
-  box-shadow: 0 0 0 2px var(--color-primary-subtle, rgba(220, 38, 38, 0.1));
+/* Outline chips, not white-on-fill. Every stance fill fails 4.5:1 against
+   white (1.92:1 at the worst); as the text colour on the dark input surface
+   the same eight land between 5.26:1 and 10.32:1, and it matches the language
+   .queue-item already uses for its border-left. */
+.current-stance,
+.queue-stance {
+  background: var(--color-bg-input-solid, #0a0a0a);
+  color: var(--stance-color, #999);
+  border: 1px solid var(--stance-color, #555);
 }
 
 /* Current-caller stance chip */
 .current-stance {
   display: none;
-  margin: 6px auto 0;
+  margin: 6px 0 0;
   padding: 3px 12px;
   border-radius: 999px;
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: #ffffff;
-  background: var(--stance-color, #555);
 }
 
 .current-stance.visible {
@@ -620,19 +932,23 @@ input[type="text"]::placeholder {
    ======================================== */
 
 .queue-count {
-  color: var(--color-text-dim, #999);
+  color: var(--color-text-muted, #b0b0b0);
   font-weight: 600;
 }
 
+/* Pinned but height-bounded, so the promote button is always a zero-scroll
+   target and a long queue can never push the tab bar off-screen. One rule
+   covers every dock height: 198px (~3 callers) at 900px tall, 88px at 400px -
+   still enough for the on-deck caller and its promote button. */
 .queue-list {
   margin-top: 10px;
-  max-height: 260px;
+  max-height: clamp(88px, 22vh, 260px);
   overflow-y: auto;
 }
 
 .queue-empty {
   text-align: center;
-  color: var(--color-text-dimmer, #666);
+  color: var(--color-text-muted, #b0b0b0);
   padding: 10px;
   font-style: italic;
   font-size: 11px;
@@ -669,7 +985,7 @@ input[type="text"]::placeholder {
 .queue-pos {
   font-family: var(--font-mono, 'Courier New', monospace);
   font-size: 11px;
-  color: var(--color-text-dim, #999);
+  color: var(--color-text-muted, #b0b0b0);
   min-width: 16px;
 }
 
@@ -678,7 +994,7 @@ input[type="text"]::placeholder {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1px;
-  color: var(--color-primary, #dc2626);
+  color: var(--color-primary-light, #ff5a67);
   background: var(--color-primary-subtle, rgba(220, 38, 38, 0.15));
   padding: 2px 6px;
   border-radius: 4px;
@@ -692,7 +1008,7 @@ input[type="text"]::placeholder {
 
 .queue-pronouns {
   font-size: 11px;
-  color: var(--color-text-dim, #999);
+  color: var(--color-text-muted, #b0b0b0);
 }
 
 .queue-stance {
@@ -702,30 +1018,30 @@ input[type="text"]::placeholder {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: #ffffff;
-  background: var(--stance-color, #555);
 }
 
 .queue-meta {
   font-size: 11px;
-  color: var(--color-text-dim, #999);
+  color: var(--color-text-muted, #b0b0b0);
   margin-top: 3px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
+/* The remove button sits next to the hottest control in the app, so the row
+   gets 28px targets and a wider gap than the 3px it used to have. */
 .queue-item-actions {
   display: flex;
-  gap: 3px;
+  gap: 6px;
   flex-shrink: 0;
 }
 
 .queue-btn {
   background: #3a3a3a;
   border: none;
-  width: 26px;
-  height: 26px;
+  min-width: 28px;
+  min-height: 28px;
   border-radius: 4px;
   cursor: pointer;
   font-size: 12px;
@@ -749,43 +1065,34 @@ input[type="text"]::placeholder {
   background: var(--color-primary-dark, #b91c1c);
 }
 
+.queue-remove {
+  margin-left: 4px;
+}
+
 .queue-remove:hover {
   background: #7f1d1d;
 }
 
-/* Queue list scrollbar */
-.queue-list::-webkit-scrollbar {
-  width: 6px;
-}
-
-.queue-list::-webkit-scrollbar-track {
-  background: var(--color-surface-border, #2d2d2d);
-  border-radius: 3px;
-}
-
-.queue-list::-webkit-scrollbar-thumb {
-  background: var(--color-primary, #dc2626);
-  border-radius: 3px;
-}
-
 /* ========================================
-   Stage (topics + call-in)
+   Overlays tab (topics / call-in / claim / ticker)
    ======================================== */
 
-.stage-block + .stage-block {
-  margin-top: 14px;
-}
-
+/* Micro-label above a field whose placeholder carries a syntax rule the
+   operator must not lose the moment they start typing. */
 .stage-sublabel {
+  display: block;
   font-size: 10px;
   font-weight: 700;
-  color: var(--color-text-dim, #999);
+  color: var(--color-text-muted, #b0b0b0);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-bottom: 6px;
 }
 
-#topicsInput {
+/* Class-keyed, not id-keyed: the topics and ticker textareas were two
+   identical 18-line blocks, and an id selector would also outrank the shared
+   :focus rule at the bottom of this file. */
+.dock-textarea {
   width: 100%;
   padding: 8px 10px;
   border: 1px solid var(--color-surface-border, #2d2d2d);
@@ -797,50 +1104,19 @@ input[type="text"]::placeholder {
   color: var(--color-text-secondary, #e5e5e5);
   transition: border-color 0.3s;
   resize: vertical;
+}
+
+#topicsInput {
   min-height: 90px;
 }
 
-#topicsInput:focus {
-  outline: none;
-  border-color: var(--color-primary, #dc2626);
-  box-shadow: 0 0 0 2px var(--color-primary-subtle, rgba(220, 38, 38, 0.1));
-}
-
-#topicsInput::placeholder {
-  color: var(--color-text-dimmer, #666);
-}
-
-/* Show/Hide toggle buttons — neutral by default, primary when "on" */
-#toggleTopicsBtn,
-#toggleCallInBtn {
-  flex: 1;
-  background: #3a3a3a;
-  color: white;
-}
-
-#toggleTopicsBtn:hover:not(:disabled),
-#toggleCallInBtn:hover:not(:disabled) {
-  background: #2a2a2a;
-  transform: translateY(-1px);
-}
-
-#toggleTopicsBtn.active,
-#toggleCallInBtn.active {
-  background: var(--color-primary, #dc2626);
-  color: #ffffff;
-}
-
-#toggleTopicsBtn.active:hover:not(:disabled),
-#toggleCallInBtn.active:hover:not(:disabled) {
-  background: var(--color-primary-dark, #b91c1c);
+#tickerInput {
+  min-height: 70px;
 }
 
 /* ========================================
-   Scene Card & Segment Timer
+   Scene tab (scene card + segment countdown)
    ======================================== */
-
-/* .stage-block / .stage-sublabel are defined with the Stage section above and
-   reused here to group the scene controls apart from the countdown controls. */
 
 .scene-btn-row {
   flex-wrap: wrap;
@@ -870,7 +1146,7 @@ input[type="text"]::placeholder {
 .scene-status {
   margin-top: 6px;
   font-size: 11px;
-  color: var(--color-text-dim, #999);
+  color: var(--color-text-muted, #b0b0b0);
   font-style: italic;
   text-align: center;
 }
@@ -892,12 +1168,6 @@ input[type="text"]::placeholder {
   color: var(--color-text-secondary, #e5e5e5);
 }
 
-.segment-duration-row input[type="number"]:focus {
-  outline: none;
-  border-color: var(--color-primary, #dc2626);
-  box-shadow: 0 0 0 2px var(--color-primary-subtle, rgba(220, 38, 38, 0.1));
-}
-
 .segment-duration-row .dock-btn {
   flex: 0 0 auto;
 }
@@ -907,7 +1177,7 @@ input[type="text"]::placeholder {
    applied here at LOW remaining time, not high elapsed time. */
 
 /* ========================================
-   Scoreboard (live per-side tally)
+   Score tab (live per-side tally)
    Reuses the [data-stance] --stance-color custom properties defined above
    for the stance select/chips - each row below carries its own
    data-stance attribute, so no new color rules are needed here.
@@ -968,18 +1238,16 @@ input[type="text"]::placeholder {
   font-family: var(--font-mono, 'Courier New', monospace);
   font-size: 16px;
   font-weight: 700;
-  color: var(--color-primary, #dc2626);
+  color: var(--color-primary-light, #ff5a67);
 }
 
-/* Show/Hide toggle - standalone from #toggleTopicsBtn/#toggleCallInBtn
-   above so this section stays self-contained; same neutral/active pattern. */
+/* Geometry only - the neutral/active colours come from .btn-toggle above. */
 .scoreboard-toggle-btn {
   flex-shrink: 0;
+  min-height: 24px;
   padding: 4px 10px;
   border: none;
   border-radius: 4px;
-  background: #3a3a3a;
-  color: #ffffff;
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
@@ -988,91 +1256,199 @@ input[type="text"]::placeholder {
   transition: all 0.2s;
 }
 
-.scoreboard-toggle-btn:hover {
-  background: #2a2a2a;
+/* ========================================
+   Responsive
+
+   340px  - the measured point at which [pronouns][stance] side by side clears
+            the stance placeholder with margin.
+   419px  - the rail band. Below it the chrome wraps and eats the pinned zone:
+            the on-air strip runs 3 rows at 250px and 2 up to 400px, and the
+            tab bar runs 2 rows at 250px.
+   720px  - two 280px columns plus gutters and padding is ~604px; 720px gives
+            headroom before a second column is worth having. It is also where
+            the old flat layout stopped changing at all.
+   560px tall - bottom-rail / short-float case, where a full-height pinned zone
+            would leave the panels nothing.
+   ======================================== */
+
+@media (min-width: 340px) {
+  .form-row {
+    grid-template-columns: 1fr minmax(110px, 0.9fr);
+  }
 }
 
-.scoreboard-toggle-btn.active {
-  background: var(--color-primary, #dc2626);
+/* A 250px rail cannot carry a 2-row tab bar (75px) and a 3-row on-air strip
+   (85px) on top of a 234px panel floor. Measured with a live caller and three
+   queued: the pinned zone got 402px against 818px of content, and the promote
+   button landed 100px below the clip - not merely cut off but not clickable,
+   since a hit test at its centre returns the element underneath it. That
+   button is the design's headline promise ("0 clicks, list pinned").
+
+   Dropping the tabs' min-width and tightening both bands' padding and font
+   takes the tab bar to 37px/1 row and the strip to 55px/2 rows; with the panel
+   floor the pinned zone goes 402 -> 542px and the hit test passes.
+
+   .onair-item's min-height: 24px is deliberately untouched - it is the WCAG
+   2.5.8 target-size floor, and it survives at every size measured. The strip's
+   height comes off its padding and its row count instead. */
+@media (max-width: 419px) {
+  .tab-bar {
+    padding: 0 4px;
+  }
+
+  .tab {
+    min-width: 0;
+    padding: 10px 2px;
+    font-size: 12px;
+  }
+
+  .onair-strip {
+    gap: 0 2px;
+    padding: 3px 8px;
+  }
+
+  .onair-item {
+    gap: 4px;
+    padding: 2px 4px;
+    font-size: 10px;
+  }
+
+  /* The pinned zone is the point of the design, so the panels yield first. */
+  .dock-main {
+    grid-template-rows: auto auto minmax(clamp(120px, 18vh, 200px), 1fr);
+  }
 }
 
-.scoreboard-toggle-btn.active:hover {
-  background: var(--color-primary-dark, #b91c1c);
+@media (min-width: 720px) {
+  .dock-live,
+  .tab-content.active {
+    display: grid;
+    gap: 10px;
+    align-items: start;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+
+  .dock-live > .dock-section,
+  .tab-content.active > .dock-section {
+    margin-bottom: 0;
+  }
+
+  /* Both axes pinned, on both sides of the split. auto-fit resolves its track
+     count from the available space BEFORE placement - 2 tracks at 720-990px,
+     3 at 1000-1190px, 4 at 1200px - so pinning only the queue leaves the
+     Update Caller card to auto-placement, which puts it in column 3 at a wide
+     dock rather than in the row below the live card. Naming column 1 for
+     everything that is not the queue is what actually produces the two-column
+     [live / update | queue] arrangement at every track count.
+
+     auto-fit then collapses the tracks nothing was placed in, so the two
+     columns share the full width instead of huddling in the left half. */
+  .dock-live > .dock-section:not(.queue-section) {
+    grid-column: 1;
+  }
+
+  .dock-live .queue-section {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+  }
+}
+
+@media (max-height: 560px) {
+  .dock-section {
+    padding: 8px;
+    margin-bottom: 6px;
+  }
+
+  .dock-live {
+    padding: 8px 8px 0;
+  }
+
+  .dock-panels {
+    padding: 8px;
+  }
+
+  /* The 140px floor inverts the design's own priority on a bottom rail: the
+     occasional controls get a guarantee and the constant ones get whatever is
+     left. Measured at 400px tall, that left the pinned zone 111px against
+     315px of content and put Clear - the button that ends a call - 43px below
+     the clip and outside a hit test.
+
+     Not everything fits at 400px and it should not pretend to. What this floor
+     buys is the honest minimum: the merged Live Caller card and the whole
+     Update/Clear row above the fold before the panels get anything. At 400px
+     tall that needs 163px and this yields 179px; the panels drop to 72px and
+     scroll, which is the correct side to lose on - the tab bar stays whole, so
+     the panel is still navigable and still one flick away. */
+  .dock-main {
+    grid-template-rows: auto auto minmax(clamp(72px, 14vh, 140px), 1fr);
+  }
+}
+
+/* A short dock has width to spare and no height to spare, so the three pinned
+   cards sit side by side rather than two of them stacking.
+
+   This is not a cosmetic preference. At 400px tall the chrome above <main>
+   measures 111px and the tab bar 38px, leaving 251px for the pinned zone and
+   the panels together. Stacking the live card (122px) above the Update Caller
+   card (155px) needs 291px before the panels get a single pixel, so Clear is
+   unreachable at every possible panel floor including zero. Side by side, the
+   tallest of the three needs 163px.
+
+   The 200px column floor rather than 280px is what keeps all three in one row
+   down to 720px; it still leaves the stance select its measured 110px. */
+@media (min-width: 720px) and (max-height: 560px) {
+  .dock-live {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+
+  .dock-live > .dock-section:not(.queue-section),
+  .dock-live .queue-section {
+    grid-column: auto;
+    grid-row: auto;
+  }
 }
 
 /* ========================================
-   Claim / Resolution Banner
+   Utilities
    ======================================== */
 
-/* Show/Hide toggle button - neutral by default, primary when "on" (same
-   language as the Stage section's own toggle buttons). */
-#toggleClaimBtn {
-  flex: 1;
-  background: #3a3a3a;
-  color: white;
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
 }
 
-#toggleClaimBtn:hover:not(:disabled) {
-  background: #2a2a2a;
-  transform: translateY(-1px);
+/* One focus treatment for the whole dock. The rules this replaces set
+   `outline: none` and substituted a 2px --color-primary-subtle shadow that
+   composites to ~1.3:1 against the card - effectively invisible. */
+:where(input, select, textarea, button, summary, .tab):focus-visible {
+  outline: 2px solid var(--color-primary-light, #ff5a67);
+  outline-offset: 2px;
 }
 
-#toggleClaimBtn.active {
-  background: var(--color-primary, #dc2626);
-  color: #ffffff;
-}
-
-#toggleClaimBtn.active:hover:not(:disabled) {
-  background: var(--color-primary-dark, #b91c1c);
-}
-
-/* ========================================
-   Ticker (bottom-of-screen crawl band)
-   ======================================== */
-
-#tickerInput {
-  width: 100%;
-  padding: 8px 10px;
-  border: 1px solid var(--color-surface-border, #2d2d2d);
-  border-radius: 6px;
-  font-size: 13px;
-  font-family: inherit;
-  line-height: 1.5;
-  background: var(--color-bg-input-solid, #0a0a0a);
-  color: var(--color-text-secondary, #e5e5e5);
-  transition: border-color 0.3s;
-  resize: vertical;
-  min-height: 70px;
-}
-
-#tickerInput:focus {
-  outline: none;
+/* The red border is kept as a redundant, always-on cue for text entry.
+   Specificity has to match input[type="text"] and the scoped number input. */
+input:focus,
+select:focus,
+textarea:focus,
+.segment-duration-row input[type="number"]:focus {
   border-color: var(--color-primary, #dc2626);
-  box-shadow: 0 0 0 2px var(--color-primary-subtle, rgba(220, 38, 38, 0.1));
 }
 
-#tickerInput::placeholder {
-  color: var(--color-text-dimmer, #666);
-}
-
-/* Show/Hide toggle - neutral by default, primary when "on" (mirrors
-   #toggleTopicsBtn / #toggleCallInBtn above) */
-#toggleTickerBtn {
-  flex: 1;
-  background: #3a3a3a;
-  color: white;
-}
-
-#toggleTickerBtn:hover:not(:disabled) {
-  background: #2a2a2a;
-  transform: translateY(-1px);
-}
-
-#toggleTickerBtn.active {
-  background: var(--color-primary, #dc2626);
-  color: #ffffff;
-}
-
-#toggleTickerBtn.active:hover:not(:disabled) {
-  background: var(--color-primary-dark, #b91c1c);
+/* Three indefinite opacity pulses run during a live show (call timer status,
+   connection dot, danger countdown) with no way to stop them. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

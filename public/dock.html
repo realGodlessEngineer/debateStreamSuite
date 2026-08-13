@@ -9,8 +9,12 @@
 </head>
 <body>
   <!-- Title Bar -->
-  <div class="title-bar">
+  <header class="title-bar">
     <h1><span class="status-dot" id="statusDot"></span> Caller Control</h1>
+    <!-- socket-connection.js already writes Connected/Disconnected into this
+         element; without it the only signal that the socket dropped is the
+         8px dot's colour, and every button silently does nothing. -->
+    <span class="connection-status" id="statusIndicator">Connecting…</span>
     <div class="title-bar-actions">
       <button class="btn-info" id="showConfigBtn">
         <span>&#127909;</span> Show
@@ -18,42 +22,60 @@
       <button class="btn-info" id="showInstructions">
         <span>?</span> OBS Setup
       </button>
-      <button class="btn-settings" id="showSettingsBtn" title="Settings">⚙️</button>
+      <button class="btn-settings" id="showSettingsBtn" aria-label="Settings" title="Settings">⚙️</button>
     </div>
-  </div>
+  </header>
 
   <!-- Show Config Summary Bar -->
   <div class="show-config-bar" id="showConfigBar">
     <span class="show-config-bar-text" id="showConfigBarText">No show configured</span>
-    <button class="show-config-bar-edit" id="showConfigBarEdit" title="Edit show config">&#9998;</button>
+    <button class="show-config-bar-edit" id="showConfigBarEdit" aria-label="Edit show configuration" title="Edit show config">&#9998;</button>
   </div>
+
+  <!-- On-Air Strip — every overlay currently on screen, on one line. Filled by
+       js/dock-onair.js; stays out of the layout while empty.
+       role="group" because a bare <div> maps to role="generic", on which ARIA
+       1.2 prohibits aria-label — Chromium still computes the name today but has
+       been moving to drop it, and the name is what says what the strip is. -->
+  <div class="onair-strip" id="onAirStrip" role="group" aria-live="polite" aria-label="Overlays currently on air"></div>
 
   <!-- Show Config Modal -->
   <div class="modal-overlay" id="showConfigModal">
-    <div class="modal">
+    <!-- No aria-modal here on purpose. This dialog's open/close lives in
+         js/show-config-modal.js, so nothing in this file can move focus into
+         it, trap Tab or restore focus on close — and aria-modal="true" tells
+         assistive tech the rest of the page is inert while the keyboard can
+         still walk straight out of it. A claim nothing enforces is worse than
+         no claim. role + aria-labelledby are honest and stay. -->
+    <div class="modal" role="dialog" aria-labelledby="showConfigModalTitle">
       <div class="modal-header">
-        <h2>Show Configuration</h2>
-        <button class="btn-close" id="closeShowConfigBtn">&times;</button>
+        <h2 id="showConfigModalTitle">Show Configuration</h2>
+        <button class="btn-close" id="closeShowConfigBtn" aria-label="Close show configuration">&times;</button>
       </div>
       <div class="modal-body">
         <h3>Show Title</h3>
         <div class="form-compact">
+          <label class="sr-only" for="showTitleInput">Show title</label>
           <input type="text" id="showTitleInput" placeholder="e.g., The Godless Engineer Show">
         </div>
 
         <h3>Host 1</h3>
         <div class="form-compact">
+          <label class="sr-only" for="host1Name">Host 1 name</label>
           <input type="text" id="host1Name" placeholder="Host name">
         </div>
         <div class="form-compact">
+          <label class="sr-only" for="host1Pronouns">Host 1 pronouns</label>
           <input type="text" id="host1Pronouns" placeholder="Pronouns (e.g., he/him)">
         </div>
 
         <h3>Host 2 <span class="optional-label">(optional)</span></h3>
         <div class="form-compact">
+          <label class="sr-only" for="host2Name">Host 2 name</label>
           <input type="text" id="host2Name" placeholder="Host name">
         </div>
         <div class="form-compact">
+          <label class="sr-only" for="host2Pronouns">Host 2 pronouns</label>
           <input type="text" id="host2Pronouns" placeholder="Pronouns (e.g., she/her)">
         </div>
 
@@ -67,10 +89,10 @@
 
   <!-- Modal Dialog -->
   <div class="modal-overlay" id="modalOverlay">
-    <div class="modal">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="obsSetupModalTitle">
       <div class="modal-header">
-        <h2>OBS Setup Instructions</h2>
-        <button class="btn-close" id="closeModal">&times;</button>
+        <h2 id="obsSetupModalTitle">OBS Setup Instructions</h2>
+        <button class="btn-close" id="closeModal" aria-label="Close OBS setup instructions">&times;</button>
       </div>
       <div class="modal-body">
         <h3>Browser Source Setup</h3>
@@ -94,220 +116,276 @@
     </div>
   </div>
 
-  <div class="dock-container">
-    <!-- Timer Section -->
-    <div class="dock-section">
-      <div class="timer-section">
-        <div class="timer-compact">
-          <div class="timer-display-compact" id="timerDisplay">00:00</div>
-          <div class="timer-status-compact" id="timerStatus">STOPPED</div>
+  <main class="dock-main">
+
+    <!-- ══ PINNED ZONE — everything touched constantly; never scrolls away ══ -->
+    <section class="dock-live" aria-label="Live caller controls">
+
+      <!-- Call timer + current caller, merged: they are read together. -->
+      <div class="dock-section">
+        <h2 class="section-label">Live Caller</h2>
+        <div class="live-card-grid">
+          <div class="current-display">
+            <div class="current-name" id="currentName">No caller live</div>
+            <div class="current-pronouns" id="currentPronouns"></div>
+            <div class="current-stance" id="currentStance" data-stance=""></div>
+          </div>
+          <div class="timer-section">
+            <div class="timer-compact">
+              <div class="timer-display-compact" id="timerDisplay">00:00</div>
+              <div class="timer-status-compact" id="timerStatus">STOPPED</div>
+            </div>
+            <div class="timer-controls">
+              <button class="dock-btn btn-start" id="startTimerBtn" aria-label="Start call timer" title="Start Timer">&#9658;</button>
+              <button class="dock-btn btn-stop" id="stopTimerBtn" aria-label="Stop call timer" title="Stop Timer">&#9632;</button>
+            </div>
+          </div>
         </div>
-        <div class="timer-controls">
-          <button class="dock-btn btn-start" id="startTimerBtn" title="Start Timer">&#9658;</button>
-          <button class="dock-btn btn-stop" id="stopTimerBtn" title="Stop Timer">&#9632;</button>
+      </div>
+
+      <!-- Input Form Section — the whole form stays in the pinned zone. A
+           `required` control inside a closed <details> or a hidden panel is
+           not focusable, and Chromium then aborts the submit silently. -->
+      <div class="dock-section">
+        <h2 class="section-label">Update Caller</h2>
+        <form id="callerForm">
+          <div class="form-compact">
+            <label class="sr-only" for="name">Caller name</label>
+            <input type="text" id="name" name="name" placeholder="Caller name" required>
+          </div>
+          <div class="form-row">
+            <label class="sr-only" for="pronouns">Pronouns</label>
+            <input type="text" id="pronouns" name="pronouns" placeholder="Pronouns (e.g., they/them)">
+            <label class="sr-only" for="stance">Stance</label>
+            <select id="stance" name="stance" class="stance-select">
+              <option value="">— Stance —</option>
+              <option value="theist">Theist</option>
+              <option value="atheist">Atheist</option>
+              <option value="agnostic">Agnostic</option>
+              <option value="christian">Christian</option>
+              <option value="muslim">Muslim</option>
+              <option value="jewish">Jewish</option>
+              <option value="undecided">Undecided</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="button-row">
+            <button type="submit" class="dock-btn btn-update">Update</button>
+            <button type="button" id="clearBtn" class="dock-btn btn-clear">Clear</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Caller Queue Section — the list itself is pinned, so the promote
+           button is a zero-scroll target at every dock size. The two cold
+           sub-blocks below it are disclosures: one click, no tab switch, and
+           nothing above them moves when they open. -->
+      <div class="dock-section queue-section">
+        <div class="section-header">
+          <h2 class="section-label">Caller Queue <span class="queue-count" id="queueCount">(0)</span></h2>
+          <button class="dock-btn-mini" id="clearQueueBtn" aria-label="Clear the whole queue" title="Clear Queue">&#128465;</button>
+        </div>
+
+        <div class="queue-list" id="queueList">
+          <div class="queue-empty">Queue is empty</div>
+        </div>
+
+        <details class="dock-disclosure" id="disclosureQueueAdd" data-disclosure="queueAdd">
+          <summary>Add a caller to the queue</summary>
+          <form id="queueForm">
+            <div class="form-compact">
+              <label class="sr-only" for="queueName">Queued caller name</label>
+              <input type="text" id="queueName" placeholder="Caller name" required>
+            </div>
+            <div class="form-row">
+              <label class="sr-only" for="queuePronouns">Queued caller pronouns</label>
+              <input type="text" id="queuePronouns" placeholder="Pronouns">
+              <label class="sr-only" for="queueStance">Queued caller stance</label>
+              <select id="queueStance" class="stance-select">
+                <option value="">— Stance —</option>
+                <option value="theist">Theist</option>
+                <option value="atheist">Atheist</option>
+                <option value="agnostic">Agnostic</option>
+                <option value="christian">Christian</option>
+                <option value="muslim">Muslim</option>
+                <option value="jewish">Jewish</option>
+                <option value="undecided">Undecided</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div class="form-compact">
+              <label class="sr-only" for="queueTopic">Topic or position</label>
+              <input type="text" id="queueTopic" placeholder="Topic / position (optional)">
+            </div>
+            <div class="form-compact">
+              <label class="sr-only" for="queuePlatform">Platform</label>
+              <input type="text" id="queuePlatform" placeholder="Platform — phone, Discord… (optional)">
+            </div>
+            <!-- Secondary weight on purpose: this one files a caller away, it
+                 does not put anyone on air. -->
+            <div class="button-row">
+              <button type="submit" class="dock-btn btn-clear" id="addQueueBtn">Add to queue</button>
+            </div>
+          </form>
+        </details>
+
+        <details class="dock-disclosure" id="disclosureCallLog" data-disclosure="callLog">
+          <summary>Call log</summary>
+          <div class="section-header">
+            <span></span>
+            <div>
+              <button class="dock-btn-mini" id="exportLogBtn" aria-label="Export call log" title="Export Log">&#8681;</button>
+              <button class="dock-btn-mini" id="clearLogBtn" aria-label="Clear call log" title="Clear Log">&#128465;</button>
+            </div>
+          </div>
+          <div class="log-compact" id="callLog">
+            <div class="log-empty-compact">No calls logged yet</div>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- ══ TABS — everything touched occasionally ══ -->
+    <div class="tab-bar" role="tablist" aria-label="Overlay control groups">
+      <button class="tab active" id="tabbtn-overlays" role="tab"
+              aria-selected="true" aria-controls="tab-overlays" tabindex="0" data-tab="overlays">Overlays</button>
+      <button class="tab" id="tabbtn-scene" role="tab"
+              aria-selected="false" aria-controls="tab-scene" tabindex="-1" data-tab="scene">Scene</button>
+      <button class="tab" id="tabbtn-score" role="tab"
+              aria-selected="false" aria-controls="tab-score" tabindex="-1" data-tab="score">Score</button>
+    </div>
+
+    <div class="dock-panels">
+
+      <!-- The four "typed once, toggled occasionally" persistent overlays.
+           They share one interaction shape: text field → Update → Show/Hide. -->
+      <div class="tab-content active" id="tab-overlays" role="tabpanel" aria-labelledby="tabbtn-overlays" tabindex="0">
+
+        <div class="dock-section">
+          <h2 class="section-label">Topics</h2>
+          <div class="form-compact">
+            <!-- The label carries the syntax rule, so the placeholder shows an
+                 example instead of repeating it word for word. -->
+            <label class="stage-sublabel" for="topicsInput">One topic per line</label>
+            <textarea id="topicsInput" class="dock-textarea" placeholder="e.g. Does the Kalam argument work?" rows="6"></textarea>
+          </div>
+          <div class="button-row">
+            <button id="updateTopicsBtn" class="dock-btn btn-update">Update</button>
+            <button id="clearTopicsBtn" class="dock-btn btn-clear">Clear</button>
+            <button id="toggleTopicsBtn" class="dock-btn btn-toggle">Show</button>
+          </div>
+        </div>
+
+        <div class="dock-section">
+          <h2 class="section-label">Call-In</h2>
+          <div class="form-compact">
+            <label class="sr-only" for="callInInput">Call-in link or phone number</label>
+            <input type="text" id="callInInput" placeholder="Call-in link or phone #">
+          </div>
+          <div class="button-row">
+            <button id="updateCallInBtn" class="dock-btn btn-update">Update</button>
+            <button id="toggleCallInBtn" class="dock-btn btn-toggle">Show</button>
+          </div>
+        </div>
+
+        <div class="dock-section">
+          <h2 class="section-label">Claim / Resolution</h2>
+          <div class="form-compact">
+            <label class="sr-only" for="claimTextInput">Proposition</label>
+            <input type="text" id="claimTextInput" placeholder="e.g., RESOLVED: The Gospels are historically reliable" maxlength="200">
+          </div>
+          <div class="form-compact">
+            <label class="sr-only" for="claimSubtextInput">Attribution or qualifier</label>
+            <input type="text" id="claimSubtextInput" placeholder="Attribution or qualifier (optional)" maxlength="150">
+          </div>
+          <div class="button-row">
+            <button type="button" id="updateClaimBtn" class="dock-btn btn-update">Update</button>
+            <button type="button" id="toggleClaimBtn" class="dock-btn btn-toggle">Show</button>
+          </div>
+        </div>
+
+        <div class="dock-section">
+          <h2 class="section-label">Ticker</h2>
+          <div class="form-compact">
+            <label class="stage-sublabel" for="tickerInput">One item per line</label>
+            <textarea id="tickerInput" class="dock-textarea" placeholder="e.g. Follow @GodlessEngineer" rows="4"></textarea>
+          </div>
+          <div class="button-row">
+            <button id="updateTickerBtn" class="dock-btn btn-update">Update</button>
+            <button id="clearTickerBtn" class="dock-btn btn-clear">Clear</button>
+            <button id="toggleTickerBtn" class="dock-btn btn-toggle">Show</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Used at segment boundaries, when nobody is live — precisely when the
+           pinned caller zone is idle. -->
+      <div class="tab-content" id="tab-scene" role="tabpanel" aria-labelledby="tabbtn-scene" tabindex="0" hidden>
+
+        <div class="dock-section">
+          <h2 class="section-label">Scene Card</h2>
+          <div class="button-row scene-btn-row">
+            <button type="button" class="dock-btn scene-btn" id="sceneStartingSoonBtn" data-scene-key="starting-soon">Starting Soon</button>
+            <button type="button" class="dock-btn scene-btn" id="sceneBrbBtn" data-scene-key="brb">BRB</button>
+            <button type="button" class="dock-btn scene-btn" id="sceneEndingBtn" data-scene-key="ending">Ending</button>
+          </div>
+          <div class="form-compact">
+            <label class="sr-only" for="sceneMessageInput">Scene subline</label>
+            <input type="text" id="sceneMessageInput" placeholder="Subline (optional) — e.g. back in 5" maxlength="120">
+          </div>
+          <div class="button-row">
+            <button type="button" class="dock-btn btn-clear" id="sceneClearBtn">Clear Scene</button>
+          </div>
+          <div class="scene-status" id="sceneStatus">No scene showing</div>
+        </div>
+
+        <div class="dock-section">
+          <h2 class="section-label">Segment Countdown</h2>
+          <div class="form-compact">
+            <label class="sr-only" for="segmentLabelInput">Segment label</label>
+            <input type="text" id="segmentLabelInput" placeholder="Label — e.g. Break, Q&amp;A, Rebuttal" maxlength="40">
+          </div>
+          <label class="stage-sublabel" for="segmentDurationInput">Minutes</label>
+          <div class="segment-duration-row">
+            <input type="number" id="segmentDurationInput" placeholder="Minutes" min="0.5" max="60" step="0.5" value="5">
+            <button type="button" class="dock-btn btn-update" id="segmentStartBtn">Start</button>
+          </div>
+          <div class="button-row">
+            <button type="button" class="dock-btn btn-stop" id="segmentStopBtn">Stop</button>
+            <button type="button" class="dock-btn btn-clear" id="segmentResetBtn">Reset</button>
+          </div>
+          <div class="timer-compact">
+            <div class="timer-display-compact" id="segmentTimerDisplay">0:00</div>
+            <div class="timer-status-compact" id="segmentTimerStatus">STOPPED</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live per-side tally, keyed off the same CALLER.STANCES the caller and
+           queue stance selects use. -->
+      <div class="tab-content" id="tab-score" role="tabpanel" aria-labelledby="tabbtn-score" tabindex="0" hidden>
+
+        <div class="dock-section">
+          <div class="section-header">
+            <h2 class="section-label">Scoreboard</h2>
+            <button id="toggleScoreboardBtn" class="scoreboard-toggle-btn btn-toggle" title="Show/Hide Scoreboard Overlay">Show</button>
+          </div>
+          <div class="scoreboard-control-rows" id="scoreboardControlRows"></div>
+          <div class="button-row" style="margin-top: 10px;">
+            <button id="resetScoreboardBtn" class="dock-btn btn-clear">Reset All</button>
+          </div>
         </div>
       </div>
     </div>
+  </main>
 
-    <!-- Current Caller Section -->
-    <div class="dock-section current-section">
-      <div class="section-label">Current Caller</div>
-      <div class="current-display">
-        <div class="current-name" id="currentName">-</div>
-        <div class="current-pronouns" id="currentPronouns">-</div>
-        <div class="current-stance" id="currentStance" data-stance=""></div>
-      </div>
-    </div>
-
-    <!-- Input Form Section -->
-    <div class="dock-section">
-      <div class="section-label">Update Caller</div>
-      <form id="callerForm">
-        <div class="form-compact">
-          <input type="text" id="name" name="name" placeholder="Caller name" required>
-        </div>
-        <div class="form-row">
-          <input type="text" id="pronouns" name="pronouns" placeholder="Pronouns (e.g., they/them)">
-          <select id="stance" name="stance" class="stance-select">
-            <option value="">— Stance —</option>
-            <option value="theist">Theist</option>
-            <option value="atheist">Atheist</option>
-            <option value="agnostic">Agnostic</option>
-            <option value="christian">Christian</option>
-            <option value="muslim">Muslim</option>
-            <option value="jewish">Jewish</option>
-            <option value="undecided">Undecided</option>
-            <option value="other">Other</option>
-          </select>
-        </div>
-        <div class="button-row">
-          <button type="submit" class="dock-btn btn-update">Update</button>
-          <button type="button" id="clearBtn" class="dock-btn btn-clear">Clear</button>
-        </div>
-      </form>
-    </div>
-
-    <!-- Caller Queue Section -->
-    <div class="dock-section">
-      <div class="section-header">
-        <div class="section-label">Caller Queue <span class="queue-count" id="queueCount">(0)</span></div>
-        <button class="dock-btn-mini" id="clearQueueBtn" title="Clear Queue">&#128465;</button>
-      </div>
-      <form id="queueForm">
-        <div class="form-compact">
-          <input type="text" id="queueName" placeholder="Caller name" required>
-        </div>
-        <div class="form-row">
-          <input type="text" id="queuePronouns" placeholder="Pronouns">
-          <select id="queueStance" class="stance-select">
-            <option value="">— Stance —</option>
-            <option value="theist">Theist</option>
-            <option value="atheist">Atheist</option>
-            <option value="agnostic">Agnostic</option>
-            <option value="christian">Christian</option>
-            <option value="muslim">Muslim</option>
-            <option value="jewish">Jewish</option>
-            <option value="undecided">Undecided</option>
-            <option value="other">Other</option>
-          </select>
-        </div>
-        <div class="form-compact">
-          <input type="text" id="queueTopic" placeholder="Topic / position (optional)">
-        </div>
-        <div class="form-compact">
-          <input type="text" id="queuePlatform" placeholder="Platform — phone, Discord… (optional)">
-        </div>
-        <button type="submit" class="dock-btn btn-update" id="addQueueBtn">Add to Queue</button>
-      </form>
-      <div class="queue-list" id="queueList">
-        <div class="queue-empty">Queue is empty</div>
-      </div>
-    </div>
-
-    <!-- Stage Section -->
-    <div class="dock-section">
-      <div class="section-label">Stage</div>
-
-      <div class="stage-block">
-        <div class="stage-sublabel">Topics</div>
-        <div class="form-compact">
-          <textarea id="topicsInput" placeholder="One topic per line" rows="6"></textarea>
-        </div>
-        <div class="button-row">
-          <button id="updateTopicsBtn" class="dock-btn btn-update">Update</button>
-          <button id="clearTopicsBtn" class="dock-btn btn-clear">Clear</button>
-          <button id="toggleTopicsBtn" class="dock-btn">Show</button>
-        </div>
-      </div>
-
-      <div class="stage-block">
-        <div class="stage-sublabel">Call-In</div>
-        <div class="form-compact">
-          <input type="text" id="callInInput" placeholder="Call-in link or phone #">
-        </div>
-        <div class="button-row">
-          <button id="updateCallInBtn" class="dock-btn btn-update">Update</button>
-          <button id="toggleCallInBtn" class="dock-btn">Show</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Call Log Section -->
-    <div class="dock-section">
-      <div class="section-header">
-        <div class="section-label">Call Log</div>
-        <div>
-          <button class="dock-btn-mini" id="exportLogBtn" title="Export Log">&#8681;</button>
-          <button class="dock-btn-mini" id="clearLogBtn" title="Clear Log">&#128465;</button>
-        </div>
-      </div>
-      <div class="log-compact" id="callLog">
-        <div class="log-empty-compact">No calls logged yet</div>
-      </div>
-    </div>
-
-    <!-- Scene Card & Segment Timer Section -->
-    <div class="dock-section">
-      <div class="section-label">Scene &amp; Segment Timer</div>
-
-      <div class="stage-block">
-        <div class="stage-sublabel">Scene Card</div>
-        <div class="button-row scene-btn-row">
-          <button type="button" class="dock-btn scene-btn" id="sceneStartingSoonBtn" data-scene-key="starting-soon">Starting Soon</button>
-          <button type="button" class="dock-btn scene-btn" id="sceneBrbBtn" data-scene-key="brb">BRB</button>
-          <button type="button" class="dock-btn scene-btn" id="sceneEndingBtn" data-scene-key="ending">Ending</button>
-        </div>
-        <div class="form-compact">
-          <input type="text" id="sceneMessageInput" placeholder="Subline (optional) — e.g. back in 5" maxlength="120">
-        </div>
-        <div class="button-row">
-          <button type="button" class="dock-btn btn-clear" id="sceneClearBtn">Clear Scene</button>
-        </div>
-        <div class="scene-status" id="sceneStatus">No scene showing</div>
-      </div>
-
-      <div class="stage-block">
-        <div class="stage-sublabel">Segment Countdown</div>
-        <div class="form-compact">
-          <input type="text" id="segmentLabelInput" placeholder="Label — e.g. Break, Q&amp;A, Rebuttal" maxlength="40">
-        </div>
-        <div class="segment-duration-row">
-          <input type="number" id="segmentDurationInput" placeholder="Minutes" min="0.5" max="60" step="0.5" value="5">
-          <button type="button" class="dock-btn btn-update" id="segmentStartBtn">Start</button>
-        </div>
-        <div class="button-row">
-          <button type="button" class="dock-btn btn-stop" id="segmentStopBtn">Stop</button>
-          <button type="button" class="dock-btn btn-clear" id="segmentResetBtn">Reset</button>
-        </div>
-        <div class="timer-compact">
-          <div class="timer-display-compact" id="segmentTimerDisplay">0:00</div>
-          <div class="timer-status-compact" id="segmentTimerStatus">STOPPED</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Scoreboard Section - live per-side tally, keyed off the same
-         CALLER.STANCES the caller/queue stance selects use. -->
-    <div class="dock-section">
-      <div class="section-header">
-        <div class="section-label">Scoreboard</div>
-        <button id="toggleScoreboardBtn" class="scoreboard-toggle-btn" title="Show/Hide Scoreboard Overlay">Show</button>
-      </div>
-      <div class="scoreboard-control-rows" id="scoreboardControlRows"></div>
-      <div class="button-row" style="margin-top: 10px;">
-        <button id="resetScoreboardBtn" class="dock-btn btn-clear">Reset All</button>
-      </div>
-    </div>
-
-    <!-- Claim / Resolution Banner Section -->
-    <div class="dock-section">
-      <div class="section-label">Claim / Resolution</div>
-      <div class="form-compact">
-        <input type="text" id="claimTextInput" placeholder="e.g., RESOLVED: The Gospels are historically reliable" maxlength="200">
-      </div>
-      <div class="form-compact">
-        <input type="text" id="claimSubtextInput" placeholder="Attribution or qualifier (optional)" maxlength="150">
-      </div>
-      <div class="button-row">
-        <button type="button" id="updateClaimBtn" class="dock-btn btn-update">Update</button>
-        <button type="button" id="toggleClaimBtn" class="dock-btn">Show</button>
-      </div>
-    </div>
-
-    <!-- Ticker Section -->
-    <div class="dock-section">
-      <div class="section-label">Ticker</div>
-      <div class="form-compact">
-        <textarea id="tickerInput" placeholder="One item per line — handles, next topic, announcements" rows="4"></textarea>
-      </div>
-      <div class="button-row">
-        <button id="updateTickerBtn" class="dock-btn btn-update">Update</button>
-        <button id="clearTickerBtn" class="dock-btn btn-clear">Clear</button>
-        <button id="toggleTickerBtn" class="dock-btn">Show</button>
-      </div>
-    </div>
-
-  </div>
+  <!-- First script after the panels, and ahead of socket.io and the control
+       modules on purpose. The markup ships #tab-overlays selected; if the
+       operator left the dock on Scene or Score, dock-tabs.js is what corrects
+       it, and every parser-blocking script it sits behind is another chance for
+       the browser to paint the default tab first. It depends on none of them —
+       no socket, and both node sets it queries are inside <main> above. -->
+  <script src="js/dock-tabs.js"></script>
 
   <script src="/socket.io/socket.io.js"></script>
   <script src="js/sanitize.js"></script>
@@ -320,21 +398,50 @@
   <script src="js/scoreboard-control.js"></script>
   <script src="js/claim-control.js"></script>
   <script src="js/ticker-control.js"></script>
+  <!-- After caller-control.js so window.CallerControl.socket exists, and after
+       dock-tabs.js above because it calls into window.DockTabs. -->
+  <script src="js/dock-onair.js"></script>
   <script>
     // OBS Setup modal
+    //
+    // This dialog declares aria-modal="true", which tells assistive tech that
+    // everything outside it is inert. Nothing else enforces that, so the
+    // keyboard has to: focus moves in on open, cannot Tab back out, and returns
+    // to whatever opened the dialog on close — every close path, not just the
+    // button. Without this the attribute is a promise the page does not keep,
+    // which leaves an AT user worse off than no attribute at all.
     const modalOverlay = document.getElementById('modalOverlay');
     const showConfigModal = document.getElementById('showConfigModal');
+    const closeModalBtn = document.getElementById('closeModal');
+    let obsModalOpener = null;
 
-    document.getElementById('showInstructions').addEventListener('click', () => {
+    function openObsModal() {
+      obsModalOpener = document.activeElement;
       modalOverlay.classList.add('active');
-    });
+      closeModalBtn.focus();
+    }
 
-    document.getElementById('closeModal').addEventListener('click', () => {
+    function closeObsModal() {
       modalOverlay.classList.remove('active');
-    });
+      // The opener could have been re-rendered away while the dialog was up.
+      if (obsModalOpener && document.contains(obsModalOpener)) obsModalOpener.focus();
+      obsModalOpener = null;
+    }
+
+    document.getElementById('showInstructions').addEventListener('click', openObsModal);
+    closeModalBtn.addEventListener('click', closeObsModal);
 
     modalOverlay.addEventListener('click', (e) => {
-      if (e.target === modalOverlay) modalOverlay.classList.remove('active');
+      if (e.target === modalOverlay) closeObsModal();
+    });
+
+    // Close is the only focusable control in this dialog, so the trap is just
+    // refusing to leave it. The listener sits on the overlay, so it only ever
+    // fires while focus is already inside.
+    modalOverlay.addEventListener('keydown', (e) => {
+      if (e.key !== 'Tab') return;
+      e.preventDefault();
+      closeModalBtn.focus();
     });
 
     document.addEventListener('keydown', (e) => {
@@ -342,7 +449,7 @@
         if (showConfigModal.classList.contains('active')) {
           ShowConfigModal.close();
         } else if (modalOverlay.classList.contains('active')) {
-          modalOverlay.classList.remove('active');
+          closeObsModal();
         }
       }
     });
