@@ -118,90 +118,61 @@
 
   <main class="dock-main">
 
-    <!-- ══ PINNED ZONE — everything touched constantly; never scrolls away ══ -->
-    <section class="dock-live" aria-label="Live caller controls">
+    <!-- ══ BAR — the one thing that must stay readable from every tab, and
+         then the tabs themselves. Who is live and for how long is the only
+         caller state the operator reads while working in Overlays, Scene or
+         Score, so it is the only caller state kept out of the panels.
+         Everything else about a caller — the form, the timer buttons, the
+         queue, the log — is one Alt+1 away. ══ -->
+    <div class="dock-bar">
 
-      <!-- Call timer + current caller, merged: they are read together. -->
-      <div class="dock-section">
-        <h2 class="section-label">Live Caller</h2>
-        <div class="live-card-grid">
-          <div class="current-display">
-            <div class="current-name" id="currentName">No caller live</div>
-            <div class="current-pronouns" id="currentPronouns"></div>
-            <div class="current-stance" id="currentStance" data-stance=""></div>
-          </div>
-          <div class="timer-section">
-            <div class="timer-compact">
-              <div class="timer-display-compact" id="timerDisplay">00:00</div>
-              <div class="timer-status-compact" id="timerStatus">STOPPED</div>
-            </div>
-            <div class="timer-controls">
-              <button class="dock-btn btn-start" id="startTimerBtn" aria-label="Start call timer" title="Start Timer">&#9658;</button>
-              <button class="dock-btn btn-stop" id="stopTimerBtn" aria-label="Stop call timer" title="Stop Timer">&#9632;</button>
-            </div>
-          </div>
-        </div>
+      <!-- Deliberately NOT a live region: the clock inside ticks once a second
+           and aria-live would announce it once a second. role="group" because
+           a bare div maps to `generic`, on which ARIA 1.2 prohibits aria-label
+           — the same reason .onair-strip carries one. -->
+      <div class="live-line" role="group" aria-label="Live caller">
+        <div class="current-name" id="currentName">No caller live</div>
+        <div class="current-pronouns" id="currentPronouns"></div>
+        <div class="current-stance" id="currentStance" data-stance=""></div>
+        <span class="live-timer">
+          <span class="sr-only">Call time</span>
+          <div class="timer-display-compact" id="timerDisplay">00:00</div>
+          <div class="timer-status-compact" id="timerStatus">STOPPED</div>
+        </span>
       </div>
 
-      <!-- Input Form Section — the whole form stays in the pinned zone. A
-           `required` control inside a closed <details> or a hidden panel is
-           not focusable, and Chromium then aborts the submit silently. -->
-      <div class="dock-section">
-        <h2 class="section-label">Update Caller</h2>
-        <form id="callerForm">
-          <div class="form-compact">
-            <label class="sr-only" for="name">Caller name</label>
-            <input type="text" id="name" name="name" placeholder="Caller name" required>
-          </div>
-          <div class="form-row">
-            <label class="sr-only" for="pronouns">Pronouns</label>
-            <input type="text" id="pronouns" name="pronouns" placeholder="Pronouns (e.g., they/them)">
-            <label class="sr-only" for="stance">Stance</label>
-            <select id="stance" name="stance" class="stance-select">
-              <option value="">— Stance —</option>
-              <option value="theist">Theist</option>
-              <option value="atheist">Atheist</option>
-              <option value="agnostic">Agnostic</option>
-              <option value="christian">Christian</option>
-              <option value="muslim">Muslim</option>
-              <option value="jewish">Jewish</option>
-              <option value="undecided">Undecided</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
-          <div class="button-row">
-            <button type="submit" class="dock-btn btn-update">Update</button>
-            <button type="button" id="clearBtn" class="dock-btn btn-clear">Clear</button>
-          </div>
-        </form>
+      <div class="tab-bar" role="tablist" aria-label="Dock sections">
+        <button class="tab active" id="tabbtn-callers" role="tab"
+                aria-selected="true" aria-controls="tab-callers" tabindex="0" data-tab="callers">Callers</button>
+        <button class="tab" id="tabbtn-overlays" role="tab"
+                aria-selected="false" aria-controls="tab-overlays" tabindex="-1" data-tab="overlays">Overlays</button>
+        <button class="tab" id="tabbtn-scene" role="tab"
+                aria-selected="false" aria-controls="tab-scene" tabindex="-1" data-tab="scene">Scene</button>
+        <button class="tab" id="tabbtn-score" role="tab"
+                aria-selected="false" aria-controls="tab-score" tabindex="-1" data-tab="score">Score</button>
       </div>
+    </div>
 
-      <!-- Caller Queue Section — the list itself is pinned, so the promote
-           button is a zero-scroll target at every dock size. The two cold
-           sub-blocks below it are disclosures: one click, no tab switch, and
-           nothing above them moves when they open. -->
-      <div class="dock-section queue-section">
-        <div class="section-header">
-          <h2 class="section-label">Caller Queue <span class="queue-count" id="queueCount">(0)</span></h2>
-          <button class="dock-btn-mini" id="clearQueueBtn" aria-label="Clear the whole queue" title="Clear Queue">&#128465;</button>
-        </div>
+    <!-- ══ PANELS — the only element on the page that scrolls ══ -->
+    <div class="dock-panels">
 
-        <div class="queue-list" id="queueList">
-          <div class="queue-empty">Queue is empty</div>
-        </div>
+      <!-- Tasks 1-3 of a live segment: put someone on air, watch the call,
+           queue the next one. Default tab, so this is what first paint shows
+           and the promote button is a zero-scroll target on arrival. -->
+      <div class="tab-content active" id="tab-callers" role="tabpanel" aria-labelledby="tabbtn-callers" tabindex="0">
 
-        <details class="dock-disclosure" id="disclosureQueueAdd" data-disclosure="queueAdd">
-          <summary>Add a caller to the queue</summary>
-          <form id="queueForm">
+        <div class="dock-section">
+          <h2 class="section-label">Update Caller</h2>
+          <form id="callerForm">
             <div class="form-compact">
-              <label class="sr-only" for="queueName">Queued caller name</label>
-              <input type="text" id="queueName" placeholder="Caller name" required>
+              <label class="sr-only" for="name">Caller name</label>
+              <input type="text" id="name" name="name" placeholder="Caller name" required>
             </div>
             <div class="form-row">
-              <label class="sr-only" for="queuePronouns">Queued caller pronouns</label>
-              <input type="text" id="queuePronouns" placeholder="Pronouns">
-              <label class="sr-only" for="queueStance">Queued caller stance</label>
-              <select id="queueStance" class="stance-select">
+              <label class="sr-only" for="pronouns">Pronouns</label>
+              <input type="text" id="pronouns" name="pronouns" placeholder="Pronouns (e.g., they/them)">
+              <label class="sr-only" for="stance">Stance</label>
+              <select id="stance" name="stance" class="stance-select">
                 <option value="">— Stance —</option>
                 <option value="theist">Theist</option>
                 <option value="atheist">Atheist</option>
@@ -213,53 +184,94 @@
                 <option value="other">Other</option>
               </select>
             </div>
-            <div class="form-compact">
-              <label class="sr-only" for="queueTopic">Topic or position</label>
-              <input type="text" id="queueTopic" placeholder="Topic / position (optional)">
-            </div>
-            <div class="form-compact">
-              <label class="sr-only" for="queuePlatform">Platform</label>
-              <input type="text" id="queuePlatform" placeholder="Platform — phone, Discord… (optional)">
-            </div>
-            <!-- Secondary weight on purpose: this one files a caller away, it
-                 does not put anyone on air. -->
             <div class="button-row">
-              <button type="submit" class="dock-btn btn-clear" id="addQueueBtn">Add to queue</button>
+              <button type="submit" class="dock-btn btn-update">Update</button>
+              <button type="button" id="clearBtn" class="dock-btn btn-clear">Clear</button>
             </div>
           </form>
-        </details>
 
-        <details class="dock-disclosure" id="disclosureCallLog" data-disclosure="callLog">
-          <summary>Call log</summary>
+          <!-- Outside the form on purpose. Neither button declares a type, and
+               a typeless button inside a form is a submit button — it would
+               fire #callerForm every time the operator started the clock.
+               type="button" is the second guard. -->
+          <div class="timer-controls-row">
+            <span class="stage-sublabel">Call timer</span>
+            <button type="button" class="dock-btn btn-start" id="startTimerBtn" aria-label="Start call timer" title="Start Timer">&#9658;</button>
+            <button type="button" class="dock-btn btn-stop" id="stopTimerBtn" aria-label="Stop call timer" title="Stop Timer">&#9632;</button>
+          </div>
+        </div>
+
+        <!-- The queue and its two cold sub-blocks. The disclosures stay
+             disclosures: one click, no tab switch, and nothing above them
+             moves when they open. -->
+        <div class="dock-section queue-section">
           <div class="section-header">
-            <span></span>
-            <div>
-              <button class="dock-btn-mini" id="exportLogBtn" aria-label="Export call log" title="Export Log">&#8681;</button>
-              <button class="dock-btn-mini" id="clearLogBtn" aria-label="Clear call log" title="Clear Log">&#128465;</button>
+            <h2 class="section-label">Caller Queue <span class="queue-count" id="queueCount">(0)</span></h2>
+            <button class="dock-btn-mini" id="clearQueueBtn" aria-label="Clear the whole queue" title="Clear Queue">&#128465;</button>
+          </div>
+
+          <div class="queue-list" id="queueList">
+            <div class="queue-empty">Queue is empty</div>
+          </div>
+
+          <details class="dock-disclosure" id="disclosureQueueAdd" data-disclosure="queueAdd">
+            <summary>Add a caller to the queue</summary>
+            <form id="queueForm">
+              <div class="form-compact">
+                <label class="sr-only" for="queueName">Queued caller name</label>
+                <input type="text" id="queueName" placeholder="Caller name" required>
+              </div>
+              <div class="form-row">
+                <label class="sr-only" for="queuePronouns">Queued caller pronouns</label>
+                <input type="text" id="queuePronouns" placeholder="Pronouns">
+                <label class="sr-only" for="queueStance">Queued caller stance</label>
+                <select id="queueStance" class="stance-select">
+                  <option value="">— Stance —</option>
+                  <option value="theist">Theist</option>
+                  <option value="atheist">Atheist</option>
+                  <option value="agnostic">Agnostic</option>
+                  <option value="christian">Christian</option>
+                  <option value="muslim">Muslim</option>
+                  <option value="jewish">Jewish</option>
+                  <option value="undecided">Undecided</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <div class="form-compact">
+                <label class="sr-only" for="queueTopic">Topic or position</label>
+                <input type="text" id="queueTopic" placeholder="Topic / position (optional)">
+              </div>
+              <div class="form-compact">
+                <label class="sr-only" for="queuePlatform">Platform</label>
+                <input type="text" id="queuePlatform" placeholder="Platform — phone, Discord… (optional)">
+              </div>
+              <!-- Secondary weight on purpose: this one files a caller away, it
+                   does not put anyone on air. -->
+              <div class="button-row">
+                <button type="submit" class="dock-btn btn-clear" id="addQueueBtn">Add to queue</button>
+              </div>
+            </form>
+          </details>
+
+          <details class="dock-disclosure" id="disclosureCallLog" data-disclosure="callLog">
+            <summary>Call log</summary>
+            <div class="section-header">
+              <span></span>
+              <div>
+                <button class="dock-btn-mini" id="exportLogBtn" aria-label="Export call log" title="Export Log">&#8681;</button>
+                <button class="dock-btn-mini" id="clearLogBtn" aria-label="Clear call log" title="Clear Log">&#128465;</button>
+              </div>
             </div>
-          </div>
-          <div class="log-compact" id="callLog">
-            <div class="log-empty-compact">No calls logged yet</div>
-          </div>
-        </details>
+            <div class="log-compact" id="callLog">
+              <div class="log-empty-compact">No calls logged yet</div>
+            </div>
+          </details>
+        </div>
       </div>
-    </section>
-
-    <!-- ══ TABS — everything touched occasionally ══ -->
-    <div class="tab-bar" role="tablist" aria-label="Overlay control groups">
-      <button class="tab active" id="tabbtn-overlays" role="tab"
-              aria-selected="true" aria-controls="tab-overlays" tabindex="0" data-tab="overlays">Overlays</button>
-      <button class="tab" id="tabbtn-scene" role="tab"
-              aria-selected="false" aria-controls="tab-scene" tabindex="-1" data-tab="scene">Scene</button>
-      <button class="tab" id="tabbtn-score" role="tab"
-              aria-selected="false" aria-controls="tab-score" tabindex="-1" data-tab="score">Score</button>
-    </div>
-
-    <div class="dock-panels">
 
       <!-- The four "typed once, toggled occasionally" persistent overlays.
            They share one interaction shape: text field → Update → Show/Hide. -->
-      <div class="tab-content active" id="tab-overlays" role="tabpanel" aria-labelledby="tabbtn-overlays" tabindex="0">
+      <div class="tab-content" id="tab-overlays" role="tabpanel" aria-labelledby="tabbtn-overlays" tabindex="0" hidden>
 
         <div class="dock-section">
           <h2 class="section-label">Topics</h2>
@@ -380,10 +392,10 @@
   </main>
 
   <!-- First script after the panels, and ahead of socket.io and the control
-       modules on purpose. The markup ships #tab-overlays selected; if the
-       operator left the dock on Scene or Score, dock-tabs.js is what corrects
-       it, and every parser-blocking script it sits behind is another chance for
-       the browser to paint the default tab first. It depends on none of them —
+       modules on purpose. The markup ships #tab-callers selected; if the
+       operator left the dock on Overlays, Scene or Score, dock-tabs.js is what
+       corrects it, and every parser-blocking script it sits behind is another
+       chance for the browser to paint the default tab first. It depends on none of them —
        no socket, and both node sets it queries are inside <main> above. -->
   <script src="js/dock-tabs.js"></script>
 

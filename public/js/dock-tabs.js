@@ -1,6 +1,6 @@
 /**
  * Dock Tab Bar
- * Drives the dock's three control tabs (Overlays / Scene / Score) to the
+ * Drives the dock's four sections (Callers / Overlays / Scene / Score) to the
  * WAI-ARIA APG Tabs pattern — roving tabindex, arrow/Home/End keys, automatic
  * activation — and remembers the operator's tab and open disclosures across
  * reloads (an OBS dock reloads whenever OBS restarts).
@@ -23,8 +23,11 @@
   const TAB_KEY = 'obs-dock-active-tab';
   const DISC_KEY = 'obs-dock-disclosures';
 
-  const TABS = ['overlays', 'scene', 'score'];
-  const DEFAULT_TAB = 'overlays';
+  // Ordered by how often the operator touches each during a live segment, so
+  // the most-used section is both leftmost and Alt+1. A tab stored by an older
+  // build is still one of these four, so it is still honoured on reload.
+  const TABS = ['callers', 'overlays', 'scene', 'score'];
+  const DEFAULT_TAB = 'callers';
 
   const tabButtons = Array.prototype.slice.call(
     document.querySelectorAll('.tab-bar [role="tab"]')
@@ -120,7 +123,7 @@
   }
 
   /**
-   * Alt+1/2/3 from anywhere in the dock. Alt rather than a bare digit: bare
+   * Alt+1/2/3/4 from anywhere in the dock. Alt rather than a bare digit: bare
    * digits would type into the segment duration field and every text input,
    * and WCAG 2.1.4 requires bare single-character shortcuts to be remappable
    * or focus-scoped. Alt+digit collides with nothing inside an OBS dock.
@@ -129,11 +132,15 @@
    * fires for the top digit row only and never for the numpad — and Alt+numpad
    * is the Windows Alt-code input method, whose digit presses do arrive as
    * keydowns with altKey set and event.key '1'. It is layout-proof for free:
-   * the top row reports Digit1..Digit3 whatever the keyboard prints on it.
+   * the top row reports Digit1..Digit4 whatever the keyboard prints on it.
    *
    * Requiring Alt keeps the digit out of a text field, but it does not stop
    * .focus() from yanking the caret out of one, so the focus move is dropped
-   * when the shortcut is fired from inside a field. The tab still switches.
+   * when the shortcut fires from inside a field AND lands on the tab already
+   * showing. When it switches tab, that field is about to be hidden - a hidden
+   * element is not rendered and so is not a focusable area, and what the
+   * browser then does with the orphaned focus is its own business. The new tab
+   * button is the only landing place this code controls.
    * @param {KeyboardEvent} event
    */
   function handleShortcut(event) {
@@ -153,7 +160,13 @@
     const inField = event.target.closest
       && event.target.closest('input, textarea, select, [contenteditable]');
 
-    selectTab(TABS[index], !inField);
+    const target = TABS[index];
+    const current = tabButtons.find(
+      (btn) => btn.getAttribute('aria-selected') === 'true'
+    );
+    const changing = !current || current.getAttribute('data-tab') !== target;
+
+    selectTab(target, changing || !inField);
   }
 
   // ============================================

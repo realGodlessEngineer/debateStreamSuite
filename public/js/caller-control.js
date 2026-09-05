@@ -248,8 +248,11 @@
    * @param {Object} data - Caller data { name, pronouns, stance, timerStartedAt }
    */
   function updateCallerDisplay(data) {
-    elements.currentName.textContent = data.name || '-';
-    elements.currentPronouns.textContent = data.pronouns || '-';
+    // The live line is always on screen now, so its idle text is read on every
+    // tab. A bare "-" was fine inside a card the operator opened on purpose; as
+    // permanent chrome it has to say what it means.
+    elements.currentName.textContent = data.name || 'No caller live';
+    elements.currentPronouns.textContent = data.pronouns || '';
 
     if (elements.currentStance) {
       const label = STANCE_LABELS[data.stance] || '';

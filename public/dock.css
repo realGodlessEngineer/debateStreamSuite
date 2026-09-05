@@ -17,11 +17,10 @@
 /* ========================================
    Dock shell
 
-   Three fixed bands (title bar / show-config bar / on-air strip) and then
-   <main>, which takes the rest and splits it again into the pinned live-caller
-   zone, the tab bar and the scrolling panel region. The page itself never
-   scrolls at any dock size; scrolling belongs to .dock-panels, and to
-   .dock-live only when the dock is too short to show the pinned zone whole.
+   Four fixed bands (title bar / show-config bar / on-air strip / .dock-bar)
+   and then one scrolling panel region. The page itself never scrolls at any
+   dock size and .dock-panels is the only element that does - nothing inside it
+   is sticky, so a focused control can never end up underneath the chrome.
    ======================================== */
 
 html,
@@ -43,31 +42,47 @@ body {
   overflow: hidden;
 }
 
-/* The panel row gets a floor rather than a bare 1fr. An auto row is maximised
-   before a flexible one gets anything, so on a narrow rail - where the pinned
-   zone alone measures ~700px against a 900px dock - the panels would otherwise
-   be handed 0px and the tabs would be useless. The floor is inert wherever the
-   pinned zone already fits: at 720px+ the panels take ~390px on their own. */
+/* Two rows now, and the panel row needs no floor. The floor existed to stop an
+   auto-sized pinned zone from starving the panels - an auto row is maximised
+   before a flexible one gets anything - and there is no longer an auto row of
+   variable height above the panels. .dock-bar is a fixed band. */
 .dock-main {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  grid-template-rows: auto auto minmax(clamp(140px, 26vh, 280px), 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
   min-height: 0;
 }
 
-/* overflow-y rather than hidden: when the rail is too short to show the whole
-   pinned zone, the operator gets a scrollbar rather than an unreachable Clear
-   button. Measured, it never appears at 720px wide or more; at 250-400px the
-   pinned zone is 680-740px of content and does scroll.
+/* The live line and the tab bar. Below 720px they stack; at 720px+ they share
+   one row (see the media query), which is what returns 33px to the panels on a
+   short bottom rail. Grid areas rather than `order`: the live line holds
+   nothing focusable, so a DOM/visual mismatch cannot disturb focus order. */
+.dock-bar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: "live" "tabs";
+  background: var(--color-bg-input-solid, #0a0a0a);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
 
-   position: relative because the .sr-only labels inside are absolutely
-   positioned. With no positioned ancestor their containing block is the page,
-   which lets them escape every overflow:hidden between here and the root and
-   stretch the document's scroll area down to their static position. */
-.dock-live {
+/* The only caller state kept out of the panels: who is live, and for how long.
+   Nothing here is interactive - Clear ends a call and must not sit in a strip
+   the operator reads rather than aims at.
+
+   position: relative because the .sr-only "Call time" label inside is
+   absolutely positioned. With no positioned ancestor its containing block is
+   the page, which lets it escape every overflow:hidden between here and the
+   root and stretch the document's scroll area down to its static position. */
+.live-line {
   position: relative;
-  padding: 12px 12px 0;
-  overflow-y: auto;
+  grid-area: live;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  min-height: 32px;
+  padding: 4px 12px;
+  border-bottom: 1px solid var(--color-surface-border, #2d2d2d);
 }
 
 /* min-height: 0 is load-bearing. A grid row defaults to a min-content floor
@@ -259,18 +274,17 @@ body {
    is deliberately NOT linked here - it drags in Quran/dictionary/fallacy
    accents the dock has no use for.
 
-   The tab bar sits on --color-bg-card over the near-black body, not on the
-   elevated card surface: the same tab colours over #1f1f1f drop to 4.17/3.95
-   and fail WCAG 1.4.3.
+   The tab bar sits on the .dock-bar band (#0a0a0a) rather than the elevated
+   card surface: the same tab colours over #1f1f1f drop to 4.17/3.95 and fail
+   WCAG 1.4.3. Over #0a0a0a they measure 9.1:1 and 6.5:1.
    ======================================== */
 
 .tab-bar {
+  grid-area: tabs;
   display: flex;
   flex-wrap: wrap;
   gap: 0;
   padding: 0 12px;
-  background: var(--color-bg-card, rgba(255, 255, 255, 0.03));
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .tab {
@@ -344,40 +358,43 @@ body {
 }
 
 /* ========================================
-   Live Caller card
+   Live caller readout
 
-   The call timer and the current-caller readout merged into one card: they are
-   read together, and two bordered boxes cost 118px more than one.
+   The five elements of the live line, plus the Start/Stop row that stayed
+   behind in the Callers tab. .timer-compact and the base .timer-display-compact
+   size below are shared with the segment countdown on the Scene tab, so the
+   live line overrides them by id rather than editing the shared rule.
    ======================================== */
 
-.live-card-grid {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 10px;
-  align-items: center;
-}
-
-.current-display {
-  min-width: 0;
-}
-
+/* flex: 1 1 60px so the name is what yields when the line is narrow, and
+   min-width: 0 so it can actually ellipsis rather than force the timer out. */
 .current-name {
-  font-size: 18px;
+  flex: 1 1 60px;
+  min-width: 0;
+  font-size: 14px;
   font-weight: 700;
+  line-height: 1.3;
   color: var(--color-primary-light, #ff5a67);
-  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .current-pronouns {
-  font-size: 14px;
+  font-size: 12px;
+  line-height: 1.3;
   color: var(--color-text-muted, #b0b0b0);
+  white-space: nowrap;
 }
 
-.timer-section {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 6px;
+/* margin-left: auto rather than the old .timer-compact text-align, and one
+   inline-flex so the clock and its status wrap to the next line as a unit. */
+.live-timer {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-left: auto;
+  white-space: nowrap;
 }
 
 .timer-compact {
@@ -404,9 +421,55 @@ body {
   animation: pulse 2s infinite;
 }
 
-.timer-controls {
+/* 20px rather than the shared 24px: the line is 32px tall. Still >=18.5px bold,
+   so #e63946 on #0a0a0a is judged as large text at 4.75:1 against a 3:1 need.
+   tabular-nums so the digits do not jitter as the seconds roll over. */
+#timerDisplay {
+  font-size: 20px;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+#timerStatus {
+  margin-top: 0;
+  line-height: 1;
+}
+
+/* RUNNING/STOPPED is already words, not colour alone; the dot is the glanceable
+   channel. A pseudo-element survives the textContent replacement caller-control
+   does, and .active is a class it already toggles - no :has(), no extra JS. */
+#timerStatus::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 4px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  vertical-align: middle;
+}
+
+#timerStatus.active::before {
+  background: currentColor;
+}
+
+/* The chip sets a 6px top margin for the old stacked card; in the line it is
+   one flex item among five. */
+.live-line .current-stance {
+  margin: 0;
+}
+
+/* Start/Stop, left behind in the Callers tab. The label takes the free space so
+   the two buttons sit at the right edge, under the Update/Clear row above. */
+.timer-controls-row {
   display: flex;
-  gap: 5px;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.timer-controls-row .stage-sublabel {
+  margin: 0 auto 0 0;
 }
 
 /* Form Section */
@@ -489,12 +552,24 @@ textarea::placeholder {
   background: var(--color-primary-dark, #b91c1c);
 }
 
+/* Two buttons wear .btn-stop and they are not the same shape: #stopTimerBtn
+   is a 40px square holding a square glyph, #segmentStopBtn carries the word
+   "Stop" beside Reset. The square sizing therefore belongs to the icon button,
+   not to the class - on the class it clipped "Stop" to 40px and painted it
+   underneath Reset at any dock narrower than ~500px. */
 .btn-stop {
   background: #3a3a3a;
   color: white;
+}
+
+#stopTimerBtn {
   width: 40px;
   padding: 8px;
   font-size: 14px;
+}
+
+#segmentStopBtn {
+  flex: 1;
 }
 
 .btn-stop:hover:not(:disabled) {
@@ -639,19 +714,14 @@ textarea::placeholder {
   font-size: 11px;
 }
 
-/* Scrollbars - the four regions that scroll internally. .dock-live belongs
-   here too: it is the pinned zone's own scrollbar, it is the only route to a
-   control that has fallen below the clip on a short or narrow dock, and left
-   unstyled it takes Chromium's 15px default - 6% of a 250px rail, and enough
-   to render the pinned cards 9px narrower than the panel cards below them. */
-.dock-live::-webkit-scrollbar,
+/* Scrollbars - the three regions that scroll internally. Left unstyled they
+   take Chromium's 15px default, which is 6% of a 250px rail. */
 .dock-panels::-webkit-scrollbar,
 .log-compact::-webkit-scrollbar,
 .queue-list::-webkit-scrollbar {
   width: 6px;
 }
 
-.dock-live::-webkit-scrollbar-track,
 .dock-panels::-webkit-scrollbar-track,
 .log-compact::-webkit-scrollbar-track,
 .queue-list::-webkit-scrollbar-track {
@@ -659,7 +729,6 @@ textarea::placeholder {
   border-radius: 3px;
 }
 
-.dock-live::-webkit-scrollbar-thumb,
 .dock-panels::-webkit-scrollbar-thumb,
 .log-compact::-webkit-scrollbar-thumb,
 .queue-list::-webkit-scrollbar-thumb {
@@ -667,7 +736,6 @@ textarea::placeholder {
   border-radius: 3px;
 }
 
-.dock-live::-webkit-scrollbar-thumb:hover,
 .dock-panels::-webkit-scrollbar-thumb:hover,
 .log-compact::-webkit-scrollbar-thumb:hover,
 .queue-list::-webkit-scrollbar-thumb:hover {
@@ -936,13 +1004,13 @@ textarea::placeholder {
   font-weight: 600;
 }
 
-/* Pinned but height-bounded, so the promote button is always a zero-scroll
-   target and a long queue can never push the tab bar off-screen. One rule
-   covers every dock height: 198px (~3 callers) at 900px tall, 88px at 400px -
-   still enough for the on-deck caller and its promote button. */
+/* The list scrolls inside the card rather than growing without bound, so the
+   two disclosures below it stay at a predictable place in the panel. Roomier
+   than when the list was pinned - it is inside the scrolling panel now, not
+   competing with it: ~6 callers at 900px tall, ~3 at 400px. */
 .queue-list {
   margin-top: 10px;
-  max-height: clamp(88px, 22vh, 260px);
+  max-height: clamp(120px, 40vh, 420px);
   overflow-y: auto;
 }
 
@@ -1267,8 +1335,8 @@ textarea::placeholder {
    720px  - two 280px columns plus gutters and padding is ~604px; 720px gives
             headroom before a second column is worth having. It is also where
             the old flat layout stopped changing at all.
-   560px tall - bottom-rail / short-float case, where a full-height pinned zone
-            would leave the panels nothing.
+   560px tall - bottom-rail / short-float case, where every band above the
+            panel has to give something back.
    ======================================== */
 
 @media (min-width: 340px) {
@@ -1277,16 +1345,10 @@ textarea::placeholder {
   }
 }
 
-/* A 250px rail cannot carry a 2-row tab bar (75px) and a 3-row on-air strip
-   (85px) on top of a 234px panel floor. Measured with a live caller and three
-   queued: the pinned zone got 402px against 818px of content, and the promote
-   button landed 100px below the clip - not merely cut off but not clickable,
-   since a hit test at its centre returns the element underneath it. That
-   button is the design's headline promise ("0 clicks, list pinned").
-
-   Dropping the tabs' min-width and tightening both bands' padding and font
-   takes the tab bar to 37px/1 row and the strip to 55px/2 rows; with the panel
-   floor the pinned zone goes 402 -> 542px and the hit test passes.
+/* A 250px rail cannot carry a 2-row tab bar and a 3-row on-air strip on top of
+   a usable panel. Dropping the tabs' min-width and tightening both bands'
+   padding and font keeps four tabs in one row (~188px of 250) and the strip at
+   two rows, which is what buys the panel its height back.
 
    .onair-item's min-height: 24px is deliberately untouched - it is the WCAG
    2.5.8 target-size floor, and it survives at every size measured. The strip's
@@ -1313,14 +1375,57 @@ textarea::placeholder {
     font-size: 10px;
   }
 
-  /* The pinned zone is the point of the design, so the panels yield first. */
-  .dock-main {
-    grid-template-rows: auto auto minmax(clamp(120px, 18vh, 200px), 1fr);
+  .live-line {
+    gap: 2px 8px;
+    padding: 3px 8px;
+  }
+
+  /* 18px is below the 18.5px "large text" line, so this size has to clear 4.5:1
+     rather than 3:1. #e63946 on the band's #0a0a0a measures 4.75:1. */
+  #timerDisplay {
+    font-size: 18px;
   }
 }
 
 @media (min-width: 720px) {
-  .dock-live,
+  /* The dock has width to spare and, on a bottom rail, no height to spare -
+     so the live line moves up beside the tabs and hands 33px to the panel.
+     The tab bar stays directly above its panel either way: proximity is what
+     ties a tab to the thing it controls. */
+  .dock-bar {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas: "tabs live";
+    align-items: stretch;
+  }
+
+  /* The name stops flexing here so the five readouts travel together to the
+     right edge instead of the name growing and stranding the clock 700px away
+     from the person it is timing. It still shrinks and ellipsises. */
+  .live-line {
+    justify-content: flex-end;
+    border-bottom: none;
+  }
+
+  .live-line .current-name {
+    flex: 0 1 auto;
+  }
+
+  .live-line .live-timer {
+    margin-left: 0;
+  }
+
+  /* Eight sides stacked is a 300px column on a dock with room for several
+     across. The 210px floor is measured, not chosen: a row spends 16px of
+     padding, 24px of gaps, 72px on the two adjust buttons and ~23px on the
+     tally, so anything narrower truncates "Undecided" and "Agnostic" to
+     "Undec..." - and the label is the only thing telling the operator which
+     side they are about to score. */
+  .scoreboard-control-rows {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 6px;
+  }
+
   .tab-content.active {
     display: grid;
     gap: 10px;
@@ -1328,29 +1433,10 @@ textarea::placeholder {
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   }
 
-  .dock-live > .dock-section,
   .tab-content.active > .dock-section {
     margin-bottom: 0;
   }
 
-  /* Both axes pinned, on both sides of the split. auto-fit resolves its track
-     count from the available space BEFORE placement - 2 tracks at 720-990px,
-     3 at 1000-1190px, 4 at 1200px - so pinning only the queue leaves the
-     Update Caller card to auto-placement, which puts it in column 3 at a wide
-     dock rather than in the row below the live card. Naming column 1 for
-     everything that is not the queue is what actually produces the two-column
-     [live / update | queue] arrangement at every track count.
-
-     auto-fit then collapses the tracks nothing was placed in, so the two
-     columns share the full width instead of huddling in the left half. */
-  .dock-live > .dock-section:not(.queue-section) {
-    grid-column: 1;
-  }
-
-  .dock-live .queue-section {
-    grid-column: 2;
-    grid-row: 1 / span 2;
-  }
 }
 
 @media (max-height: 560px) {
@@ -1359,52 +1445,25 @@ textarea::placeholder {
     margin-bottom: 6px;
   }
 
-  .dock-live {
-    padding: 8px 8px 0;
-  }
-
   .dock-panels {
     padding: 8px;
   }
 
-  /* The 140px floor inverts the design's own priority on a bottom rail: the
-     occasional controls get a guarantee and the constant ones get whatever is
-     left. Measured at 400px tall, that left the pinned zone 111px against
-     315px of content and put Clear - the button that ends a call - 43px below
-     the clip and outside a hit test.
-
-     Not everything fits at 400px and it should not pretend to. What this floor
-     buys is the honest minimum: the merged Live Caller card and the whole
-     Update/Clear row above the fold before the panels get anything. At 400px
-     tall that needs 163px and this yields 179px; the panels drop to 72px and
-     scroll, which is the correct side to lose on - the tab bar stays whole, so
-     the panel is still navigable and still one flick away. */
-  .dock-main {
-    grid-template-rows: auto auto minmax(clamp(72px, 14vh, 140px), 1fr);
-  }
-}
-
-/* A short dock has width to spare and no height to spare, so the three pinned
-   cards sit side by side rather than two of them stacking.
-
-   This is not a cosmetic preference. At 400px tall the chrome above <main>
-   measures 111px and the tab bar 38px, leaving 251px for the pinned zone and
-   the panels together. Stacking the live card (122px) above the Update Caller
-   card (155px) needs 291px before the panels get a single pixel, so Clear is
-   unreachable at every possible panel floor including zero. Side by side, the
-   tallest of the three needs 163px.
-
-   The 200px column floor rather than 280px is what keeps all three in one row
-   down to 720px; it still leaves the stance select its measured 110px. */
-@media (min-width: 720px) and (max-height: 560px) {
-  .dock-live {
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  .show-config-bar {
+    padding: 2px 8px;
   }
 
-  .dock-live > .dock-section:not(.queue-section),
-  .dock-live .queue-section {
-    grid-column: auto;
-    grid-row: auto;
+  .live-line {
+    min-height: 28px;
+    padding: 3px 12px;
+  }
+
+  /* 36 -> 32px. Still well clear of the WCAG 2.5.8 24px floor, and it is what
+     lets the eight scoreboard rows fit a 400px-tall dock without scrolling. */
+  .scoreboard-adj-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
   }
 }
 
