@@ -117,6 +117,7 @@
   let callerVisible = false;
   let transitioning = false;
   let currentTimerStartedAt = null;  // server-clock ms, or null when stopped
+  let currentCallerName = '';        // name on the card now, for swap detection
   let lastScores = {};
   let segment = { label: '', endsAt: null, remainingMs: 0, running: false };
 
@@ -336,13 +337,24 @@
     function doShow() {
       populateCaller(data);
       activateLayout();
+      currentCallerName = data.name || '';
       showElement(elements.callerDisplay);
       callerVisible = true;
       setTimeout(function () { transitioning = false; }, ANIM_BOUNCE_IN);
     }
 
-    // Hide title bar first if visible
-    if (titleBarVisible) {
+    if (callerVisible && (data.name || '') !== currentCallerName) {
+      // A different caller replacing a live one slides the card out and brings
+      // it back in, so the swap reads as new information rather than a name
+      // changing under the operator mid-sentence. Keyed on the name alone:
+      // callerUpdate also fires for a timer start/stop and for a pronoun or
+      // stance correction, and re-animating for those would blank the lower
+      // third for a second in the middle of a call - those update in place.
+      // populateCaller runs inside doShow, i.e. only once the exit has
+      // finished, so the outgoing caller leaves under their own name.
+      hideElement(elements.callerDisplay).then(doShow);
+    } else if (titleBarVisible) {
+      // Hide title bar first if visible
       hideElement(elements.titleBar).then(function () {
         titleBarVisible = false;
         doShow();
@@ -379,6 +391,7 @@
 
       // Clear caller text after hide animation
       populateCaller({ name: '', pronouns: '' });
+      currentCallerName = '';
 
       transitioning = false;
 

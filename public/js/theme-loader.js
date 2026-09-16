@@ -26,6 +26,11 @@
       name: 'Sandstone',
       description: 'Weathered quarried-stone theme with warm ochre accents',
       file: 'css/themes/sandstone.css'
+    },
+    'red-chrome': {
+      name: 'Red Chrome',
+      description: 'Neon red chrome nameplate centered on the stage',
+      file: 'css/themes/red-chrome.css'
     }
   };
 

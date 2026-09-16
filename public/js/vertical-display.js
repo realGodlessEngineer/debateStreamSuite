@@ -60,6 +60,7 @@
   let showInfoVisible = false;
   let callerVisible = false;
   let currentTimerStartedAt = null;  // server-clock ms, or null when stopped
+  let currentCallerName = '';        // name on the card now, for swap detection
 
   // ============================================
   // Socket Connection
@@ -149,12 +150,29 @@
     // No parentheses - the pronouns render as their own pill beside the name
     var pronouns = data.pronouns || '';
 
+    // A different caller replacing a live one slides the card out and brings it
+    // back in, so the swap reads as new information rather than a name changing
+    // under the operator mid-sentence. Keyed on the name alone: callerUpdate
+    // also fires for a timer start/stop and for a pronoun or stance correction,
+    // and re-animating for those would blank the lower third for a second in
+    // the middle of a call - those still update in place. Re-entering only once
+    // the exit resolves is what lets the outgoing caller leave under their own
+    // name; callerVisible is cleared first so the re-entry takes the plain path.
+    if (callerVisible && name !== currentCallerName) {
+      hideElement(elements.callerDisplay).then(function () {
+        callerVisible = false;
+        showCallerCard(data);
+      });
+      return;
+    }
+
     elements.callerName.textContent = name;
     elements.callerPronouns.textContent = pronouns;
     renderStance(elements.callerStance, data.stance);
     // The card's own data-stance drives its accent edge color
     elements.callerCard.setAttribute('data-stance', data.stance || '');
     currentTimerStartedAt = typeof data.timerStartedAt === 'number' ? data.timerStartedAt : null;
+    currentCallerName = name;
     renderTimer();
 
     if (!callerVisible) {
@@ -170,6 +188,7 @@
       elements.callerName.textContent = '';
       elements.callerPronouns.textContent = '';
       currentTimerStartedAt = null;
+      currentCallerName = '';
       renderStance(elements.callerStance, '');
       elements.callerCard.setAttribute('data-stance', '');
       renderTimer();

@@ -1,0 +1,373 @@
+/**
+ * Red Chrome Theme
+ * Neon-red brushed-chrome nameplate for the caller lower third.
+ *
+ * The palette variables feed the shared display/control CSS exactly like the
+ * other themes. What makes this theme different is the *caller card*: instead
+ * of the rounded gradient panel the flat themes draw, it becomes a fixed-aspect
+ * plate backed by images/nameplate-red.png, centered on the stage, sliding up
+ * from below the bottom edge. That is layered on in the
+ * `body[data-theme="red-chrome"]` block at the bottom, so it only touches this
+ * theme and needs no edits to display.css / stage-foreground.css /
+ * vertical-display.css. Same trick sandstone.css uses for its stone surface.
+ *
+ * Deliberately scoped to the caller card alone. The title bar, "Up Next" pill,
+ * scoreboard, claim band and ticker keep their existing chrome, re-tinted by
+ * the variables above. The two lower-third overlays therefore sit in different
+ * places under this theme - the title bar stays bottom-right, the plate is
+ * centered - but they never share the screen, so the swap is a cut, not a
+ * collision.
+ */
+
+:root {
+  /* Theme Metadata */
+  --theme-name: 'Red Chrome';
+  --theme-description: 'Neon red chrome nameplate over a black stage';
+
+  /* Brand Colors - sampled off the plate's neon (#fa1410 core, blown out to
+     #ff2b28 so it clears 4.5:1 against the dock's #0a0a0a band; the older
+     #e63946 sat right on the line). */
+  --color-primary: #ff2b28;
+  --color-primary-dark: #c11310;
+  --color-primary-light: #ff6663;
+  --color-primary-glow: rgba(255, 43, 40, 0.45);
+  --color-primary-subtle: rgba(255, 43, 40, 0.18);
+  --color-primary-border: rgba(255, 43, 40, 0.34);
+
+  /* Accent (for connected status, etc.) */
+  --color-accent: #e01a17;
+  --color-accent-dark: #a81110;
+  --color-accent-glow: rgba(224, 26, 23, 0.32);
+
+  /* Background Colors - the plate's own face is #221614; the page chrome
+     matches it so the dock and the overlay read as one product. */
+  --color-bg-primary: #080707;
+  --color-bg-secondary: #0d0a0a;
+  --color-bg-tertiary: #181312;
+  --color-bg-tinted: #1d0b0a;
+  --color-bg-card: rgba(255, 255, 255, 0.035);
+  --color-bg-card-solid: #221614;
+  --color-bg-input: rgba(0, 0, 0, 0.55);
+  --color-bg-input-solid: #080707;
+  --color-bg-hover: rgba(255, 255, 255, 0.08);
+  --color-bg-dark: #0d0a0a;
+
+  /* Surface Colors - brushed steel edges */
+  --color-surface-border: #33292a;
+  --color-surface-elevated: #221614;
+
+  /* Text Colors */
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #e6e2e2;
+  --color-text-muted: #b4acac;
+  --color-text-dim: #877e7e;
+  --color-text-dimmer: #625b5b;
+
+  /* Status Colors */
+  --color-success: #22c55e;
+  --color-success-bg: rgba(34, 197, 94, 0.2);
+  --color-success-border: rgba(34, 197, 94, 0.5);
+  --color-error: #ff6b6b;
+  --color-error-bg: rgba(220, 53, 69, 0.2);
+  --color-error-border: rgba(220, 53, 69, 0.5);
+  --color-warning: #f59e0b;
+  --color-warning-bg: rgba(245, 158, 11, 0.2);
+  --color-warning-border: rgba(245, 158, 11, 0.5);
+
+  /* Connected Status */
+  --color-connected: #22c55e;
+  --color-connected-glow: rgba(34, 197, 94, 0.5);
+  --color-disconnected: #7f1210;
+
+  /* Shadows */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.6);
+  --shadow-md: 0 4px 20px rgba(255, 43, 40, 0.38);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.75);
+  --shadow-glow: 0 0 22px rgba(200, 25, 22, 0.24);
+
+  /* Scrollbar */
+  --scrollbar-track: transparent;
+  --scrollbar-thumb: var(--color-primary-border);
+  --scrollbar-thumb-hover: var(--color-primary);
+}
+
+/* Body background gradient (control panels; the OBS pages force transparent) */
+body {
+  background: linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-tinted) 100%);
+}
+
+/* ============================================================
+   The nameplate - OBS caller card only
+   ============================================================
+   Every length below is calc(N * var(--u, 1px)). --u is stage-foreground.css's
+   design-pixel unit, so on the consolidated stage the plate scales with the
+   canvas; display.html and vertical-display.html never define it, and the 1px
+   fallback is exactly right there because both are fixed 1920x1080 / 1080x1920
+   pages. Same idiom the stage pages already use, no JS, no resize listener.
+
+   Artwork geometry, measured off images/nameplate-red.png (2172 x 724, RGBA).
+   The file is mostly transparent glow; the plate proper is a narrow band:
+
+       y   0..241   transparent + red bloom above
+       y 242..257   white chrome top rail
+       y 258..414   DARK FACE  <- the only place text may go (#221614)
+       y 415..444   red neon underline
+       y 445..452   chrome sub-bar
+       y 453..723   transparent + red bloom below
+       x   0..299   left chevron cap + neon bar (and mirrored on the right)
+
+   So the padding below is not styling, it is the safe area: it insets the flex
+   row to exactly x 300..1872, y 258..414 of the source, scaled to the rendered
+   plate. Change --plate-w and every inset follows; change the artwork and they
+   all have to be re-measured.
+   ============================================================ */
+
+body[data-theme="red-chrome"] {
+  /* The source is exactly 3:1 (2172 = 3 x 724), so 1500 x 500 is lossless and
+     leaves a 1086 x 108 text band. Sized off the measured worst case rather
+     than taste: the meta cluster and the pronoun pill never shrink, so the
+     name gets 1086 - 32 (gap) - 285 (meta) - 14 - 123 (pronouns) = 632 units,
+     about 23 characters at the 52-unit name below. 1420 was the first cut and
+     clipped "Jonathan Whitfield" at 19. */
+  --plate-w: calc(1500 * var(--u, 1px));
+  --plate-h: calc(500 * var(--u, 1px));
+  --plate-pad-top: calc(178 * var(--u, 1px));
+  --plate-pad-bottom: calc(214 * var(--u, 1px));
+  --plate-pad-x: calc(207 * var(--u, 1px));
+
+  /* Travel for the entrance: enough to park the plate's visible band fully
+     below the canvas edge before it rises. The bar's top edge sits 343 units
+     above the canvas bottom at rest, so 360 clears it with room over. */
+  --plate-travel: calc(360 * var(--u, 1px));
+}
+
+/* ---- Placement: centered on X, lower third on Y ----
+   The base rule pins the overlay 40px from both sides and right-aligns the
+   card; the plate wants the full width and the middle of it. bottom:10 looks
+   flush to the edge but isn't - 258 of the plate box's 500 units sit below the
+   bar, and the last 138 of those are fully transparent in the source, so the
+   bar's own center lands at 75% of canvas height with nothing clipped. */
+body[data-theme="red-chrome"] .caller-overlay {
+  left: 0;
+  right: 0;
+  bottom: calc(10 * var(--u, 1px));
+  /* display:flex is redeclared, not assumed: display.css and
+     stage-foreground.css set it, vertical-display.css does not, and without it
+     justify-content is inert and the plate sits hard against the left edge. */
+  display: flex;
+  justify-content: center;
+  transform: translateY(var(--plate-travel));
+}
+
+/* Lift clear of the ticker crawl, matching the +52 the stage page applies to
+   its own lower third. Needs the theme attribute and .has-ticker on the same
+   compound to out-specify `body.has-ticker .caller-overlay`, which is an exact
+   specificity tie that the theme sheet would otherwise lose on source order -
+   theme-loader.js inserts it ahead of the page stylesheet. */
+body[data-theme="red-chrome"].has-ticker .caller-overlay {
+  bottom: calc(62 * var(--u, 1px));
+}
+
+/* ---- Entrance / exit ----
+   Durations are fixed by the JS, not by taste: caller-display.js,
+   stage-foreground.js and vertical-display.js all hold ANIM_BOUNCE_IN = 700
+   and ANIM_SLIDE_OUT = 400 and time their state changes off those numbers. A
+   theme may restyle the motion; it may not change how long it lasts. */
+body[data-theme="red-chrome"] .caller-overlay.visible {
+  animation: plateSlideIn 0.7s cubic-bezier(0.22, 1.15, 0.36, 1) forwards;
+}
+
+body[data-theme="red-chrome"] .caller-overlay.hiding {
+  animation: plateSlideOut 0.4s cubic-bezier(0.55, 0, 0.85, 0.35) forwards;
+}
+
+@keyframes plateSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(var(--plate-travel));
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(calc(-14 * var(--u, 1px)));
+  }
+  80% {
+    transform: translateY(calc(5 * var(--u, 1px)));
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes plateSlideOut {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(var(--plate-travel));
+  }
+}
+
+/* ---- The plate ----
+   .two-host and .one-host are listed explicitly because each sets its own
+   width / min-width / padding at a specificity this block has to beat. Their
+   `display` is left alone: the control modules toggle .active on exactly one
+   of the two, and claiming display here would strand both.
+   background-size is 100% 100% rather than contain so the safe-area padding
+   above stays exact; the box is 3.0021:1 against the source's 3.0000:1, a
+   0.07% stretch that cannot be seen. */
+body[data-theme="red-chrome"] .caller-card,
+body[data-theme="red-chrome"] .caller-card.two-host,
+body[data-theme="red-chrome"] .caller-card.one-host {
+  width: var(--plate-w);
+  height: var(--plate-h);
+  min-width: 0;
+  max-width: 100%;
+  flex-shrink: 0;
+  padding: var(--plate-pad-top) var(--plate-pad-x) var(--plate-pad-bottom);
+  background: url("../../images/nameplate-red.png") center center / 100% 100% no-repeat;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  overflow: hidden;
+  align-items: center;
+  gap: calc(32 * var(--u, 1px));
+}
+
+/* The stance edge is drawn at the left edge of the *box*, which under this
+   theme is empty bloom 196 units clear of the artwork. The stance chip is
+   still there and still carries the color. */
+body[data-theme="red-chrome"] .caller-accent {
+  display: none;
+}
+
+/* ---- Interior ----
+   One line, and only one: the face is 108 units tall at this plate size, so a
+   name that wrapped would climb straight through the chrome rail. nowrap plus
+   ellipsis holds it, and the plate is sized so that lands around 23 characters
+   - a long one truncates cleanly instead of breaking the artwork. */
+body[data-theme="red-chrome"] .caller-name-row {
+  flex-wrap: nowrap;
+  gap: calc(14 * var(--u, 1px));
+  min-width: 0;
+}
+
+body[data-theme="red-chrome"] .caller-name {
+  font-size: calc(52 * var(--u, 1px));
+  line-height: 1.06;
+  letter-spacing: calc(-0.5 * var(--u, 1px));
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  overflow-wrap: normal;
+  min-width: 0;
+  text-shadow: 0 calc(2 * var(--u, 1px)) calc(6 * var(--u, 1px)) rgba(0, 0, 0, 0.85);
+}
+
+body[data-theme="red-chrome"] .caller-label {
+  font-size: calc(15 * var(--u, 1px));
+  letter-spacing: calc(5 * var(--u, 1px));
+  line-height: 1;
+  margin-bottom: calc(3 * var(--u, 1px));
+  color: var(--color-primary);
+  text-shadow: 0 0 calc(12 * var(--u, 1px)) var(--color-primary-glow);
+}
+
+body[data-theme="red-chrome"] .caller-pronouns {
+  font-size: calc(17 * var(--u, 1px));
+  padding: calc(3 * var(--u, 1px)) calc(12 * var(--u, 1px));
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+body[data-theme="red-chrome"] .caller-meta {
+  gap: calc(22 * var(--u, 1px));
+}
+
+body[data-theme="red-chrome"] .caller-stance {
+  font-size: calc(16 * var(--u, 1px));
+  letter-spacing: calc(2 * var(--u, 1px));
+  padding: calc(5 * var(--u, 1px)) calc(18 * var(--u, 1px));
+}
+
+body[data-theme="red-chrome"] .caller-timer {
+  font-size: calc(26 * var(--u, 1px));
+  gap: calc(8 * var(--u, 1px));
+  padding: calc(6 * var(--u, 1px)) calc(14 * var(--u, 1px));
+  border-radius: calc(8 * var(--u, 1px));
+}
+
+body[data-theme="red-chrome"] .caller-timer::before {
+  width: calc(11 * var(--u, 1px));
+  height: calc(11 * var(--u, 1px));
+}
+
+/* ---- Portrait ----
+   vertical-display.html is a fixed 1080x1920 page, so a 1420-unit plate would
+   run 340 units off both sides; the consolidated stage hits this query too.
+   Everything is the same fractions of a 980-unit plate, leaving a 710 x 70
+   band. Plain @media, never @container or :has() - the CEF build OBS bundles
+   varies by release. */
+@media (max-aspect-ratio: 1/1) {
+  body[data-theme="red-chrome"] {
+    --plate-w: calc(980 * var(--u, 1px));
+    --plate-h: calc(327 * var(--u, 1px));
+    --plate-pad-top: calc(117 * var(--u, 1px));
+    --plate-pad-bottom: calc(140 * var(--u, 1px));
+    --plate-pad-x: calc(135 * var(--u, 1px));
+    --plate-travel: calc(300 * var(--u, 1px));
+  }
+
+  /* 60 is the inset both portrait pages already use for their lower third. */
+  body[data-theme="red-chrome"] .caller-overlay {
+    bottom: calc(60 * var(--u, 1px));
+  }
+
+  body[data-theme="red-chrome"].has-ticker .caller-overlay {
+    bottom: calc(112 * var(--u, 1px));
+  }
+
+  body[data-theme="red-chrome"] .caller-card,
+  body[data-theme="red-chrome"] .caller-card.two-host,
+  body[data-theme="red-chrome"] .caller-card.one-host {
+    gap: calc(22 * var(--u, 1px));
+  }
+
+  body[data-theme="red-chrome"] .caller-name {
+    font-size: calc(38 * var(--u, 1px));
+  }
+
+  body[data-theme="red-chrome"] .caller-label {
+    font-size: calc(11 * var(--u, 1px));
+    letter-spacing: calc(3 * var(--u, 1px));
+    margin-bottom: calc(2 * var(--u, 1px));
+  }
+
+  body[data-theme="red-chrome"] .caller-pronouns {
+    font-size: calc(12 * var(--u, 1px));
+    padding: calc(2 * var(--u, 1px)) calc(9 * var(--u, 1px));
+  }
+
+  body[data-theme="red-chrome"] .caller-meta {
+    gap: calc(14 * var(--u, 1px));
+  }
+
+  body[data-theme="red-chrome"] .caller-stance {
+    font-size: calc(11 * var(--u, 1px));
+    letter-spacing: calc(1 * var(--u, 1px));
+    padding: calc(3 * var(--u, 1px)) calc(12 * var(--u, 1px));
+  }
+
+  body[data-theme="red-chrome"] .caller-timer {
+    font-size: calc(18 * var(--u, 1px));
+    gap: calc(6 * var(--u, 1px));
+    padding: calc(4 * var(--u, 1px)) calc(10 * var(--u, 1px));
+  }
+
+  body[data-theme="red-chrome"] .caller-timer::before {
+    width: calc(8 * var(--u, 1px));
+    height: calc(8 * var(--u, 1px));
+  }
+}
